@@ -6,7 +6,6 @@ composer.lock
 .env
 .env.local
 .env.*.local
-config/.env
 
 # IDE
 .idea/

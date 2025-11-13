@@ -11,32 +11,32 @@ use Doctrine\ORM\Mapping as ORM;
 class DProduto
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'id_indicador', type: 'string', length: 50)]
     private string $idIndicador;
 
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 50, options: ['default' => '0'])]
+    #[ORM\Column(name: 'id_subindicador', type: 'string', length: 50, options: ['default' => '0'])]
     private string $idSubindicador;
 
-    #[ORM\Column(type: 'tinyint')]
+    #[ORM\Column(name: 'id_familia', type: 'tinyint')]
     private int $idFamilia;
 
     #[ORM\Column(type: 'string', length: 100)]
     private string $familia;
 
-    #[ORM\Column(type: 'string', length: 100)]
+    #[ORM\Column(name: 'familia_slug', type: 'string', length: 100)]
     private string $familiaSlug;
 
     #[ORM\Column(type: 'string', length: 150)]
     private string $indicador;
 
-    #[ORM\Column(type: 'string', length: 150, unique: true)]
+    #[ORM\Column(name: 'indicador_slug', type: 'string', length: 150, unique: true)]
     private string $indicadorSlug;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     private ?string $subindicador = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'subindicador_slug', type: 'string', length: 150, nullable: true)]
     private ?string $subindicadorSlug = null;
 
     public function getIdIndicador(): string

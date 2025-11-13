@@ -1167,7 +1167,7 @@ function ensureOmegaTemplate(){
   if (existing) return Promise.resolve(existing);
   if (omegaTemplatePromise) return omegaTemplatePromise;
 
-  omegaTemplatePromise = fetch("public/omega.html")
+  omegaTemplatePromise = fetch("/omega.html")
     .then((res) => {
       if (!res.ok) throw new Error(`Falha ao carregar omega.html: ${res.status}`);
       return res.text();
@@ -5100,7 +5100,7 @@ function resolveOmegaDefaultUserHint(detail){
 function buildOmegaLaunchUrl(detail){
   const baseHref = typeof window !== 'undefined' && window.TICKET_URL
     ? window.TICKET_URL
-    : 'public/omega.html';
+    : '/omega.html';
   const origin = (typeof window !== 'undefined' && window.location)
     ? window.location.href
     : 'http://localhost/';

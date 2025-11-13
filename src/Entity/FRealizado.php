@@ -11,79 +11,79 @@ use Doctrine\ORM\Mapping as ORM;
 class FRealizado
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 60)]
+    #[ORM\Column(name: 'registro_id', type: 'string', length: 60)]
     private string $registroId;
 
     #[ORM\Column(type: 'string', length: 100)]
     private string $segmento;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'segmento_id', type: 'string', length: 50)]
     private string $segmentoId;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'diretoria_id', type: 'string', length: 50)]
     private string $diretoriaId;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'diretoria_nome', type: 'string', length: 150)]
     private string $diretoriaNome;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'gerencia_regional_id', type: 'string', length: 50)]
     private string $gerenciaRegionalId;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'gerencia_regional_nome', type: 'string', length: 150)]
     private string $gerenciaRegionalNome;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'regional_nome', type: 'string', length: 150)]
     private string $regionalNome;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'agencia_id', type: 'string', length: 50)]
     private string $agenciaId;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'agencia_nome', type: 'string', length: 150)]
     private string $agenciaNome;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(name: 'gerente_gestao_id', type: 'string', length: 50, nullable: true)]
     private ?string $gerenteGestaoId = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'gerente_gestao_nome', type: 'string', length: 150, nullable: true)]
     private ?string $gerenteGestaoNome = null;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(name: 'gerente_id', type: 'string', length: 50, nullable: true)]
     private ?string $gerenteId = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'gerente_nome', type: 'string', length: 150, nullable: true)]
     private ?string $gerenteNome = null;
 
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(name: 'familia_id', type: 'string', length: 20)]
     private string $familiaId;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'familia_nome', type: 'string', length: 150)]
     private string $familiaNome;
 
-    #[ORM\Column(type: 'string', length: 80)]
+    #[ORM\Column(name: 'id_indicador', type: 'string', length: 80)]
     private string $idIndicador;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'ds_indicador', type: 'string', length: 150)]
     private string $dsIndicador;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     private ?string $subproduto = null;
 
-    #[ORM\Column(type: 'string', length: 80, options: ['default' => '0'])]
+    #[ORM\Column(name: 'id_subindicador', type: 'string', length: 80, options: ['default' => '0'])]
     private string $idSubindicador = '0';
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(name: 'status_id', type: 'string', length: 20, nullable: true)]
     private ?string $statusId = null;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     private ?string $carteira = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'canal_venda', type: 'string', length: 150, nullable: true)]
     private ?string $canalVenda = null;
 
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[ORM\Column(name: 'tipo_venda', type: 'string', length: 100, nullable: true)]
     private ?string $tipoVenda = null;
 
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[ORM\Column(name: 'modalidade_pagamento', type: 'string', length: 100, nullable: true)]
     private ?string $modalidadePagamento = null;
 
     #[ORM\Column(type: 'date')]
@@ -92,25 +92,25 @@ class FRealizado
     #[ORM\Column(type: 'date')]
     private \DateTimeInterface $competencia;
 
-    #[ORM\Column(type: 'decimal', precision: 18, scale: 2)]
+    #[ORM\Column(name: 'realizado_mensal', type: 'decimal', precision: 18, scale: 2)]
     private string $realizadoMensal;
 
-    #[ORM\Column(type: 'decimal', precision: 18, scale: 2, nullable: true)]
+    #[ORM\Column(name: 'realizado_acumulado', type: 'decimal', precision: 18, scale: 2, nullable: true)]
     private ?string $realizadoAcumulado = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $quantidade = null;
 
-    #[ORM\Column(type: 'decimal', precision: 18, scale: 2, nullable: true)]
+    #[ORM\Column(name: 'variavel_real', type: 'decimal', precision: 18, scale: 2, nullable: true)]
     private ?string $variavelReal = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(name: 'familia_codigo', type: 'string', length: 20, nullable: true)]
     private ?string $familiaCodigo = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(name: 'indicador_codigo', type: 'string', length: 20, nullable: true)]
     private ?string $indicadorCodigo = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(name: 'subindicador_codigo', type: 'string', length: 20, nullable: true)]
     private ?string $subindicadorCodigo = null;
 
     public function getRegistroId(): string
@@ -157,4 +157,3 @@ class FRealizado
         return $this;
     }
 }
-

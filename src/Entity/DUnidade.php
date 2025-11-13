@@ -11,43 +11,43 @@ use Doctrine\ORM\Mapping as ORM;
 class DUnidade
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'segmento_id', type: 'string', length: 50)]
     private string $segmentoId;
 
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'diretoria_id', type: 'string', length: 50)]
     private string $diretoriaId;
 
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(name: 'gerencia_regional_id', type: 'string', length: 50)]
     private string $gerenciaRegionalId;
 
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    #[ORM\Column(name: 'agencia_id', type: 'string', length: 50, unique: true)]
     private string $agenciaId;
 
     #[ORM\Column(type: 'string', length: 100)]
     private string $segmento;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'diretoria_regional', type: 'string', length: 150)]
     private string $diretoriaRegional;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(name: 'gerencia_regional', type: 'string', length: 150)]
     private string $gerenciaRegional;
 
     #[ORM\Column(type: 'string', length: 150)]
     private string $agencia;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'gerente_gestao', type: 'string', length: 150, nullable: true)]
     private ?string $gerenteGestao = null;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(name: 'gerente_gestao_id', type: 'string', length: 50, nullable: true)]
     private ?string $gerenteGestaoId = null;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     private ?string $gerente = null;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(name: 'gerente_id', type: 'string', length: 50, nullable: true)]
     private ?string $gerenteId = null;
 
     public function getSegmentoId(): string

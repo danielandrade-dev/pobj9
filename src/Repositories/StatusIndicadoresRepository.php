@@ -7,6 +7,7 @@ namespace Pobj\Api\Repositories;
 use Doctrine\ORM\EntityManager;
 use Pobj\Api\Entity\DStatusIndicador;
 use Pobj\Api\Enums\StatusIndicador;
+use Pobj\Api\Interfaces\RepositoryInterface;
 
 class StatusIndicadoresRepository implements RepositoryInterface
 {

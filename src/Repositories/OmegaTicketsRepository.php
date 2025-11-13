@@ -6,6 +6,7 @@ namespace Pobj\Api\Repositories;
 
 use Doctrine\ORM\EntityManager;
 use Pobj\Api\Entity\OmegaChamado;
+use Pobj\Api\Interfaces\RepositoryInterface;
 
 class OmegaTicketsRepository implements RepositoryInterface
 {

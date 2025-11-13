@@ -18,13 +18,13 @@ class OmegaDepartamento
     #[ORM\Column(type: 'string', length: 120)]
     private string $tipo;
 
-    #[ORM\Column(type: 'string', length: 30, unique: true)]
+    #[ORM\Column(name: 'departamento_id', type: 'string', length: 30, unique: true)]
     private string $departamentoId;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'ordem_departamento', type: 'integer', nullable: true)]
     private ?int $ordemDepartamento = null;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'ordem_tipo', type: 'integer', nullable: true)]
     private ?int $ordemTipo = null;
 
     public function getDepartamento(): string

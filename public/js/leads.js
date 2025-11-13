@@ -6,7 +6,7 @@ function ensureLeadsTemplate(){
   if (existing) return Promise.resolve(existing);
   if (leadsTemplatePromise) return leadsTemplatePromise;
 
-  leadsTemplatePromise = fetch("leads.html")
+  leadsTemplatePromise = fetch("/leads.html")
     .then(res => {
       if (!res.ok) throw new Error(`Falha ao carregar leads.html: ${res.status}`);
       return res.text();

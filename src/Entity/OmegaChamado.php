@@ -20,10 +20,10 @@ class OmegaChamado
     #[ORM\Column(type: 'string', length: 200, nullable: true)]
     private ?string $company = null;
 
-    #[ORM\Column(type: 'string', length: 80, nullable: true)]
+    #[ORM\Column(name: 'product_id', type: 'string', length: 80, nullable: true)]
     private ?string $productId = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'product_label', type: 'string', length: 150, nullable: true)]
     private ?string $productLabel = null;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
@@ -50,16 +50,16 @@ class OmegaChamado
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updated = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(name: 'due_date', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $dueDate = null;
 
-    #[ORM\Column(type: 'string', length: 60, nullable: true)]
+    #[ORM\Column(name: 'requester_id', type: 'string', length: 60, nullable: true)]
     private ?string $requesterId = null;
 
-    #[ORM\Column(type: 'string', length: 60, nullable: true)]
+    #[ORM\Column(name: 'owner_id', type: 'string', length: 60, nullable: true)]
     private ?string $ownerId = null;
 
-    #[ORM\Column(type: 'string', length: 60, nullable: true)]
+    #[ORM\Column(name: 'team_id', type: 'string', length: 60, nullable: true)]
     private ?string $teamId = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -74,7 +74,7 @@ class OmegaChamado
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     private ?string $agencia = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(name: 'gerente_gestao', type: 'string', length: 150, nullable: true)]
     private ?string $gerenteGestao = null;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]

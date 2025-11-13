@@ -71,7 +71,7 @@ const API_HTTP_BASE = typeof window !== "undefined" && window.API_HTTP_BASE
   ? String(window.API_HTTP_BASE)
   : DEFAULT_HTTP_BASE;
 const API_ENDPOINT_PARAM = "endpoint";
-const TICKET_URL = "omega.html";
+const TICKET_URL = "/omega.html";
 
 function ensureHttpContext(){
   if (typeof window === "undefined") return;

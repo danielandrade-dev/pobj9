@@ -26,7 +26,7 @@ class OmegaStatus
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $ordem = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(name: 'departamento_id', type: 'string', length: 20, nullable: true)]
     private ?string $departamentoId = null;
 
     public function getId(): string

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pobj\Api\Repositories;
+namespace Pobj\Api\Interfaces;
 
 use Doctrine\ORM\EntityManager;
 

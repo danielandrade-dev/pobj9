@@ -6,6 +6,7 @@ namespace Pobj\Api\Repositories;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Pobj\Api\Interfaces\RepositoryInterface;
 
 class MetaRepository implements RepositoryInterface
 {

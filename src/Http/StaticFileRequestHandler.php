@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Http;
 
+use Pobj\Api\Http\ViewRenderer;
+
 class StaticFileRequestHandler
 {
     private const MIME_TYPES = [
@@ -24,7 +26,26 @@ class StaticFileRequestHandler
     {
         $publicPath = $projectRoot . '/public' . $requestPath;
         
+        // Se não encontrou em public/, tenta em resources/views/ para arquivos HTML específicos
         if (!is_file($publicPath)) {
+            $fileName = basename($requestPath);
+            $allowedViews = ['leads.html', 'omega.html'];
+            
+            if (in_array($fileName, $allowedViews, true)) {
+                $viewPath = $projectRoot . '/resources/views/' . $fileName;
+                if (is_file($viewPath)) {
+                    $viewRenderer = new ViewRenderer($projectRoot);
+                    $viewName = pathinfo($fileName, PATHINFO_FILENAME);
+                    $content = $viewRenderer->render($viewName);
+                    
+                    header('Content-Type: text/html; charset=utf-8');
+                    header('Cache-Control: public, max-age=3600');
+                    echo $content;
+                    
+                    return true;
+                }
+            }
+            
             return false;
         }
 

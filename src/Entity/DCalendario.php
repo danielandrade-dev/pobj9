@@ -23,13 +23,13 @@ class DCalendario
     #[ORM\Column(type: 'tinyint')]
     private int $mes;
 
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(name: 'mes_nome', type: 'string', length: 20)]
     private string $mesNome;
 
     #[ORM\Column(type: 'tinyint')]
     private int $dia;
 
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(name: 'dia_da_semana', type: 'string', length: 20)]
     private string $diaDaSemana;
 
     #[ORM\Column(type: 'tinyint')]
@@ -41,7 +41,7 @@ class DCalendario
     #[ORM\Column(type: 'tinyint')]
     private int $semestre;
 
-    #[ORM\Column(type: 'boolean')]
+    #[ORM\Column(name: 'eh_dia_util', type: 'boolean')]
     private bool $ehDiaUtil;
 
     public function getData(): \DateTimeInterface

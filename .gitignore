@@ -1,11 +1,4 @@
-# Composer
-/vendor/
-composer.lock
 
-# Environment
-.env
-.env.local
-.env.*.local
 
 # IDE
 .idea/

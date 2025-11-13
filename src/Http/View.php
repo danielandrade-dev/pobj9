@@ -177,9 +177,12 @@ class View
     private function processAssetPaths(string $content): string
     {
         $replacements = [
-            '/(href|src)="(?!public\/|https?:\/\/)((?:style|leads|omega)\.(?:css|js))"/' => '$1="public/$2"',
+            // Arquivos JS na raiz -> public/js/
+            '/(href|src)="(?!public\/|https?:\/\/)((?:script|leads|omega)\.js)"/' => '$1="public/js/$2"',
+            // Arquivos CSS na raiz -> public/css/
+            '/(href|src)="(?!public\/|https?:\/\/)((?:style|leads|omega)\.css)"/' => '$1="public/css/$2"',
+            // Imagens -> public/img/
             '/(href|src)="(?!public\/|https?:\/\/)(img\/[^"]+)"/' => '$1="public/$2"',
-            '/(href|src)="(?!public\/|https?:\/\/)(script\.js)"/' => '$1="public/$2"',
         ];
         
         return preg_replace(

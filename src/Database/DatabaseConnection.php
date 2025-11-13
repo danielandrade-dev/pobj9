@@ -9,11 +9,16 @@ use PDOException;
 
 /**
  * Gerenciador de conexão com banco de dados
+ * 
+ * Esta classe mantém compatibilidade com código legado que usa PDO diretamente.
+ * Internamente, usa a conexão do Doctrine para evitar múltiplas conexões.
  */
 class DatabaseConnection
 {
     /**
      * Retorna uma conexão PDO configurada
+     * 
+     * Usa a conexão do Doctrine internamente para evitar múltiplas conexões.
      *
      * @throws PDOException
      */
@@ -24,10 +29,32 @@ class DatabaseConnection
             return $pdo;
         }
 
+        // Tenta usar a conexão do Doctrine primeiro (mais eficiente - reutiliza conexão)
+        try {
+            $em = DoctrineManager::getEntityManager();
+            $connection = $em->getConnection();
+            $nativeConnection = $connection->getNativeConnection();
+            
+            // O Doctrine DBAL retorna PDO quando usa driver pdo_mysql
+            if ($nativeConnection instanceof PDO) {
+                return $nativeConnection;
+            }
+        } catch (\Throwable $e) {
+            // Se Doctrine falhar, cria conexão PDO direta (fallback)
+            \Pobj\Api\Helpers\Logger::warning('Doctrine não disponível, usando conexão PDO direta', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Fallback: cria conexão PDO direta
         $config = self::getConfig();
 
         // Suporta socket Unix (comum no Linux quando host é 'localhost')
-        if ($config['host'] === 'localhost' && $config['port'] === 3306) {
+        // Se host for 'localhost', tenta socket Unix primeiro, depois usa 127.0.0.1 para TCP/IP
+        $host = $config['host'];
+        $useSocket = false;
+        
+        if ($host === 'localhost' && $config['port'] === 3306) {
             // Tenta usar socket Unix primeiro (mais rápido no Linux)
             $socketPaths = [
                 '/var/run/mysqld/mysqld.sock',
@@ -35,33 +62,29 @@ class DatabaseConnection
                 '/var/lib/mysql/mysql.sock',
             ];
             
-            $socketFound = false;
             foreach ($socketPaths as $socketPath) {
-                if (file_exists($socketPath)) {
+                if (file_exists($socketPath) && is_readable($socketPath)) {
                     $dsn = sprintf(
                         'mysql:unix_socket=%s;dbname=%s;charset=utf8mb4',
                         $socketPath,
                         $config['database']
                     );
-                    $socketFound = true;
+                    $useSocket = true;
                     break;
                 }
             }
             
-            if (!$socketFound) {
-                // Fallback para TCP/IP
-                $dsn = sprintf(
-                    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-                    $config['host'],
-                    $config['port'],
-                    $config['database']
-                );
+            // Se não encontrou socket, usa 127.0.0.1 ao invés de localhost para forçar TCP/IP
+            if (!$useSocket) {
+                $host = '127.0.0.1';
             }
-        } else {
-            // Usa TCP/IP para hosts remotos ou portas diferentes
+        }
+        
+        if (!$useSocket) {
+            // Usa TCP/IP
             $dsn = sprintf(
                 'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-                $config['host'],
+                $host,
                 $config['port'],
                 $config['database']
             );
@@ -79,10 +102,12 @@ class DatabaseConnection
             
             // Mensagens mais amigáveis baseadas no código de erro
             $userMessage = match (true) {
-                $errorCode === 2002 || strpos($errorMessage, 'No such file or directory') !== false => 
+                $errorCode === 2002 || strpos($errorMessage, 'No such file or directory') !== false,
+                strpos($errorMessage, 'Connection refused') !== false => 
                     sprintf(
-                        'MySQL não está acessível. Verifique se o serviço está rodando em %s:%d. ' .
-                        'Erro: %s',
+                        'MySQL não está acessível em %s:%d. ' .
+                        'Verifique se o serviço MySQL está rodando: sudo systemctl start mysql (ou mariadb). ' .
+                        'Erro técnico: %s',
                         $config['host'],
                         $config['port'],
                         $errorMessage
@@ -91,18 +116,12 @@ class DatabaseConnection
                     'Credenciais inválidas. Verifique DB_USER e DB_PASSWORD no arquivo .env',
                 $errorCode === 1049 => 
                     sprintf(
-                        'Banco de dados "%s" não existe. Verifique DB_NAME no arquivo .env',
+                        'Banco de dados "%s" não existe. Verifique DB_NAME no arquivo .env ou crie o banco primeiro.',
                         $config['database']
-                    ),
-                $errorCode === 2002 || strpos($errorMessage, 'Connection refused') !== false =>
-                    sprintf(
-                        'Conexão recusada em %s:%d. Verifique se o MySQL está rodando e a porta está correta.',
-                        $config['host'],
-                        $config['port']
                     ),
                 default => 
                     sprintf(
-                        'Erro ao conectar ao MySQL (%s): %s',
+                        'Erro ao conectar ao MySQL (código %s): %s',
                         $errorCode,
                         $errorMessage
                     ),

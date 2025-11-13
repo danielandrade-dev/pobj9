@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Http\Controllers;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
-use Pobj\Api\Http\Handlers\ResumoHandler;
+use Pobj\Api\Container\Container;
+use Pobj\Api\Enums\HttpStatusCode;
 use Pobj\Api\Response\ResponseHelper;
+use Pobj\Api\Services\ResumoService;
 
 class ResumoController
 {
     public function handle(array $params, $payload = null): void
     {
-        $pdo = DatabaseConnection::getConnection();
-        $handler = new ResumoHandler($pdo);
-        $handler->handle($params);
+        try {
+            $container = Container::getInstance();
+            $service = $container->get(ResumoService::class);
+            $result = $service->getResumo($params);
+            ResponseHelper::json($result);
+        } catch (\InvalidArgumentException $e) {
+            ResponseHelper::error($e->getMessage(), HttpStatusCode::BAD_REQUEST->value);
+        }
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Response;
 
+use Pobj\Api\Enums\HttpStatusCode;
+
 class ResponseHelper
 {
     public static function json($data): void
@@ -12,14 +14,14 @@ class ResponseHelper
         exit;
     }
 
-    public static function error(string $message, int $status = 400): void
+    public static function error(string $message, int $status = HttpStatusCode::BAD_REQUEST->value): void
     {
-        if ($status >= 500) {
+        if ($status >= HttpStatusCode::INTERNAL_SERVER_ERROR->value) {
             \Pobj\Api\Helpers\Logger::error("HTTP $status: $message", [
                 'status' => $status,
                 'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
             ]);
-        } elseif ($status >= 400) {
+        } elseif ($status >= HttpStatusCode::BAD_REQUEST->value) {
             \Pobj\Api\Helpers\Logger::warning("HTTP $status: $message", [
                 'status' => $status,
                 'request_uri' => $_SERVER['REQUEST_URI'] ?? null,

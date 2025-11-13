@@ -4,22 +4,29 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Http\Controllers;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
-use Pobj\Api\Http\Handlers\FiltrosHandler;
+use Pobj\Api\Container\Container;
+use Pobj\Api\Enums\FiltroNivel;
+use Pobj\Api\Enums\HttpStatusCode;
 use Pobj\Api\Response\ResponseHelper;
+use Pobj\Api\Services\FiltrosService;
 
 class FiltrosController
 {
     public function handle(array $params, $payload = null): void
     {
-        $nivel = $params['nivel'] ?? '';
-        if (empty($nivel)) {
-            ResponseHelper::error('Parâmetro "nivel" é obrigatório', 400);
+        $nivelStr = $params['nivel'] ?? '';
+        if (empty($nivelStr)) {
+            ResponseHelper::error('Parâmetro "nivel" é obrigatório', HttpStatusCode::BAD_REQUEST->value);
         }
 
-        $pdo = DatabaseConnection::getConnection();
-        $handler = new FiltrosHandler($pdo);
-        $handler->handle($nivel);
+        $nivel = FiltroNivel::tryFromString($nivelStr);
+        if ($nivel === null) {
+            ResponseHelper::error('Nível inválido: ' . $nivelStr, HttpStatusCode::BAD_REQUEST->value);
+        }
+
+        $container = Container::getInstance();
+        $service = $container->get(FiltrosService::class);
+        $result = $service->getFiltroByNivel($nivel);
+        ResponseHelper::json($result);
     }
 }

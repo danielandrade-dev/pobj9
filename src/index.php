@@ -6,6 +6,8 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/bootstrap.php';
 
+use Pobj\Api\Enums\HttpMethod;
+use Pobj\Api\Enums\HttpStatusCode;
 use Pobj\Api\Http\Router;
 use Pobj\Api\Response\ResponseHelper;
 
@@ -16,10 +18,11 @@ try {
     }
     
     $params = $_GET;
-    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $method = $_SERVER['REQUEST_METHOD'] ?? HttpMethod::GET->value;
     
     $payload = null;
-    if (in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
+    $methodsWithPayload = [HttpMethod::POST->value, HttpMethod::PUT->value, HttpMethod::PATCH->value];
+    if (in_array($method, $methodsWithPayload, true)) {
         $rawInput = file_get_contents('php://input');
         if ($rawInput !== false && $rawInput !== '') {
             $payload = json_decode($rawInput, true);
@@ -38,7 +41,7 @@ try {
         'method' => $method ?? null,
     ]);
 
-    http_response_code(500);
+    http_response_code(HttpStatusCode::INTERNAL_SERVER_ERROR->value);
     echo json_encode([
         'error' => 'server_error',
         'message' => 'Ocorreu um erro interno. Verifique os logs para mais detalhes.',

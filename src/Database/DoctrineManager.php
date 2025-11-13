@@ -7,6 +7,7 @@ namespace Pobj\Api\Database;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
+use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Pobj\Api\Helpers\EnvHelper;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use RuntimeException;
@@ -35,6 +36,10 @@ class DoctrineManager
             $proxyDir,
             $cache
         );
+        
+        // Configura estratégia de nomenclatura para snake_case
+        // Mas respeita o atributo 'name' quando especificado explicitamente
+        $config->setNamingStrategy(new UnderscoreNamingStrategy());
 
         $connectionParams = [
             'driver' => 'pdo_mysql',

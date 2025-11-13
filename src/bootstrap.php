@@ -28,9 +28,6 @@ if (file_exists($composerAutoload)) {
             require $file;
         }
     });
-
-    // Carrega funções helper globais para compatibilidade
-    require_once __DIR__ . '/Helpers/functions.php';
 }
 
 // Registra handlers de erro e exceção para logging

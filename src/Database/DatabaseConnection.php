@@ -10,8 +10,9 @@ use PDOException;
 /**
  * Gerenciador de conexão com banco de dados
  * 
- * Esta classe mantém compatibilidade com código legado que usa PDO diretamente.
- * Internamente, usa a conexão do Doctrine para evitar múltiplas conexões.
+ * Gerencia conexões PDO com o banco de dados MySQL.
+ * Internamente, tenta usar a conexão do Doctrine para evitar múltiplas conexões.
+ * Se o Doctrine não estiver disponível, cria uma conexão PDO direta.
  */
 class DatabaseConnection
 {

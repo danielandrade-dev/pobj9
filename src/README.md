@@ -20,7 +20,7 @@ src/
 ├── Response/
 │   └── ResponseHelper.php         # Helpers de resposta JSON
 ├── Ai/
-│   └── knowledge.php              # Funções de IA/RAG
+│   └── KnowledgeHelper.php        # Helper para funcionalidades de IA/RAG
 └── README.md                    # Esta documentação
 ```
 
@@ -29,6 +29,8 @@ src/
 - `Pobj\Api\Database` - Classes relacionadas ao banco de dados
 - `Pobj\Api\Http\Handlers` - Handlers HTTP para endpoints
 - `Pobj\Api\Response` - Classes de resposta HTTP
+- `Pobj\Api\Ai` - Classes relacionadas a IA/RAG
+- `Pobj\Api\Helpers` - Classes helper utilitárias
 
 ## Padrões Seguidos
 

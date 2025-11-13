@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Http\Handlers;
 
+use Pobj\Api\Ai\KnowledgeHelper;
 use Pobj\Api\Response\ResponseHelper;
 
 /**
@@ -18,27 +19,25 @@ class AgentHandler
      */
     public function handle(array $payload): void
     {
-        require_once __DIR__ . '/../../Ai/knowledge.php';
-
         $question = trim((string) ($payload['question'] ?? ''));
         if ($question === '') {
             ResponseHelper::error('Campo "question" é obrigatório.', 422);
         }
 
         try {
-            $apiKey = ai_env('OPENAI_API_KEY', '');
+            $apiKey = KnowledgeHelper::env('OPENAI_API_KEY', '');
             if ($apiKey === '') {
                 ResponseHelper::error('OPENAI_API_KEY não configurada', 500);
             }
-            $model = ai_env('OPENAI_MODEL', 'gpt-5-mini');
+            $model = KnowledgeHelper::env('OPENAI_MODEL', 'gpt-5-mini');
 
             // índice da pasta de conhecimento
             $dir = __DIR__ . '/../../../../docs/knowledge';
             $indexPath = __DIR__ . '/../../../../docs/knowledge.index.json';
-            $index = ai_build_or_load_index($dir, $indexPath);
+            $index = KnowledgeHelper::buildOrLoadIndex($dir, $indexPath);
 
             // retrieval
-            $top = ai_retrieve_topk($question, $index, 6);
+            $top = KnowledgeHelper::retrieveTopK($question, $index, 6);
             $context = '';
             $sources = [];
             foreach ($top as $i => $hit) {
@@ -96,7 +95,7 @@ SYS;
                 $payloadOpenAI['temperature'] = 0.2;
             }
 
-            $resp = ai_http_post_json(
+            $resp = KnowledgeHelper::httpPostJson(
                 'https://api.openai.com/v1/chat/completions',
                 ['Authorization: Bearer ' . $apiKey],
                 $payloadOpenAI

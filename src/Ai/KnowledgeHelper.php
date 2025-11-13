@@ -12,7 +12,7 @@ use Pobj\Api\Helpers\EnvHelper;
 class KnowledgeHelper
 {
     /**
-     * Lê variável de ambiente (compatibilidade com código legado)
+     * Lê variável de ambiente
      *
      * @param string $key
      * @param string|null $default
@@ -294,6 +294,94 @@ class KnowledgeHelper
             $nb += $b[$i] * $b[$i];
         }
         return ($na > 0 && $nb > 0) ? $dot / (sqrt($na) * sqrt($nb)) : 0.0;
+    }
+
+    /**
+     * Constrói ou carrega índice de conhecimento
+     *
+     * @param string $dir Diretório com arquivos de conhecimento
+     * @param string $indexPath Caminho para salvar/carregar o índice JSON
+     * @return array{items: array<int, array{source: string, name: string, chunk_id: int, text: string}>, embeddings: array<int, array<int, float>>, signature: array<string, int>, built_at: int}
+     */
+    public static function buildOrLoadIndex(string $dir, string $indexPath): array
+    {
+        $files = self::scanKnowledge($dir);
+        $sig = [];
+        foreach ($files as $f) {
+            $sig[$f['path']] = $f['mtime'];
+        }
+
+        // Carrega índice existente se assinatura confere
+        if (is_file($indexPath)) {
+            $idx = json_decode((string) file_get_contents($indexPath), true);
+            if (is_array($idx) && ($idx['signature'] ?? null) === $sig) {
+                return $idx;
+            }
+        }
+
+        // (Re)constrói índice
+        $items = [];  // cada item = ['source'=>path, 'name'=>name, 'chunk_id'=>X, 'text'=>...]
+        foreach ($files as $f) {
+            $chunks = self::chunkText($f['text']);
+            foreach ($chunks as $c) {
+                $items[] = [
+                    'source' => $f['path'],
+                    'name' => $f['name'],
+                    'chunk_id' => $c['id'],
+                    'text' => $c['text'],
+                ];
+            }
+        }
+        if (empty($items)) {
+            $idx = ['items' => [], 'embeddings' => [], 'signature' => $sig, 'built_at' => time()];
+            @file_put_contents($indexPath, json_encode($idx, JSON_UNESCAPED_UNICODE));
+            return $idx;
+        }
+
+        $inputs = [];
+        foreach ($items as $i) {
+            $inputs[] = $i['text'];
+        }
+        $emb = self::embed($inputs);
+
+        $idx = ['items' => $items, 'embeddings' => $emb, 'signature' => $sig, 'built_at' => time()];
+        @file_put_contents($indexPath, json_encode($idx, JSON_UNESCAPED_UNICODE));
+        return $idx;
+    }
+
+    /**
+     * Recupera top-K trechos mais relevantes para uma query
+     *
+     * @param string $query Query de busca
+     * @param array{items: array<int, array{source: string, name: string, chunk_id: int, text: string}>, embeddings: array<int, array<int, float>>} $index Índice de conhecimento
+     * @param int $k Número de resultados a retornar
+     * @return array<int, array{score: float, source: string, name: string, chunk_id: int, text: string}>
+     */
+    public static function retrieveTopK(string $query, array $index, int $k = 6): array
+    {
+        if ($query === '' || empty($index['items'])) {
+            return [];
+        }
+        $qEmbeds = self::embed([$query]);
+        $q = isset($qEmbeds[0]) ? $qEmbeds[0] : [];
+        $scored = [];
+        foreach ($index['items'] as $i => $it) {
+            $e = isset($index['embeddings'][$i]) ? $index['embeddings'][$i] : null;
+            if (!is_array($e)) {
+                continue;
+            }
+            $scored[] = [
+                'score' => self::cosine($q, $e),
+                'source' => $it['source'],
+                'name' => $it['name'],
+                'chunk_id' => $it['chunk_id'],
+                'text' => $it['text'],
+            ];
+        }
+        usort($scored, static function ($a, $b) {
+            return ($a['score'] < $b['score']) ? 1 : -1;
+        });
+        return array_slice($scored, 0, max(1, $k));
     }
 }
 

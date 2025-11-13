@@ -8,9 +8,6 @@ use PDO;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Handler para endpoints de filtros
- */
 class FiltrosHandler
 {
     private PDO $pdo;
@@ -20,9 +17,6 @@ class FiltrosHandler
         $this->pdo = $pdo;
     }
 
-    /**
-     * Processa requisições de filtros baseado no nível
-     */
     public function handle(string $nivel): void
     {
         switch ($nivel) {
@@ -140,4 +134,3 @@ class FiltrosHandler
         ResponseHelper::json($rows);
     }
 }
-

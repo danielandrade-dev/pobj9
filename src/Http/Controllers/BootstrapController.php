@@ -9,17 +9,8 @@ use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Http\Handlers\BootstrapHandler;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Controller para endpoint bootstrap
- */
 class BootstrapController
 {
-    /**
-     * Retorna dados iniciais do frontend
-     *
-     * @param array<string, mixed> $params
-     * @param mixed $payload
-     */
     public function handle(array $params, $payload = null): void
     {
         $pdo = DatabaseConnection::getConnection();
@@ -27,4 +18,3 @@ class BootstrapController
         $handler->handle();
     }
 }
-

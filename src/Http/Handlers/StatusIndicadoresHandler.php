@@ -8,9 +8,6 @@ use PDO;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Handler para endpoint status_indicadores
- */
 class StatusIndicadoresHandler
 {
     private PDO $pdo;
@@ -20,9 +17,6 @@ class StatusIndicadoresHandler
         $this->pdo = $pdo;
     }
 
-    /**
-     * Retorna lista de status de indicadores
-     */
     public function handle(): void
     {
         $rows = DatabaseConnection::query(
@@ -39,4 +33,3 @@ class StatusIndicadoresHandler
         ResponseHelper::json(['rows' => $rows]);
     }
 }
-

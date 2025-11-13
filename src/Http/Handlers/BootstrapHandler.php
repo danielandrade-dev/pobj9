@@ -8,9 +8,6 @@ use PDO;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Handler para endpoint bootstrap
- */
 class BootstrapHandler
 {
     private PDO $pdo;
@@ -20,11 +17,6 @@ class BootstrapHandler
         $this->pdo = $pdo;
     }
 
-    /**
-     * Retorna todos os dados necessários para inicialização do frontend
-     *
-     * @return void
-     */
     public function handle(): void
     {
         $payload = [];
@@ -78,4 +70,3 @@ class BootstrapHandler
         ResponseHelper::json($payload);
     }
 }
-

@@ -9,31 +9,21 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
 use Pobj\Api\Helpers\EnvHelper;
 
-/**
- * Gerenciador do Doctrine ORM
- */
 class DoctrineManager
 {
     private static ?EntityManager $entityManager = null;
 
-    /**
-     * Retorna o EntityManager do Doctrine
-     *
-     * @throws \Doctrine\ORM\Exception\ORMException
-     */
     public static function getEntityManager(): EntityManager
     {
         if (self::$entityManager !== null) {
             return self::$entityManager;
         }
 
-        // Configuração do Doctrine
         $isDevMode = EnvHelper::get('APP_ENV', 'production') !== 'production';
         $proxyDir = __DIR__ . '/../../var/cache/doctrine/proxies';
         $cache = null;
 
         if (!$isDevMode) {
-            // Em produção, usa cache de arquivos
             $cache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('', 0, __DIR__ . '/../../var/cache/doctrine');
         }
 
@@ -44,7 +34,6 @@ class DoctrineManager
             $cache
         );
 
-        // Configuração da conexão
         $connectionParams = [
             'driver' => 'pdo_mysql',
             'host' => self::getDbHost(),
@@ -61,9 +50,6 @@ class DoctrineManager
         return self::$entityManager;
     }
 
-    /**
-     * Retorna o host do banco de dados
-     */
     private static function getDbHost(): string
     {
         $host = EnvHelper::get('DB_HOST');
@@ -71,13 +57,10 @@ class DoctrineManager
             throw new \RuntimeException('DB_HOST não configurado no arquivo .env');
         }
 
-        // Suporta formato host:port
         if (strpos($host, ':') !== false) {
             [$host] = explode(':', $host, 2);
         }
 
-        // Converte localhost para 127.0.0.1 para forçar TCP/IP
-        // Isso evita problemas com socket Unix que pode não existir ou não estar acessível
         if ($host === 'localhost') {
             $host = '127.0.0.1';
         }
@@ -85,9 +68,6 @@ class DoctrineManager
         return (string) $host;
     }
 
-    /**
-     * Retorna a porta do banco de dados
-     */
     private static function getDbPort(): int
     {
         $host = EnvHelper::get('DB_HOST');
@@ -104,9 +84,6 @@ class DoctrineManager
         return (int) $port;
     }
 
-    /**
-     * Retorna o usuário do banco de dados
-     */
     private static function getDbUser(): string
     {
         $user = EnvHelper::get('DB_USER');
@@ -117,17 +94,11 @@ class DoctrineManager
         return (string) $user;
     }
 
-    /**
-     * Retorna a senha do banco de dados
-     */
     private static function getDbPassword(): string
     {
         return (string) EnvHelper::get('DB_PASSWORD', '');
     }
 
-    /**
-     * Retorna o nome do banco de dados
-     */
     private static function getDbName(): string
     {
         $database = EnvHelper::get('DB_NAME');
@@ -138,4 +109,3 @@ class DoctrineManager
         return (string) $database;
     }
 }
-

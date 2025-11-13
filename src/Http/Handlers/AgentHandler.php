@@ -7,16 +7,8 @@ namespace Pobj\Api\Http\Handlers;
 use Pobj\Api\Ai\KnowledgeHelper;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Handler para endpoint agent (IA)
- */
 class AgentHandler
 {
-    /**
-     * Processa requisição do agente de IA
-     *
-     * @param array<string, mixed> $payload
-     */
     public function handle(array $payload): void
     {
         $question = trim((string) ($payload['question'] ?? ''));
@@ -31,12 +23,10 @@ class AgentHandler
             }
             $model = KnowledgeHelper::env('OPENAI_MODEL', 'gpt-5-mini');
 
-            // índice da pasta de conhecimento
             $dir = __DIR__ . '/../../../../docs/knowledge';
             $indexPath = __DIR__ . '/../../../../docs/knowledge.index.json';
             $index = KnowledgeHelper::buildOrLoadIndex($dir, $indexPath);
 
-            // retrieval
             $top = KnowledgeHelper::retrieveTopK($question, $index, 6);
             $context = '';
             $sources = [];
@@ -55,7 +45,6 @@ class AgentHandler
                 $context = "Nenhum documento disponível em docs/knowledge.";
             }
 
-            // ===== PROMPT REFORÇADO =====
             $userName = '';
             if (!empty($payload['user_name'])) {
                 $parts = preg_split('/\s+/', trim((string) $payload['user_name']));
@@ -80,9 +69,7 @@ SYS;
             $user = "{$saud}\n" .
                 "Pergunta: {$question}\n\n" .
                 "Contexto (trechos recuperados dos manuais):\n{$context}";
-            // ============================
 
-            // temperature condicional (mini/nano não aceitam)
             $supportsTemp = !preg_match('/\b(gpt-5-mini|gpt-5-nano)\b/i', $model);
             $payloadOpenAI = [
                 'model' => $model,
@@ -108,7 +95,6 @@ SYS;
                 'sources' => $sources,
                 'model' => $model,
             ]);
-            /** @phpstan-ignore-next-line */
         } catch (\Throwable $err) {
             http_response_code(500);
             $message = trim($err->getMessage()) ?: 'Falha interna ao processar a pergunta.';

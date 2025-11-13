@@ -2,16 +2,10 @@
 
 declare(strict_types=1);
 
-/**
- * Bootstrap da API - Carrega todas as dependências
- */
-
-// Carrega autoloader do Composer se disponível, senão usa autoloader simples
 $composerAutoload = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($composerAutoload)) {
     require_once $composerAutoload;
 } else {
-    // Fallback: autoloader simples seguindo PSR-4
     spl_autoload_register(function (string $className): void {
         $prefix = 'Pobj\\Api\\';
         $baseDir = __DIR__ . '/';
@@ -30,7 +24,5 @@ if (file_exists($composerAutoload)) {
     });
 }
 
-// Registra handlers de erro e exceção para logging
 use Pobj\Api\Helpers\ErrorHandler;
 ErrorHandler::register();
-

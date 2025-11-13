@@ -8,9 +8,6 @@ use PDO;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Handler para endpoint resumo
- */
 class ResumoHandler
 {
     private PDO $pdo;
@@ -20,11 +17,6 @@ class ResumoHandler
         $this->pdo = $pdo;
     }
 
-    /**
-     * Processa requisição de resumo com filtros
-     *
-     * @param array<string, string> $params
-     */
     public function handle(array $params): void
     {
         $seg = trim($params['segmento_id'] ?? '');
@@ -108,4 +100,3 @@ class ResumoHandler
         ]);
     }
 }
-

@@ -9,17 +9,8 @@ use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Http\Handlers\FiltrosHandler;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Controller para endpoint de filtros
- */
 class FiltrosController
 {
-    /**
-     * Retorna filtros por nível
-     *
-     * @param array<string, mixed> $params
-     * @param mixed $payload
-     */
     public function handle(array $params, $payload = null): void
     {
         $nivel = $params['nivel'] ?? '';
@@ -32,4 +23,3 @@ class FiltrosController
         $handler->handle($nivel);
     }
 }
-

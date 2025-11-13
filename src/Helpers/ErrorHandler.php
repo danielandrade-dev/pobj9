@@ -4,34 +4,21 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Helpers;
 
-/**
- * Handler de erros e exceções para logging
- */
 class ErrorHandler
 {
-    /**
-     * Registra os handlers de erro e exceção
-     */
     public static function register(): void
     {
-        // Handler de exceções não capturadas
         set_exception_handler([self::class, 'handleException']);
 
-        // Handler de erros
         set_error_handler([self::class, 'handleError'], E_ALL);
 
-        // Handler de erros fatais
         register_shutdown_function([self::class, 'handleShutdown']);
 
-        // Desabilita exibição de erros (só log)
         ini_set('display_errors', '0');
         ini_set('log_errors', '1');
         ini_set('error_log', self::getErrorLogPath());
     }
 
-    /**
-     * Handler de exceções
-     */
     public static function handleException(\Throwable $exception): void
     {
         Logger::exception($exception, [
@@ -41,7 +28,6 @@ class ErrorHandler
             'ip' => $_SERVER['REMOTE_ADDR'] ?? null,
         ]);
 
-        // Se não estamos em modo de API, mostra erro amigável
         if (!self::isApiRequest()) {
             http_response_code(500);
             if (!headers_sent()) {
@@ -54,18 +40,8 @@ class ErrorHandler
         }
     }
 
-    /**
-     * Handler de erros PHP
-     *
-     * @param int $severity
-     * @param string $message
-     * @param string $file
-     * @param int $line
-     * @return bool
-     */
     public static function handleError(int $severity, string $message, string $file, int $line): bool
     {
-        // Não loga erros que são suprimidos com @
         if (!(error_reporting() & $severity)) {
             return false;
         }
@@ -78,13 +54,9 @@ class ErrorHandler
             'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
         ]);
 
-        // Retorna false para permitir que o handler padrão também execute
         return false;
     }
 
-    /**
-     * Handler de shutdown (erros fatais)
-     */
     public static function handleShutdown(): void
     {
         $error = error_get_last();
@@ -97,9 +69,6 @@ class ErrorHandler
         }
     }
 
-    /**
-     * Converte código de severidade para nível de log
-     */
     private static function getErrorLevel(int $severity): string
     {
         return match (true) {
@@ -121,18 +90,12 @@ class ErrorHandler
         };
     }
 
-    /**
-     * Verifica se é uma requisição de API
-     */
     private static function isApiRequest(): bool
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/src/') !== false || strpos($uri, '/health') !== false;
     }
 
-    /**
-     * Retorna o caminho do arquivo de log de erros do PHP
-     */
     private static function getErrorLogPath(): string
     {
         $logDir = __DIR__ . '/../../var/log';
@@ -142,4 +105,3 @@ class ErrorHandler
         return $logDir . '/php-errors.log';
     }
 }
-

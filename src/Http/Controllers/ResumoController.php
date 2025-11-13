@@ -9,17 +9,8 @@ use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Http\Handlers\ResumoHandler;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Controller para endpoint de resumo
- */
 class ResumoController
 {
-    /**
-     * Retorna resumo com filtros
-     *
-     * @param array<string, mixed> $params
-     * @param mixed $payload
-     */
     public function handle(array $params, $payload = null): void
     {
         $pdo = DatabaseConnection::getConnection();
@@ -27,4 +18,3 @@ class ResumoController
         $handler->handle($params);
     }
 }
-

@@ -7,17 +7,8 @@ namespace Pobj\Api\Http\Controllers;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Response\ResponseHelper;
 
-/**
- * Controller para endpoint de health check
- */
 class HealthController
 {
-    /**
-     * Health check - verifica se o banco de dados está respondendo
-     *
-     * @param array<string, mixed> $params
-     * @param mixed $payload
-     */
     public function check(array $params, $payload = null): void
     {
         $status = [
@@ -27,10 +18,8 @@ class HealthController
         ];
 
         try {
-            // Testa conexão com o banco de dados
             $pdo = DatabaseConnection::getConnection();
             
-            // Executa uma query simples para verificar se o banco está respondendo
             $stmt = $pdo->query('SELECT 1 as test');
             $result = $stmt->fetch();
             
@@ -43,7 +32,6 @@ class HealthController
             
             ResponseHelper::json($status);
         } catch (\Throwable $e) {
-            // Log do erro
             \Pobj\Api\Helpers\Logger::exception($e, [
                 'endpoint' => 'health',
             ]);
@@ -58,4 +46,3 @@ class HealthController
         }
     }
 }
-

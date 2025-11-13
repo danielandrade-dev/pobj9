@@ -1,56 +1,20 @@
 <?php
 declare(strict_types=1);
 
+use Pobj\Api\Helpers\EnvHelper;
+
 /**
  * Carrega variáveis de ambiente de arquivos .env
+ * Função de compatibilidade - use EnvHelper::load() diretamente.
  */
 function pobj_load_env(): void
 {
-    static $loaded = false;
-    if ($loaded) {
-        return;
-    }
-    $loaded = true;
-
-    $envFiles = [
-        __DIR__ . '/../config/.env',
-        __DIR__ . '/../.env',
-        __DIR__ . '/../../.env',
-        __DIR__ . '/../../config/.env',
-    ];
-
-    foreach ($envFiles as $file) {
-        if (is_file($file) && is_readable($file)) {
-            $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            if ($lines === false) {
-                continue;
-            }
-            foreach ($lines as $line) {
-                $line = trim($line);
-                // Ignora comentários e linhas vazias
-                if ($line === '' || strpos($line, '#') === 0) {
-                    continue;
-                }
-                // Processa linhas no formato KEY=VALUE
-                if (strpos($line, '=') !== false) {
-                    [$key, $value] = explode('=', $line, 2);
-                    $key = trim($key);
-                    $value = trim($value);
-                    // Remove aspas se houver
-                    $value = trim($value, '"\'');
-                    if ($key !== '' && !isset($_ENV[$key])) {
-                        $_ENV[$key] = $value;
-                        putenv("$key=$value");
-                    }
-                }
-            }
-            break; // Usa o primeiro arquivo encontrado
-        }
-    }
+    EnvHelper::load();
 }
 
 /**
  * Lê uma variável de ambiente
+ * Função de compatibilidade - use EnvHelper::get() ou pobj_env() de functions.php.
  *
  * @param string $key Nome da variável
  * @param mixed $default Valor padrão se não encontrado
@@ -58,22 +22,11 @@ function pobj_load_env(): void
  */
 function pobj_env(string $key, $default = null)
 {
-    pobj_load_env();
-    
-    // Tenta $_ENV primeiro
-    if (isset($_ENV[$key])) {
-        return $_ENV[$key];
-    }
-    
-    // Tenta getenv()
-    $value = getenv($key);
-    if ($value !== false) {
-        return $value;
-    }
-    
-    return $default;
+    return EnvHelper::get($key, $default);
 }
 
+// Carrega bootstrap para ter acesso às classes
+require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/database.php';
 
 // Só executa código HTTP se o arquivo for chamado diretamente (não incluído)

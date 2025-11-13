@@ -18,7 +18,6 @@ class AgentHandler
      */
     public function handle(array $payload): void
     {
-        require_once __DIR__ . '/../../env.php';
         require_once __DIR__ . '/../../Ai/knowledge.php';
 
         $question = trim((string) ($payload['question'] ?? ''));

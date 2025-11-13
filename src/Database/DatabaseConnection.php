@@ -19,23 +19,60 @@ class DatabaseConnection
      */
     public static function getConnection(): PDO
     {
-        $dbHost = getenv('DB_HOST') ?: 'localhost:3307';
-        $dbName = getenv('DB_NAME') ?: 'POBJ';
-        $dbUser = getenv('DB_USER') ?: 'root';
-        $dbPass = getenv('DB_PASS') ?: '';
-        $dbCharset = 'utf8mb4';
+        static $pdo = null;
+        if ($pdo instanceof PDO) {
+            return $pdo;
+        }
+
+        $config = self::getConfig();
 
         $dsn = sprintf(
-            'mysql:host=%s;dbname=%s;charset=%s',
-            $dbHost,
-            $dbName,
-            $dbCharset
+            'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+            $config['host'],
+            $config['port'],
+            $config['database']
         );
 
-        return new PDO($dsn, $dbUser, $dbPass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+        try {
+            $pdo = new PDO($dsn, $config['user'], $config['password'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
+        } catch (\PDOException $exception) {
+            throw new \RuntimeException(
+                'Não foi possível conectar ao MySQL: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        }
+
+        return $pdo;
+    }
+
+    /**
+     * Lê as variáveis de ambiente referentes ao banco
+     *
+     * @return array{host: string, port: int, user: string, password: string, database: string}
+     */
+    private static function getConfig(): array
+    {
+        $host = (string) \Pobj\Api\Helpers\EnvHelper::get('DB_HOST', 'localhost:3307');
+        // Suporta formato host:port
+        if (strpos($host, ':') !== false) {
+            [$host, $port] = explode(':', $host, 2);
+            $port = (int) $port;
+        } else {
+            $port = (int) \Pobj\Api\Helpers\EnvHelper::get('DB_PORT', 3306);
+        }
+
+        return [
+            'host' => $host,
+            'port' => $port,
+            'user' => (string) \Pobj\Api\Helpers\EnvHelper::get('DB_USER', 'root'),
+            'password' => (string) \Pobj\Api\Helpers\EnvHelper::get('DB_PASSWORD', ''),
+            'database' => (string) \Pobj\Api\Helpers\EnvHelper::get('DB_NAME', 'POBJ'),
+        ];
     }
 
     /**

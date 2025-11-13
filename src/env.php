@@ -1,53 +1,130 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../database.php';
+/**
+ * Carrega variáveis de ambiente de arquivos .env
+ */
+function pobj_load_env(): void
+{
+    static $loaded = false;
+    if ($loaded) {
+        return;
+    }
+    $loaded = true;
 
-header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+    $envFiles = [
+        __DIR__ . '/../config/.env',
+        __DIR__ . '/../.env',
+        __DIR__ . '/../../.env',
+        __DIR__ . '/../../config/.env',
+    ];
 
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-if ($method === 'OPTIONS') {
-    http_response_code(204);
-    exit;
+    foreach ($envFiles as $file) {
+        if (is_file($file) && is_readable($file)) {
+            $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if ($lines === false) {
+                continue;
+            }
+            foreach ($lines as $line) {
+                $line = trim($line);
+                // Ignora comentários e linhas vazias
+                if ($line === '' || strpos($line, '#') === 0) {
+                    continue;
+                }
+                // Processa linhas no formato KEY=VALUE
+                if (strpos($line, '=') !== false) {
+                    [$key, $value] = explode('=', $line, 2);
+                    $key = trim($key);
+                    $value = trim($value);
+                    // Remove aspas se houver
+                    $value = trim($value, '"\'');
+                    if ($key !== '' && !isset($_ENV[$key])) {
+                        $_ENV[$key] = $value;
+                        putenv("$key=$value");
+                    }
+                }
+            }
+            break; // Usa o primeiro arquivo encontrado
+        }
+    }
 }
 
-if ($method !== 'GET') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método não suportado. Utilize GET.'], JSON_UNESCAPED_UNICODE);
-    exit;
+/**
+ * Lê uma variável de ambiente
+ *
+ * @param string $key Nome da variável
+ * @param mixed $default Valor padrão se não encontrado
+ * @return mixed
+ */
+function pobj_env(string $key, $default = null)
+{
+    pobj_load_env();
+    
+    // Tenta $_ENV primeiro
+    if (isset($_ENV[$key])) {
+        return $_ENV[$key];
+    }
+    
+    // Tenta getenv()
+    $value = getenv($key);
+    if ($value !== false) {
+        return $value;
+    }
+    
+    return $default;
 }
 
-try {
-    $pdo = pobj_db();
-} catch (Throwable $exception) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Falha ao conectar ao banco de dados',
-        'details' => $exception->getMessage(),
-    ], JSON_UNESCAPED_UNICODE);
+require_once __DIR__ . '/database.php';
+
+// Só executa código HTTP se o arquivo for chamado diretamente (não incluído)
+if (basename($_SERVER['PHP_SELF'] ?? '') === basename(__FILE__)) {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    if ($method === 'OPTIONS') {
+        http_response_code(204);
+        exit;
+    }
+
+    if ($method !== 'GET') {
+        http_response_code(405);
+        echo json_encode(['error' => 'Método não suportado. Utilize GET.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    try {
+        $pdo = pobj_db();
+    } catch (Throwable $exception) {
+        http_response_code(500);
+        echo json_encode([
+            'error' => 'Falha ao conectar ao banco de dados',
+            'details' => $exception->getMessage(),
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $endpoint = pobj_resolve_endpoint();
+    $queryParams = pobj_collect_query_params();
+
+    try {
+        $response = pobj_dispatch($pdo, $endpoint, $queryParams);
+        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    } catch (PobjEndpointNotFound $exception) {
+        http_response_code(404);
+        echo json_encode(['error' => $exception->getMessage()], JSON_UNESCAPED_UNICODE);
+    } catch (Throwable $exception) {
+        http_response_code(500);
+        echo json_encode([
+            'error' => 'Erro interno do servidor',
+            'details' => $exception->getMessage(),
+        ], JSON_UNESCAPED_UNICODE);
+    }
     exit;
-}
-
-$endpoint = pobj_resolve_endpoint();
-$queryParams = pobj_collect_query_params();
-
-try {
-    $response = pobj_dispatch($pdo, $endpoint, $queryParams);
-    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-} catch (PobjEndpointNotFound $exception) {
-    http_response_code(404);
-    echo json_encode(['error' => $exception->getMessage()], JSON_UNESCAPED_UNICODE);
-} catch (Throwable $exception) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Erro interno do servidor',
-        'details' => $exception->getMessage(),
-    ], JSON_UNESCAPED_UNICODE);
 }
 
 function pobj_collect_query_params(): array

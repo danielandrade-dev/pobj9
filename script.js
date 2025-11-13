@@ -65,8 +65,8 @@ if (typeof window !== "undefined") {
 const DATA_SOURCE = "sql";
 const API_PATH = typeof window !== "undefined" && window.API_URL
   ? String(window.API_URL)
-  : "config/api/index.php";
-const DEFAULT_HTTP_BASE = "http://localhost/POBJ%20SQL%20php71/";
+  : "src/index.php";
+const DEFAULT_HTTP_BASE = "http://localhost:8000";
 const API_HTTP_BASE = typeof window !== "undefined" && window.API_HTTP_BASE
   ? String(window.API_HTTP_BASE)
   : DEFAULT_HTTP_BASE;
@@ -82,7 +82,7 @@ function ensureHttpContext(){
     : DEFAULT_HTTP_BASE;
 
   try {
-    const candidate = new URL(targetBase, "http://localhost/");
+    const candidate = new URL(targetBase, "http://localhost:8000");
     if (candidate.protocol === "http:" || candidate.protocol === "https:") {
       const candidateHref = candidate.href;
       const alreadyThere = candidateHref.replace(/\/?$/, "/") === window.location.href.replace(/\/?$/, "/");
@@ -192,11 +192,11 @@ function resolveApiBaseUrl(){
   if (normalizedPath) {
     attempts.push(() => new URL(normalizedPath, window.location.href));
   } else {
-    attempts.push(() => new URL("config/api/index.php", window.location.href));
+    attempts.push(() => new URL("src/index.php", window.location.href));
   }
 
   if (fallbackBase) {
-    attempts.push(() => new URL(normalizedPath || "config/api/index.php", fallbackBase));
+    attempts.push(() => new URL(normalizedPath || "src/index.php", fallbackBase));
   }
 
   let lastError;
@@ -6366,7 +6366,7 @@ async function apiGet(path, params){
   try {
     response = await fetch(url, { cache: "no-store" });
   } catch (err) {
-    const error = new Error("Não foi possível contactar a API PHP em config/api/index.php.");
+    const error = new Error("Não foi possível contactar a API PHP em src/index.php.");
     error.cause = err;
     throw error;
   }
@@ -6436,7 +6436,7 @@ async function apiPost(path, body = {}, params){
       cache: "no-store",
     });
   } catch (err) {
-    const error = new Error("Não foi possível contactar a API PHP em config/api/index.php.");
+    const error = new Error("Não foi possível contactar a API PHP em src/index.php.");
     error.cause = err;
     throw error;
   }
@@ -17005,7 +17005,7 @@ function buildBootstrapHelpSteps(error){
   }
 
   steps.push("Confira se o Apache (servidor web) e o MySQL estão iniciados no XAMPP.");
-  steps.push("Acesse http://localhost/POBJ%20SQL%20php71/config/api/index.php?endpoint=health e confirme que retorna {\"status\":\"ok\"}.");
+  steps.push("Acesse http://localhost/POBJ%20SQL%20php71/src/index.php?endpoint=health e confirme que retorna {\"status\":\"ok\"}.");
   steps.push("Revise o arquivo config/.env com host, usuário e senha do banco (ex.: host=localhost, user=root, sem senha no XAMPP).");
   steps.push("Execute docs/schema_mysql.sql no banco para garantir que todas as tabelas existem.");
   steps.push("Se publicar em outro domínio/porta, adicione <script>window.API_HTTP_BASE='URL-do-seu-site';</script> antes de script.js.");

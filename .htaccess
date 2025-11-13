@@ -1,0 +1,13 @@
+RewriteEngine On
+
+# Redireciona URLs limpas para src/index.php com PATH_INFO
+# Exemplo: /health -> src/index.php/health
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(health|bootstrap|agent|filtros|status_indicadores|resumo)(/.*)?$ src/index.php/$1 [QSA,L]
+
+# Mantém compatibilidade com arquivos estáticos (HTML, CSS, JS, imagens, etc)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule . - [L]
+

@@ -40,7 +40,7 @@ function pobj_db(): PDO
 function pobj_db_config(): array
 {
     return [
-        'host' => (string) pobj_env('DB_HOST', '127.0.0.1'),
+        'host' => (string) pobj_env('DB_HOST', 'localhost:3307'),
         'port' => (int) pobj_env('DB_PORT', 3306),
         'user' => (string) pobj_env('DB_USER', 'root'),
         'password' => (string) pobj_env('DB_PASSWORD', ''),

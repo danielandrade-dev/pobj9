@@ -22,10 +22,14 @@ Thumbs.db
 # Logs
 *.log
 logs/
+var/log/*.log
+!var/log/.gitkeep
 
 # Cache
 cache/
 *.cache
+var/cache/
+!var/cache/.gitkeep
 
 # Knowledge index
 docs/knowledge.index.json

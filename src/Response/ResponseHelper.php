@@ -25,6 +25,19 @@ class ResponseHelper
      */
     public static function error(string $message, int $status = 400): void
     {
+        // Log de erros HTTP (exceto 404 que são normais)
+        if ($status >= 500) {
+            \Pobj\Api\Helpers\Logger::error("HTTP $status: $message", [
+                'status' => $status,
+                'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
+            ]);
+        } elseif ($status >= 400) {
+            \Pobj\Api\Helpers\Logger::warning("HTTP $status: $message", [
+                'status' => $status,
+                'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
+            ]);
+        }
+
         http_response_code($status);
         echo json_encode(['error' => $message], JSON_UNESCAPED_UNICODE);
         exit;

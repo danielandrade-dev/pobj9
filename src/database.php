@@ -22,19 +22,39 @@ function pobj_db(): PDO
  */
 function pobj_db_config(): array
 {
-    $host = (string) \Pobj\Api\Helpers\EnvHelper::get('DB_HOST', 'localhost:3307');
+    $host = \Pobj\Api\Helpers\EnvHelper::get('DB_HOST');
+    if (empty($host)) {
+        throw new \RuntimeException('DB_HOST não configurado no arquivo .env');
+    }
+
     if (strpos($host, ':') !== false) {
         [$host, $port] = explode(':', $host, 2);
         $port = (int) $port;
     } else {
-        $port = (int) \Pobj\Api\Helpers\EnvHelper::get('DB_PORT', 3306);
+        $port = \Pobj\Api\Helpers\EnvHelper::get('DB_PORT');
+        if ($port === null) {
+            throw new \RuntimeException('DB_PORT não configurado no arquivo .env');
+        }
+        $port = (int) $port;
+    }
+
+    $user = \Pobj\Api\Helpers\EnvHelper::get('DB_USER');
+    if (empty($user)) {
+        throw new \RuntimeException('DB_USER não configurado no arquivo .env');
+    }
+
+    $password = \Pobj\Api\Helpers\EnvHelper::get('DB_PASSWORD', '');
+
+    $database = \Pobj\Api\Helpers\EnvHelper::get('DB_NAME');
+    if (empty($database)) {
+        throw new \RuntimeException('DB_NAME não configurado no arquivo .env');
     }
 
     return [
-        'host' => $host,
+        'host' => (string) $host,
         'port' => $port,
-        'user' => (string) \Pobj\Api\Helpers\EnvHelper::get('DB_USER', 'root'),
-        'password' => (string) \Pobj\Api\Helpers\EnvHelper::get('DB_PASSWORD', ''),
-        'database' => (string) \Pobj\Api\Helpers\EnvHelper::get('DB_NAME', 'POBJ'),
+        'user' => (string) $user,
+        'password' => (string) $password,
+        'database' => (string) $database,
     ];
 }

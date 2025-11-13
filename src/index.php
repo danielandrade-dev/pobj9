@@ -74,9 +74,16 @@ try {
             ResponseHelper::error('endpoint não encontrado', 404);
     }
 } catch (\Throwable $e) {
+    // Log do erro
+    \Pobj\Api\Helpers\Logger::exception($e, [
+        'endpoint' => $endpoint ?? null,
+        'params' => $params ?? null,
+        'method' => $method ?? null,
+    ]);
+
     http_response_code(500);
     echo json_encode([
         'error' => 'server_error',
-        'message' => $e->getMessage(),
+        'message' => 'Ocorreu um erro interno. Verifique os logs para mais detalhes.',
     ], JSON_UNESCAPED_UNICODE);
 }

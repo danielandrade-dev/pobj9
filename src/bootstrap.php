@@ -33,3 +33,7 @@ if (file_exists($composerAutoload)) {
     require_once __DIR__ . '/Helpers/functions.php';
 }
 
+// Registra handlers de erro e exceção para logging
+use Pobj\Api\Helpers\ErrorHandler;
+ErrorHandler::register();
+

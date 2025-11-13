@@ -8,6 +8,8 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
 use Pobj\Api\Helpers\EnvHelper;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use RuntimeException;
 
 class DoctrineManager
 {
@@ -24,7 +26,7 @@ class DoctrineManager
         $cache = null;
 
         if (!$isDevMode) {
-            $cache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('', 0, __DIR__ . '/../../var/cache/doctrine');
+            $cache = new FilesystemAdapter('', 0, __DIR__ . '/../../var/cache/doctrine');
         }
 
         $config = ORMSetup::createAttributeMetadataConfiguration(
@@ -54,7 +56,7 @@ class DoctrineManager
     {
         $host = EnvHelper::get('DB_HOST');
         if (empty($host)) {
-            throw new \RuntimeException('DB_HOST não configurado no arquivo .env');
+            throw new RuntimeException('DB_HOST não configurado no arquivo .env');
         }
 
         if (strpos($host, ':') !== false) {
@@ -78,7 +80,7 @@ class DoctrineManager
 
         $port = EnvHelper::get('DB_PORT');
         if ($port === null) {
-            throw new \RuntimeException('DB_PORT não configurado no arquivo .env');
+            throw new RuntimeException('DB_PORT não configurado no arquivo .env');
         }
 
         return (int) $port;
@@ -88,7 +90,7 @@ class DoctrineManager
     {
         $user = EnvHelper::get('DB_USER');
         if (empty($user)) {
-            throw new \RuntimeException('DB_USER não configurado no arquivo .env');
+            throw new RuntimeException('DB_USER não configurado no arquivo .env');
         }
 
         return (string) $user;
@@ -103,7 +105,7 @@ class DoctrineManager
     {
         $database = EnvHelper::get('DB_NAME');
         if (empty($database)) {
-            throw new \RuntimeException('DB_NAME não configurado no arquivo .env');
+            throw new RuntimeException('DB_NAME não configurado no arquivo .env');
         }
 
         return (string) $database;

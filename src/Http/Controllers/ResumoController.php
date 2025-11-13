@@ -20,6 +20,7 @@ class ResumoController
             ResponseHelper::json($result);
         } catch (\InvalidArgumentException $e) {
             ResponseHelper::error($e->getMessage(), HttpStatusCode::BAD_REQUEST->value);
+        }
     }
 }
 }

@@ -6,16 +6,32 @@ Este diretório contém recursos do front-end que podem ser processados ou compi
 
 ```
 resources/
-├── views/          # Templates/views (se necessário no futuro)
+├── views/          # Templates/views HTML
+│   ├── index.html  # Página principal
+│   ├── 404.html    # Página de erro 404
+│   ├── omega.html  # View do módulo Omega
+│   └── leads.html  # View do módulo Leads
 ├── assets/         # Assets não compilados (se necessário no futuro)
-└── README.md        # Este arquivo
+└── README.md       # Este arquivo
+```
+
+## Views
+
+As views HTML estão localizadas em `resources/views/` e são processadas pela classe `Pobj\Api\Http\View`. 
+
+A classe View:
+- Processa automaticamente os caminhos de assets públicos
+- Suporta variáveis simples usando `{{variavel}}`
+- Aplica substituições de caminhos para garantir que os assets sejam servidos corretamente
+
+### Exemplo de uso
+
+```php
+$view = new View($projectRoot);
+$content = $view->render('index', ['title' => 'Meu Título']);
 ```
 
 ## Nota
 
-Atualmente, todos os arquivos estáticos estão em `public/`. Este diretório `resources/` foi criado para seguir a convenção de frameworks PHP modernos e pode ser usado no futuro para:
-
-- Templates/views que precisam ser processados
-- Assets que precisam ser compilados (SASS, TypeScript, etc.)
-- Outros recursos que não devem ser servidos diretamente
+Os arquivos estáticos (CSS, JS, imagens) continuam em `public/`. Este diretório `resources/` contém apenas templates que precisam ser processados antes de serem servidos.
 

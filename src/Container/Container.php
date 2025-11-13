@@ -25,6 +25,7 @@ use Pobj\Api\Services\OmegaTicketsService;
 use Pobj\Api\Services\OmegaUsersService;
 use Pobj\Api\Services\ResumoService;
 use Pobj\Api\Services\StatusIndicadoresService;
+use RuntimeException;
 
 class Container
 {
@@ -162,7 +163,7 @@ class Container
         }
 
         if (!isset($this->bindings[$abstract])) {
-            throw new \RuntimeException("Binding não encontrado para: {$abstract}");
+            throw new RuntimeException("Binding não encontrado para: {$abstract}");
         }
 
         $binding = $this->bindings[$abstract];

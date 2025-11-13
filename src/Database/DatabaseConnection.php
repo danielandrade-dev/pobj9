@@ -6,6 +6,10 @@ namespace Pobj\Api\Database;
 
 use PDO;
 use PDOException;
+use Pobj\Api\Helpers\Logger;
+use Pobj\Api\Helpers\EnvHelper;
+use RuntimeException;
+use Throwable;
 
 class DatabaseConnection
 {
@@ -24,8 +28,8 @@ class DatabaseConnection
             if ($nativeConnection instanceof PDO) {
                 return $nativeConnection;
             }
-        } catch (\Throwable $e) {
-            \Pobj\Api\Helpers\Logger::warning('Doctrine não disponível, usando conexão PDO direta', [
+        } catch (Throwable $e) {
+            Logger::warning('Doctrine não disponível, usando conexão PDO direta', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -74,7 +78,7 @@ class DatabaseConnection
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
-        } catch (\PDOException $exception) {
+        } catch (PDOException $exception) {
             $errorCode = $exception->getCode();
             $errorMessage = $exception->getMessage();
             
@@ -104,7 +108,7 @@ class DatabaseConnection
                     ),
             };
             
-            throw new \RuntimeException($userMessage, 0, $exception);
+            throw new RuntimeException($userMessage, 0, $exception);
         }
 
         return $pdo;
@@ -112,32 +116,32 @@ class DatabaseConnection
 
     private static function getConfig(): array
     {
-        $host = \Pobj\Api\Helpers\EnvHelper::get('DB_HOST');
+        $host = EnvHelper::get('DB_HOST');
         if (empty($host)) {
-            throw new \RuntimeException('DB_HOST não configurado no arquivo .env');
+            throw new RuntimeException('DB_HOST não configurado no arquivo .env');
         }
 
         if (strpos($host, ':') !== false) {
             [$host, $port] = explode(':', $host, 2);
             $port = (int) $port;
         } else {
-            $port = \Pobj\Api\Helpers\EnvHelper::get('DB_PORT');
+            $port = EnvHelper::get('DB_PORT');
             if ($port === null) {
-                throw new \RuntimeException('DB_PORT não configurado no arquivo .env');
+                throw new RuntimeException('DB_PORT não configurado no arquivo .env');
             }
             $port = (int) $port;
         }
 
-        $user = \Pobj\Api\Helpers\EnvHelper::get('DB_USER');
+        $user = EnvHelper::get('DB_USER');
         if (empty($user)) {
-            throw new \RuntimeException('DB_USER não configurado no arquivo .env');
+            throw new RuntimeException('DB_USER não configurado no arquivo .env');
         }
 
-        $password = \Pobj\Api\Helpers\EnvHelper::get('DB_PASSWORD', '');
+        $password = EnvHelper::get('DB_PASSWORD', '');
 
-        $database = \Pobj\Api\Helpers\EnvHelper::get('DB_NAME');
-        if (empty($database)) {
-            throw new \RuntimeException('DB_NAME não configurado no arquivo .env');
+        $database = EnvHelper::get('DB_NAME');
+        if (empty($database)) { 
+            throw new RuntimeException('DB_NAME não configurado no arquivo .env');
         }
 
         return [

@@ -35,6 +35,8 @@ class Logger
 
         $timestamp = date('Y-m-d H:i:s');
         
+        $message = str_replace(["\n", "\r"], " ", trim($message));
+        
         $contextStr = '';
         if (!empty($context)) {
             if (isset($context['exception'])) {
@@ -42,16 +44,17 @@ class Logger
                 unset($context['exception']);
                 
                 $trace = $exception['trace'] ?? '';
-                $contextStr = PHP_EOL . "  Context: " . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                $contextStr = " | Context: " . json_encode($context, JSON_UNESCAPED_UNICODE);
                 if ($trace) {
-                    $contextStr .= PHP_EOL . "  Stack trace:" . PHP_EOL . "  " . str_replace("\n", "\n  ", $trace);
+                    $traceSingleLine = str_replace(["\n", "\r"], " | ", trim($trace));
+                    $contextStr .= " | Stack trace: " . $traceSingleLine;
                 }
             } else {
-                $contextStr = PHP_EOL . "  Context: " . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                $contextStr = " | Context: " . json_encode($context, JSON_UNESCAPED_UNICODE);
             }
         }
         
-        $logLine = "[$timestamp] [$level] $message$contextStr" . PHP_EOL . PHP_EOL;
+        $logLine = "[$timestamp] [$level] $message$contextStr" . PHP_EOL;
 
         @file_put_contents($logFile, $logLine, FILE_APPEND | LOCK_EX);
     }

@@ -15,36 +15,31 @@ class EnvHelper
         }
         self::$loaded = true;
 
-        $envFiles = [
-            __DIR__ . '/../../config/.env',
-            __DIR__ . '/../../.env',
-            __DIR__ . '/../../../.env',
-            __DIR__ . '/../../../config/.env',
-        ];
+        $envFile = __DIR__ . '/../../.env';
 
-        foreach ($envFiles as $file) {
-            if (is_file($file) && is_readable($file)) {
-                $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                if ($lines === false) {
-                    continue;
+        if (!is_file($envFile) || !is_readable($envFile)) {
+            return;
+        }
+
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            return;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || strpos($line, '#') === 0) {
+                continue;
+            }
+            if (strpos($line, '=') !== false) {
+                [$key, $value] = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+                $value = trim($value, '"\'');
+                if ($key !== '' && !isset($_ENV[$key])) {
+                    $_ENV[$key] = $value;
+                    putenv("$key=$value");
                 }
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if ($line === '' || strpos($line, '#') === 0) {
-                        continue;
-                    }
-                    if (strpos($line, '=') !== false) {
-                        [$key, $value] = explode('=', $line, 2);
-                        $key = trim($key);
-                        $value = trim($value);
-                        $value = trim($value, '"\'');
-                        if ($key !== '' && !isset($_ENV[$key])) {
-                            $_ENV[$key] = $value;
-                            putenv("$key=$value");
-                        }
-                    }
-                }
-                break;
             }
         }
     }

@@ -27,9 +27,9 @@ class AgentController
         } catch (\RuntimeException $e) {
             ResponseHelper::error($e->getMessage(), HttpStatusCode::INTERNAL_SERVER_ERROR->value);
         } catch (\Throwable $err) {
-            http_response_code(HttpStatusCode::INTERNAL_SERVER_ERROR->value);
             $message = trim($err->getMessage()) ?: 'Falha interna ao processar a pergunta.';
             ResponseHelper::error($message, HttpStatusCode::INTERNAL_SERVER_ERROR->value);
+        }
     }
 }
 }

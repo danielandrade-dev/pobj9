@@ -17,21 +17,20 @@ use Pobj\Api\Http\Controllers\ResumoController;
 use Pobj\Api\Http\Controllers\StatusIndicadoresController;
 
 return function (Router $router): void {
-    $router->add('health', HealthController::class, 'check', [HttpMethod::GET->value]);
-
-    $router->add('agent', AgentController::class, 'handle', [HttpMethod::POST->value]);
-
-    $router->add('bootstrap', BootstrapController::class, 'handle', [HttpMethod::GET->value]);
-
-    $router->add('filtros', FiltrosController::class, 'handle', [HttpMethod::GET->value]);
-
-    $router->add('resumo', ResumoController::class, 'handle', [HttpMethod::GET->value]);
-
-    $router->add('status_indicadores', StatusIndicadoresController::class, 'handle', [HttpMethod::GET->value]);
-
-    $router->add('omega/users', OmegaUsersController::class, 'handle', [HttpMethod::GET->value]);
-    $router->add('omega/statuses', OmegaStatusController::class, 'handle', [HttpMethod::GET->value]);
-    $router->add('omega/structure', OmegaStructureController::class, 'handle', [HttpMethod::GET->value]);
-    $router->add('omega/tickets', OmegaTicketsController::class, 'handle', [HttpMethod::GET->value]);
-    $router->add('omega/mesu', OmegaMesuController::class, 'handle', [HttpMethod::GET->value]);
+    $router->group('api', function ($router) {
+        $router->add('health', HealthController::class, 'check', [HttpMethod::GET->value]);
+        $router->add('agent', AgentController::class, 'handle', [HttpMethod::POST->value]);
+        $router->add('bootstrap', BootstrapController::class, 'handle', [HttpMethod::GET->value]);
+        $router->add('filtros', FiltrosController::class, 'handle', [HttpMethod::GET->value]);
+        $router->add('resumo', ResumoController::class, 'handle', [HttpMethod::GET->value]);
+        $router->add('status_indicadores', StatusIndicadoresController::class, 'handle', [HttpMethod::GET->value]);
+        
+        $router->group('omega', function ($router) {
+            $router->add('users', OmegaUsersController::class, 'handle', [HttpMethod::GET->value]);
+            $router->add('statuses', OmegaStatusController::class, 'handle', [HttpMethod::GET->value]);
+            $router->add('structure', OmegaStructureController::class, 'handle', [HttpMethod::GET->value]);
+            $router->add('tickets', OmegaTicketsController::class, 'handle', [HttpMethod::GET->value]);
+            $router->add('mesu', OmegaMesuController::class, 'handle', [HttpMethod::GET->value]);
+        });
+    });
 };

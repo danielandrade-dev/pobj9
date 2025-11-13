@@ -20,6 +20,31 @@ if (str_starts_with($requestPath, '/api/')) {
     exit;
 }
 
+$publicPath = __DIR__ . '/public' . $requestPath;
+if ($requestPath !== '/' && is_file($publicPath)) {
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'json' => 'application/json',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+        'ico' => 'image/x-icon',
+        'html' => 'text/html',
+        'xml' => 'application/xml',
+    ];
+    
+    $extension = strtolower(pathinfo($publicPath, PATHINFO_EXTENSION));
+    $contentType = $mimeTypes[$extension] ?? 'application/octet-stream';
+    
+    header('Content-Type: ' . $contentType);
+    header('Cache-Control: public, max-age=3600');
+    readfile($publicPath);
+    exit;
+}
+
 $indexPath = __DIR__ . '/public/index.html';
 
 if (!is_file($indexPath)) {

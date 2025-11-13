@@ -65,7 +65,7 @@ if (typeof window !== "undefined") {
 const DATA_SOURCE = "sql";
 const API_PATH = typeof window !== "undefined" && window.API_URL
   ? String(window.API_URL)
-  : "src/index.php";
+  : "../src/index.php";
 const DEFAULT_HTTP_BASE = "http://localhost:8000";
 const API_HTTP_BASE = typeof window !== "undefined" && window.API_HTTP_BASE
   ? String(window.API_HTTP_BASE)
@@ -192,11 +192,11 @@ function resolveApiBaseUrl(){
   if (normalizedPath) {
     attempts.push(() => new URL(normalizedPath, window.location.href));
   } else {
-    attempts.push(() => new URL("src/index.php", window.location.href));
+    attempts.push(() => new URL("../src/index.php", window.location.href));
   }
 
   if (fallbackBase) {
-    attempts.push(() => new URL(normalizedPath || "src/index.php", fallbackBase));
+    attempts.push(() => new URL(normalizedPath || "../src/index.php", fallbackBase));
   }
 
   let lastError;
@@ -6482,8 +6482,13 @@ async function apiPost(path, body = {}, params){
 }
 
 function prepareApiUrl(baseUrl, path, params){
-  const url = new URL(baseUrl.toString());
-  const searchParams = new URLSearchParams(url.search);
+  // Sempre usa a raiz do site para construir URLs da API com prefixo /api/
+  // Considera o pathname base caso o site não esteja na raiz (ex: /pobj9/)
+  // Remove 'public' do pathname se presente
+  let basePath = window.location.pathname.split('/').slice(0, -1).join('/') || '';
+  basePath = basePath.replace(/\/public$/, ''); // Remove /public se presente
+  const url = new URL(window.location.origin + basePath);
+  const searchParams = new URLSearchParams();
 
   if (params && typeof params === "object"){
     Object.entries(params).forEach(([key, value]) => {
@@ -6494,14 +6499,11 @@ function prepareApiUrl(baseUrl, path, params){
   }
 
   const normalized = typeof path === "string" ? path.trim() : "";
-  const endpoint = normalized.replace(/^\/+/, "");
+  const endpoint = normalized.replace(/^\/+/, "").replace(/^api\//, ""); // Remove /api/ se já estiver presente
   if (endpoint){
     searchParams.set(API_ENDPOINT_PARAM, endpoint);
-    const basePath = url.pathname.replace(/\/+$/, "");
-    const endpointPath = endpoint.replace(/^\/+/, "");
-    if (endpointPath){
-      url.pathname = `${basePath}/${endpointPath}`;
-    }
+    // Usa /api/endpoint como pathname para que o .htaccess capture corretamente
+    url.pathname = `/api/${endpoint}`;
   }
 
   const queryString = searchParams.toString();
@@ -17005,7 +17007,7 @@ function buildBootstrapHelpSteps(error){
   }
 
   steps.push("Confira se o Apache (servidor web) e o MySQL estão iniciados no XAMPP.");
-  steps.push("Acesse http://localhost/POBJ%20SQL%20php71/src/index.php?endpoint=health e confirme que retorna {\"status\":\"ok\"}.");
+  steps.push("Acesse a URL da API com /api/health e confirme que retorna {\"status\":\"ok\"}.");
   steps.push("Revise o arquivo config/.env com host, usuário e senha do banco (ex.: host=localhost, user=root, sem senha no XAMPP).");
   steps.push("Execute docs/schema_mysql.sql no banco para garantir que todas as tabelas existem.");
   steps.push("Se publicar em outro domínio/porta, adicione <script>window.API_HTTP_BASE='URL-do-seu-site';</script> antes de script.js.");

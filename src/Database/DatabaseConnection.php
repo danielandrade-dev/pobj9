@@ -49,13 +49,14 @@ class DatabaseConnection
         // Fallback: cria conexão PDO direta
         $config = self::getConfig();
 
-        // Suporta socket Unix (comum no Linux quando host é 'localhost')
-        // Se host for 'localhost', tenta socket Unix primeiro, depois usa 127.0.0.1 para TCP/IP
+        // Para Docker ou portas não padrão, sempre usa TCP/IP
+        // Socket Unix só é usado se host for 'localhost', porta 3306 E socket existir
         $host = $config['host'];
         $useSocket = false;
         
+        // Se porta não é 3306 (padrão), sempre usa TCP/IP (comum em Docker)
         if ($host === 'localhost' && $config['port'] === 3306) {
-            // Tenta usar socket Unix primeiro (mais rápido no Linux)
+            // Tenta usar socket Unix primeiro (mais rápido no Linux nativo)
             $socketPaths = [
                 '/var/run/mysqld/mysqld.sock',
                 '/tmp/mysql.sock',
@@ -73,15 +74,16 @@ class DatabaseConnection
                     break;
                 }
             }
-            
-            // Se não encontrou socket, usa 127.0.0.1 ao invés de localhost para forçar TCP/IP
-            if (!$useSocket) {
-                $host = '127.0.0.1';
-            }
         }
         
+        // Se não encontrou socket OU porta não é padrão, usa TCP/IP
+        // Para Docker, sempre converte localhost para 127.0.0.1 para forçar TCP/IP
         if (!$useSocket) {
-            // Usa TCP/IP
+            // Converte localhost para 127.0.0.1 para garantir TCP/IP (importante para Docker)
+            if ($host === 'localhost') {
+                $host = '127.0.0.1';
+            }
+            
             $dsn = sprintf(
                 'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
                 $host,

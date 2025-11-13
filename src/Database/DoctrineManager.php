@@ -76,6 +76,12 @@ class DoctrineManager
             [$host] = explode(':', $host, 2);
         }
 
+        // Converte localhost para 127.0.0.1 para forçar TCP/IP
+        // Isso evita problemas com socket Unix que pode não existir ou não estar acessível
+        if ($host === 'localhost') {
+            $host = '127.0.0.1';
+        }
+
         return (string) $host;
     }
 

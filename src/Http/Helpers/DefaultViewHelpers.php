@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pobj\Api\Http;
+namespace Pobj\Api\Http\Helpers;
 
 /**
  * Helpers padrão para uso nas views
@@ -12,12 +12,12 @@ namespace Pobj\Api\Http;
  * @helper('formatCurrency', 1234.56)
  * @helper('asset', 'script.js')
  */
-class ViewHelpers
+class DefaultViewHelpers
 {
     public static function registerDefaults(): void
     {
         // Helper para formatar datas
-        ViewHelper::register('formatDate', function (string $date, string $format = 'd/m/Y'): string {
+        ViewHelperRegistry::register('formatDate', function (string $date, string $format = 'd/m/Y'): string {
             $timestamp = strtotime($date);
             if ($timestamp === false) {
                 return $date;
@@ -26,7 +26,7 @@ class ViewHelpers
         });
 
         // Helper para formatar moeda
-        ViewHelper::register('formatCurrency', function ($value, string $currency = 'R$'): string {
+        ViewHelperRegistry::register('formatCurrency', function ($value, string $currency = 'R$'): string {
             if (!is_numeric($value)) {
                 return (string) $value;
             }
@@ -34,7 +34,7 @@ class ViewHelpers
         });
 
         // Helper para gerar URLs de assets
-        ViewHelper::register('asset', function (string $path): string {
+        ViewHelperRegistry::register('asset', function (string $path): string {
             // Remove barras iniciais
             $path = ltrim($path, '/');
             // Se não começar com public/, adiciona
@@ -45,7 +45,7 @@ class ViewHelpers
         });
 
         // Helper para formatar números
-        ViewHelper::register('formatNumber', function ($value, int $decimals = 0): string {
+        ViewHelperRegistry::register('formatNumber', function ($value, int $decimals = 0): string {
             if (!is_numeric($value)) {
                 return (string) $value;
             }
@@ -53,17 +53,17 @@ class ViewHelpers
         });
 
         // Helper para escapar HTML
-        ViewHelper::register('e', function (string $value): string {
+        ViewHelperRegistry::register('e', function (string $value): string {
             return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         });
 
         // Helper para verificar se variável existe e não é vazia
-        ViewHelper::register('isset', function ($value): bool {
+        ViewHelperRegistry::register('isset', function ($value): bool {
             return isset($value) && $value !== '' && $value !== null;
         });
 
         // Helper para gerar classes CSS condicionais
-        ViewHelper::register('class', function (...$classes): string {
+        ViewHelperRegistry::register('class', function (...$classes): string {
             $result = [];
             foreach ($classes as $class) {
                 if (is_string($class) && !empty($class)) {

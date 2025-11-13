@@ -4,36 +4,54 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
-use Pobj\Api\Helpers\EnvHelper;
+use Doctrine\ORM\EntityManager;
+use Pobj\Api\Entity\OmegaDepartamento;
 
 class OmegaStructureRepository implements RepositoryInterface
 {
-    private PDO $pdo;
+    private EntityManager $entityManager;
 
-    public function __construct(PDO $pdo)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->pdo = $pdo;
+        $this->entityManager = $entityManager;
     }
 
+    /**
+     * @return OmegaDepartamento[]
+     */
     public function findAll(): array
     {
-        $tableName = $this->getTableName();
-        $rows = DatabaseConnection::query(
-            $this->pdo,
-            "SELECT departamento, departamento_id, ordem_departamento, tipo, ordem_tipo
-             FROM {$tableName}
-             ORDER BY ordem_departamento ASC, ordem_tipo ASC, departamento ASC, tipo ASC"
-        );
-
-        return $rows ?: [];
+        return $this->entityManager
+            ->getRepository(OmegaDepartamento::class)
+            ->createQueryBuilder('d')
+            ->orderBy('d.ordemDepartamento', 'ASC')
+            ->addOrderBy('d.ordemTipo', 'ASC')
+            ->addOrderBy('d.departamento', 'ASC')
+            ->addOrderBy('d.tipo', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
-    private function getTableName(): string
+    /**
+     * Converte entidades para array associativo (compatibilidade com código existente)
+     * @return array<int, array<string, mixed>>
+     */
+    public function findAllAsArray(): array
     {
-        $prefix = EnvHelper::get('DB_TABLE_PREFIX', '');
-        return $prefix . 'omega_departamentos';
+        $entities = $this->findAll();
+        $result = [];
+        
+        foreach ($entities as $entity) {
+            $result[] = [
+                'departamento' => $entity->getDepartamento(),
+                'departamento_id' => $entity->getDepartamentoId(),
+                'ordem_departamento' => $entity->getOrdemDepartamento(),
+                'tipo' => $entity->getTipo(),
+                'ordem_tipo' => $entity->getOrdemTipo(),
+            ];
+        }
+        
+        return $result;
     }
 }
 

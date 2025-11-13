@@ -17,7 +17,7 @@ class OmegaUsersService
 
     public function getAllUsers(): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findAllAsArray();
     }
 }
 

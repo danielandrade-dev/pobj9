@@ -17,7 +17,7 @@ class StatusIndicadoresService
 
     public function getAllStatus(): array
     {
-        return ['rows' => $this->statusRepository->findAll()];
+        return ['rows' => $this->statusRepository->findAllAsArray()];
     }
 }
 

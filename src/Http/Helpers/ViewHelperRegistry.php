@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Pobj\Api\Http;
+namespace Pobj\Api\Http\Helpers;
 
-class ViewHelper
+class ViewHelperRegistry
 {
     private static array $helpers = [];
 

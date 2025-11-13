@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pobj\Api\Response;
 
 use Pobj\Api\Enums\HttpStatusCode;
-use Pobj\Api\Http\View;
+use Pobj\Api\Http\ViewRenderer;
 
 class ResponseHelper
 {
@@ -18,7 +18,7 @@ class ResponseHelper
     public static function view(string $viewName, array $data = [], int $statusCode = HttpStatusCode::OK->value): void
     {
         $projectRoot = dirname(__DIR__, 2);
-        $view = new View($projectRoot);
+        $view = new ViewRenderer($projectRoot);
         
         http_response_code($statusCode);
         header('Content-Type: text/html; charset=utf-8');

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
+use Doctrine\ORM\EntityManager;
 
 interface RepositoryInterface
 {
-    public function __construct(PDO $pdo);
+    public function __construct(EntityManager $entityManager);
 }
 

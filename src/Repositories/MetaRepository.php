@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
 class MetaRepository implements RepositoryInterface
 {
-    private PDO $pdo;
+    private EntityManager $entityManager;
+    private Connection $connection;
 
-    public function __construct(PDO $pdo)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->pdo = $pdo;
+        $this->entityManager = $entityManager;
+        $this->connection = $entityManager->getConnection();
     }
 
     public function sumByPeriodAndFilters(
@@ -24,28 +26,29 @@ class MetaRepository implements RepositoryInterface
         ?string $indicadorId = null
     ): float {
         $bind = array_merge([
-            ':ini' => $dateFrom,
-            ':fim' => $dateTo,
+            'ini' => $dateFrom,
+            'fim' => $dateTo,
         ], $bindValues);
 
         $where = $filters ? ' AND ' . implode(' AND ', $filters) : '';
 
         $indicadorFilter = '';
         if ($indicadorId !== null && $indicadorId !== '') {
-            $bind[':id_indicador'] = $indicadorId;
+            $bind['id_indicador'] = $indicadorId;
             $indicadorFilter = ' AND m.id_indicador = :id_indicador';
         }
 
-        $result = DatabaseConnection::query(
-            $this->pdo,
-            "SELECT SUM(m.meta_mensal) AS total_meta
-             FROM f_meta m
-             JOIN d_calendario c ON c.data = m.data_meta
-             JOIN d_estrutura e ON e.funcional = m.funcional
-             WHERE c.data BETWEEN :ini AND :fim{$indicadorFilter}{$where}",
-            $bind
-        );
+        $sql = "SELECT SUM(m.meta_mensal) AS total_meta
+                FROM f_metas m
+                JOIN d_calendario c ON c.data = m.data
+                JOIN d_unidades u ON u.segmento_id = m.segmento_id 
+                    AND u.diretoria_id = m.diretoria_id 
+                    AND u.gerencia_regional_id = m.gerencia_regional_id 
+                    AND u.agencia_id = m.agencia_id
+                WHERE c.data BETWEEN :ini AND :fim{$indicadorFilter}{$where}";
 
-        return (float) ($result[0]['total_meta'] ?? 0);
+        $result = $this->connection->executeQuery($sql, $bind)->fetchAssociative();
+
+        return (float) ($result['total_meta'] ?? 0);
     }
 }

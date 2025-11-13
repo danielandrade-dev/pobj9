@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Http;
 
-class View
+use Pobj\Api\Http\Helpers\ViewHelperRegistry;
+
+class ViewRenderer
 {
     private string $projectRoot;
 
@@ -114,7 +116,7 @@ class View
             }
             
             try {
-                $result = ViewHelper::call($helperName, ...$args);
+                $result = ViewHelperRegistry::call($helperName, ...$args);
                 return is_string($result) ? $result : (string) $result;
             } catch (\RuntimeException $e) {
                 return ''; // Retorna vazio se helper não existir

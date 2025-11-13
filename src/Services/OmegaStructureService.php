@@ -17,7 +17,7 @@ class OmegaStructureService
 
     public function getStructure(): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findAllAsArray();
     }
 }
 

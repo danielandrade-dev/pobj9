@@ -17,7 +17,7 @@ class OmegaStatusService
 
     public function getAllStatus(): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findAllAsArray();
     }
 }
 

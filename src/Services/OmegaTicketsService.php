@@ -17,7 +17,7 @@ class OmegaTicketsService
 
     public function getAllTickets(): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findAllAsArray();
     }
 }
 

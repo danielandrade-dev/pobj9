@@ -29,7 +29,7 @@ class BootstrapService
             'agencias' => $this->estruturaRepository->findAllAgencias(),
             'ggestoes' => $this->estruturaRepository->findAllGGestoes(),
             'gerentes' => $this->estruturaRepository->findAllGerentes(),
-            'statusIndicadores' => $this->statusRepository->findAll(),
+            'statusIndicadores' => $this->statusRepository->findAllAsArray(),
         ];
     }
 }

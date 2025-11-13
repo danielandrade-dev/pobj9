@@ -4,148 +4,138 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
 class EstruturaRepository implements RepositoryInterface
 {
-    private PDO $pdo;
+    private EntityManager $entityManager;
+    private Connection $connection;
 
-    public function __construct(PDO $pdo)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->pdo = $pdo;
+        $this->entityManager = $entityManager;
+        $this->connection = $entityManager->getConnection();
     }
 
     public function findAllSegmentos(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_segmento AS id, segmento AS nome
-             FROM d_estrutura
-             WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
-             ORDER BY nome'
-        );
+        $sql = 'SELECT DISTINCT segmento_id AS id, segmento AS nome
+                FROM d_unidades
+                WHERE segmento_id IS NOT NULL AND segmento IS NOT NULL
+                ORDER BY nome';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findAllDiretorias(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_diretoria AS id, diretoria AS nome
-             FROM d_estrutura
-             WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
-             ORDER BY nome'
-        );
+        $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_regional AS nome
+                FROM d_unidades
+                WHERE diretoria_id IS NOT NULL AND diretoria_regional IS NOT NULL
+                ORDER BY nome';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findAllRegionais(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_regional AS id, regional AS nome
-             FROM d_estrutura
-             WHERE id_regional IS NOT NULL AND regional IS NOT NULL
-             ORDER BY nome'
-        );
+        $sql = 'SELECT DISTINCT gerencia_regional_id AS id, gerencia_regional AS nome
+                FROM d_unidades
+                WHERE gerencia_regional_id IS NOT NULL AND gerencia_regional IS NOT NULL
+                ORDER BY nome';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findAllAgencias(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_agencia AS id, agencia AS nome, porte
-             FROM d_estrutura
-             WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
-             ORDER BY nome'
-        );
+        $sql = 'SELECT DISTINCT agencia_id AS id, agencia AS nome, NULL AS porte
+                FROM d_unidades
+                WHERE agencia_id IS NOT NULL AND agencia IS NOT NULL
+                ORDER BY nome';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findAllGGestoes(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            "SELECT DISTINCT funcional AS id, nome
-             FROM d_estrutura
-             WHERE cargo LIKE 'Gerente de Gestao%' OR cargo LIKE 'Gerente de Gestão%'
-             ORDER BY nome"
-        );
+        $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS nome
+                FROM d_unidades
+                WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao IS NOT NULL
+                ORDER BY nome";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findAllGerentes(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            "SELECT DISTINCT funcional AS id, nome
-             FROM d_estrutura
-             WHERE cargo LIKE 'Gerente%' AND cargo NOT LIKE 'Gerente de Gest%'
-             ORDER BY nome"
-        );
+        $sql = "SELECT DISTINCT gerente_id AS id, gerente AS nome
+                FROM d_unidades
+                WHERE gerente_id IS NOT NULL AND gerente IS NOT NULL
+                ORDER BY nome";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findSegmentosForFilter(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_segmento AS id, segmento AS label
-             FROM d_estrutura
-             WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
-             ORDER BY label'
-        );
+        $sql = 'SELECT DISTINCT segmento_id AS id, segmento AS label
+                FROM d_unidades
+                WHERE segmento_id IS NOT NULL AND segmento IS NOT NULL
+                ORDER BY label';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findDiretoriasForFilter(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_diretoria AS id, diretoria AS label
-             FROM d_estrutura
-             WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
-             ORDER BY label'
-        );
+        $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_regional AS label
+                FROM d_unidades
+                WHERE diretoria_id IS NOT NULL AND diretoria_regional IS NOT NULL
+                ORDER BY label';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findRegionaisForFilter(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_regional AS id, regional AS label
-             FROM d_estrutura
-             WHERE id_regional IS NOT NULL AND regional IS NOT NULL
-             ORDER BY label'
-        );
+        $sql = 'SELECT DISTINCT gerencia_regional_id AS id, gerencia_regional AS label
+                FROM d_unidades
+                WHERE gerencia_regional_id IS NOT NULL AND gerencia_regional IS NOT NULL
+                ORDER BY label';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findAgenciasForFilter(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            'SELECT DISTINCT id_agencia AS id, agencia AS label, porte
-             FROM d_estrutura
-             WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
-             ORDER BY label'
-        );
+        $sql = 'SELECT DISTINCT agencia_id AS id, agencia AS label, NULL AS porte
+                FROM d_unidades
+                WHERE agencia_id IS NOT NULL AND agencia IS NOT NULL
+                ORDER BY label';
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findGGestoesForFilter(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            "SELECT DISTINCT funcional AS id, nome AS label
-             FROM d_estrutura
-             WHERE cargo LIKE 'Gerente de Gestao%' OR cargo LIKE 'Gerente de Gestão%'
-             ORDER BY label"
-        );
+        $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS label
+                FROM d_unidades
+                WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao IS NOT NULL
+                ORDER BY label";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 
     public function findGerentesForFilter(): array
     {
-        return DatabaseConnection::query(
-            $this->pdo,
-            "SELECT DISTINCT funcional AS id, nome AS label
-             FROM d_estrutura
-             WHERE cargo LIKE 'Gerente%' AND cargo NOT LIKE 'Gerente de Gest%'
-             ORDER BY label"
-        );
+        $sql = "SELECT DISTINCT gerente_id AS id, gerente AS label
+                FROM d_unidades
+                WHERE gerente_id IS NOT NULL AND gerente IS NOT NULL
+                ORDER BY label";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 }
 

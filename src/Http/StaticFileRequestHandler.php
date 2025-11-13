@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Http;
 
-class StaticFileHandler
+class StaticFileRequestHandler
 {
     private const MIME_TYPES = [
         'css' => 'text/css',
@@ -20,18 +20,20 @@ class StaticFileHandler
         'xml' => 'application/xml',
     ];
 
-    public function serve(string $filePath): bool
+    public function handle(string $requestPath, string $projectRoot): bool
     {
-        if (!is_file($filePath)) {
+        $publicPath = $projectRoot . '/public' . $requestPath;
+        
+        if (!is_file($publicPath)) {
             return false;
         }
 
-        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $extension = strtolower(pathinfo($publicPath, PATHINFO_EXTENSION));
         $contentType = self::MIME_TYPES[$extension] ?? 'application/octet-stream';
         
         header('Content-Type: ' . $contentType);
         header('Cache-Control: public, max-age=3600');
-        readfile($filePath);
+        readfile($publicPath);
         
         return true;
     }

@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
 class RealizadoRepository implements RepositoryInterface
 {
-    private PDO $pdo;
+    private EntityManager $entityManager;
+    private Connection $connection;
 
-    public function __construct(PDO $pdo)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->pdo = $pdo;
+        $this->entityManager = $entityManager;
+        $this->connection = $entityManager->getConnection();
     }
 
     public function sumByPeriodAndFilters(
@@ -24,28 +26,29 @@ class RealizadoRepository implements RepositoryInterface
         ?string $indicadorId = null
     ): float {
         $bind = array_merge([
-            ':ini' => $dateFrom,
-            ':fim' => $dateTo,
+            'ini' => $dateFrom,
+            'fim' => $dateTo,
         ], $bindValues);
 
         $where = $filters ? ' AND ' . implode(' AND ', $filters) : '';
 
         $indicadorFilter = '';
         if ($indicadorId !== null && $indicadorId !== '') {
-            $bind[':id_indicador'] = $indicadorId;
+            $bind['id_indicador'] = $indicadorId;
             $indicadorFilter = ' AND r.id_indicador = :id_indicador';
         }
 
-        $result = DatabaseConnection::query(
-            $this->pdo,
-            "SELECT SUM(r.realizado) AS total_realizado
-             FROM f_realizado r
-             JOIN d_calendario c ON c.data = r.data_realizado
-             JOIN d_estrutura e ON e.funcional = r.funcional
-             WHERE c.data BETWEEN :ini AND :fim{$indicadorFilter}{$where}",
-            $bind
-        );
+        $sql = "SELECT SUM(r.realizado_mensal) AS total_realizado
+                FROM f_realizados r
+                JOIN d_calendario c ON c.data = r.data
+                JOIN d_unidades u ON u.segmento_id = r.segmento_id 
+                    AND u.diretoria_id = r.diretoria_id 
+                    AND u.gerencia_regional_id = r.gerencia_regional_id 
+                    AND u.agencia_id = r.agencia_id
+                WHERE c.data BETWEEN :ini AND :fim{$indicadorFilter}{$where}";
 
-        return (float) ($result[0]['total_realizado'] ?? 0);
+        $result = $this->connection->executeQuery($sql, $bind)->fetchAssociative();
+
+        return (float) ($result['total_realizado'] ?? 0);
     }
 }

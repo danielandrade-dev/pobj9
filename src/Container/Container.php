@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Container;
 
+use Doctrine\ORM\EntityManager;
 use PDO;
 use Pobj\Api\Database\DatabaseConnection;
+use Pobj\Api\Database\DoctrineManager;
 use Pobj\Api\Repositories\EstruturaRepository;
 use Pobj\Api\Repositories\MetaRepository;
 use Pobj\Api\Repositories\OmegaMesuRepository;
@@ -52,20 +54,24 @@ class Container
             return DatabaseConnection::getConnection();
         });
 
+        $this->singleton(EntityManager::class, function () {
+            return DoctrineManager::getEntityManager();
+        });
+
         $this->singleton(EstruturaRepository::class, function (Container $container) {
-            return new EstruturaRepository($container->get(PDO::class));
+            return new EstruturaRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(StatusIndicadoresRepository::class, function (Container $container) {
-            return new StatusIndicadoresRepository($container->get(PDO::class));
+            return new StatusIndicadoresRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(RealizadoRepository::class, function (Container $container) {
-            return new RealizadoRepository($container->get(PDO::class));
+            return new RealizadoRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(MetaRepository::class, function (Container $container) {
-            return new MetaRepository($container->get(PDO::class));
+            return new MetaRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(BootstrapService::class, function (Container $container) {
@@ -100,7 +106,7 @@ class Container
         });
 
         $this->singleton(OmegaUsersRepository::class, function (Container $container) {
-            return new OmegaUsersRepository($container->get(PDO::class));
+            return new OmegaUsersRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(OmegaUsersService::class, function (Container $container) {
@@ -108,7 +114,7 @@ class Container
         });
 
         $this->singleton(OmegaStatusRepository::class, function (Container $container) {
-            return new OmegaStatusRepository($container->get(PDO::class));
+            return new OmegaStatusRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(OmegaStatusService::class, function (Container $container) {
@@ -116,7 +122,7 @@ class Container
         });
 
         $this->singleton(OmegaStructureRepository::class, function (Container $container) {
-            return new OmegaStructureRepository($container->get(PDO::class));
+            return new OmegaStructureRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(OmegaStructureService::class, function (Container $container) {
@@ -124,7 +130,7 @@ class Container
         });
 
         $this->singleton(OmegaTicketsRepository::class, function (Container $container) {
-            return new OmegaTicketsRepository($container->get(PDO::class));
+            return new OmegaTicketsRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(OmegaTicketsService::class, function (Container $container) {
@@ -132,7 +138,7 @@ class Container
         });
 
         $this->singleton(OmegaMesuRepository::class, function (Container $container) {
-            return new OmegaMesuRepository($container->get(PDO::class));
+            return new OmegaMesuRepository($container->get(EntityManager::class));
         });
 
         $this->singleton(OmegaMesuService::class, function (Container $container) {

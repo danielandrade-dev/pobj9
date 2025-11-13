@@ -4,65 +4,40 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
-use Pobj\Api\Helpers\EnvHelper;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
 class OmegaMesuRepository implements RepositoryInterface
 {
-    private PDO $pdo;
+    private EntityManager $entityManager;
+    private Connection $connection;
 
-    public function __construct(PDO $pdo)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->pdo = $pdo;
+        $this->entityManager = $entityManager;
+        $this->connection = $entityManager->getConnection();
     }
 
     public function findAll(): array
     {
-        $tableName = $this->getTableName();
-        $rows = DatabaseConnection::query(
-            $this->pdo,
-            "SELECT DISTINCT
-                segmento AS Segmento,
-                id_segmento AS 'Id Segmento',
-                diretoria AS Diretoria,
-                id_diretoria AS 'ID Diretoria',
-                regional AS 'Gerencia Regional',
-                id_regional AS 'Id Gerencia Regional',
-                agencia AS Agencia,
-                id_agencia AS 'Id Agencia',
-                CASE 
-                    WHEN cargo LIKE 'Gerente de Gestao%' OR cargo LIKE 'Gerente de Gestão%' 
-                    THEN nome 
-                    ELSE NULL 
-                END AS 'Gerente de Gestao',
-                CASE 
-                    WHEN cargo LIKE 'Gerente de Gestao%' OR cargo LIKE 'Gerente de Gestão%' 
-                    THEN funcional 
-                    ELSE NULL 
-                END AS 'Id Gerente de Gestao',
-                CASE 
-                    WHEN cargo LIKE 'Gerente%' AND cargo NOT LIKE 'Gerente de Gest%' 
-                    THEN nome 
-                    ELSE NULL 
-                END AS Gerente,
-                CASE 
-                    WHEN cargo LIKE 'Gerente%' AND cargo NOT LIKE 'Gerente de Gest%' 
-                    THEN funcional 
-                    ELSE NULL 
-                END AS 'Id Gerente'
-             FROM {$tableName}
-             WHERE segmento IS NOT NULL
-             ORDER BY segmento, diretoria, regional, agencia"
-        );
+        $sql = "SELECT DISTINCT
+                    segmento AS Segmento,
+                    segmento_id AS 'Id Segmento',
+                    diretoria_regional AS Diretoria,
+                    diretoria_id AS 'ID Diretoria',
+                    gerencia_regional AS 'Gerencia Regional',
+                    gerencia_regional_id AS 'Id Gerencia Regional',
+                    agencia AS Agencia,
+                    agencia_id AS 'Id Agencia',
+                    gerente_gestao AS 'Gerente de Gestao',
+                    gerente_gestao_id AS 'Id Gerente de Gestao',
+                    gerente AS Gerente,
+                    gerente_id AS 'Id Gerente'
+                FROM d_unidades
+                WHERE segmento IS NOT NULL
+                ORDER BY segmento, diretoria_regional, gerencia_regional, agencia";
 
-        return $rows ?: [];
-    }
-
-    private function getTableName(): string
-    {
-        $prefix = EnvHelper::get('DB_TABLE_PREFIX', '');
-        return $prefix . 'd_estrutura';
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
     }
 }
 

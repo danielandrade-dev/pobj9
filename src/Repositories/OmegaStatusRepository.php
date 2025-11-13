@@ -4,36 +4,53 @@ declare(strict_types=1);
 
 namespace Pobj\Api\Repositories;
 
-use PDO;
-use Pobj\Api\Database\DatabaseConnection;
-use Pobj\Api\Helpers\EnvHelper;
+use Doctrine\ORM\EntityManager;
+use Pobj\Api\Entity\OmegaStatus;
 
 class OmegaStatusRepository implements RepositoryInterface
 {
-    private PDO $pdo;
+    private EntityManager $entityManager;
 
-    public function __construct(PDO $pdo)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->pdo = $pdo;
+        $this->entityManager = $entityManager;
     }
 
+    /**
+     * @return OmegaStatus[]
+     */
     public function findAll(): array
     {
-        $tableName = $this->getTableName();
-        $rows = DatabaseConnection::query(
-            $this->pdo,
-            "SELECT id, label, tone, descricao, ordem, departamento_id
-             FROM {$tableName}
-             ORDER BY ordem ASC, label ASC"
-        );
-
-        return $rows ?: [];
+        return $this->entityManager
+            ->getRepository(OmegaStatus::class)
+            ->createQueryBuilder('s')
+            ->orderBy('s.ordem', 'ASC')
+            ->addOrderBy('s.label', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
-    private function getTableName(): string
+    /**
+     * Converte entidades para array associativo (compatibilidade com código existente)
+     * @return array<int, array<string, mixed>>
+     */
+    public function findAllAsArray(): array
     {
-        $prefix = EnvHelper::get('DB_TABLE_PREFIX', '');
-        return $prefix . 'omega_status';
+        $entities = $this->findAll();
+        $result = [];
+        
+        foreach ($entities as $entity) {
+            $result[] = [
+                'id' => $entity->getId(),
+                'label' => $entity->getLabel(),
+                'tone' => $entity->getTone(),
+                'descricao' => $entity->getDescricao(),
+                'ordem' => $entity->getOrdem(),
+                'departamento_id' => $entity->getDepartamentoId(),
+            ];
+        }
+        
+        return $result;
     }
 }
 

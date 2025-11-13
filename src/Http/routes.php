@@ -8,6 +8,11 @@ use Pobj\Api\Http\Controllers\AgentController;
 use Pobj\Api\Http\Controllers\BootstrapController;
 use Pobj\Api\Http\Controllers\FiltrosController;
 use Pobj\Api\Http\Controllers\HealthController;
+use Pobj\Api\Http\Controllers\OmegaMesuController;
+use Pobj\Api\Http\Controllers\OmegaStatusController;
+use Pobj\Api\Http\Controllers\OmegaStructureController;
+use Pobj\Api\Http\Controllers\OmegaTicketsController;
+use Pobj\Api\Http\Controllers\OmegaUsersController;
 use Pobj\Api\Http\Controllers\ResumoController;
 use Pobj\Api\Http\Controllers\StatusIndicadoresController;
 
@@ -23,4 +28,10 @@ return function (Router $router): void {
     $router->add('resumo', ResumoController::class, 'handle', [HttpMethod::GET->value]);
 
     $router->add('status_indicadores', StatusIndicadoresController::class, 'handle', [HttpMethod::GET->value]);
+
+    $router->add('omega/users', OmegaUsersController::class, 'handle', [HttpMethod::GET->value]);
+    $router->add('omega/statuses', OmegaStatusController::class, 'handle', [HttpMethod::GET->value]);
+    $router->add('omega/structure', OmegaStructureController::class, 'handle', [HttpMethod::GET->value]);
+    $router->add('omega/tickets', OmegaTicketsController::class, 'handle', [HttpMethod::GET->value]);
+    $router->add('omega/mesu', OmegaMesuController::class, 'handle', [HttpMethod::GET->value]);
 };

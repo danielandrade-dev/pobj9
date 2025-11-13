@@ -8,11 +8,21 @@ use PDO;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Repositories\EstruturaRepository;
 use Pobj\Api\Repositories\MetaRepository;
+use Pobj\Api\Repositories\OmegaMesuRepository;
+use Pobj\Api\Repositories\OmegaStatusRepository;
+use Pobj\Api\Repositories\OmegaStructureRepository;
+use Pobj\Api\Repositories\OmegaTicketsRepository;
+use Pobj\Api\Repositories\OmegaUsersRepository;
 use Pobj\Api\Repositories\RealizadoRepository;
 use Pobj\Api\Repositories\StatusIndicadoresRepository;
 use Pobj\Api\Services\AgentService;
 use Pobj\Api\Services\BootstrapService;
 use Pobj\Api\Services\FiltrosService;
+use Pobj\Api\Services\OmegaMesuService;
+use Pobj\Api\Services\OmegaStatusService;
+use Pobj\Api\Services\OmegaStructureService;
+use Pobj\Api\Services\OmegaTicketsService;
+use Pobj\Api\Services\OmegaUsersService;
 use Pobj\Api\Services\ResumoService;
 use Pobj\Api\Services\StatusIndicadoresService;
 
@@ -86,6 +96,46 @@ class Container
 
         $this->singleton(AgentService::class, function () {
             return new AgentService();
+        });
+
+        $this->singleton(OmegaUsersRepository::class, function (Container $container) {
+            return new OmegaUsersRepository($container->get(PDO::class));
+        });
+
+        $this->singleton(OmegaUsersService::class, function (Container $container) {
+            return new OmegaUsersService($container->get(OmegaUsersRepository::class));
+        });
+
+        $this->singleton(OmegaStatusRepository::class, function (Container $container) {
+            return new OmegaStatusRepository($container->get(PDO::class));
+        });
+
+        $this->singleton(OmegaStatusService::class, function (Container $container) {
+            return new OmegaStatusService($container->get(OmegaStatusRepository::class));
+        });
+
+        $this->singleton(OmegaStructureRepository::class, function (Container $container) {
+            return new OmegaStructureRepository($container->get(PDO::class));
+        });
+
+        $this->singleton(OmegaStructureService::class, function (Container $container) {
+            return new OmegaStructureService($container->get(OmegaStructureRepository::class));
+        });
+
+        $this->singleton(OmegaTicketsRepository::class, function (Container $container) {
+            return new OmegaTicketsRepository($container->get(PDO::class));
+        });
+
+        $this->singleton(OmegaTicketsService::class, function (Container $container) {
+            return new OmegaTicketsService($container->get(OmegaTicketsRepository::class));
+        });
+
+        $this->singleton(OmegaMesuRepository::class, function (Container $container) {
+            return new OmegaMesuRepository($container->get(PDO::class));
+        });
+
+        $this->singleton(OmegaMesuService::class, function (Container $container) {
+            return new OmegaMesuService($container->get(OmegaMesuRepository::class));
         });
     }
 

@@ -57,12 +57,11 @@ const OMEGA_MONTH_LABELS = [
 
 let OMEGA_STATUS_ORDER = ["todos"];
 let OMEGA_STATUS_META = {};
-const OMEGA_STATUS_SOURCE = "Bases/dStatus.csv";
 let OMEGA_STATUS_CATALOG = [];
 let omegaStatusPromise = null;
 
 function omegaShouldUseApi(){
-  return typeof DATA_SOURCE !== 'undefined' && DATA_SOURCE === 'sql' && typeof apiGet === 'function';
+  return typeof apiGet === 'function';
 }
 
 function omegaApiGet(path){
@@ -82,13 +81,7 @@ function omegaApiPost(path, payload){
 }
 
 function loadOmegaCsv(path, label){
-  if (typeof loadCSVAuto === 'function') {
-    return loadCSVAuto(path).catch((err) => {
-      console.warn(`Falha ao carregar ${label} via loader principal:`, err);
-      return fallbackLoadCsv(path);
-    });
-  }
-  return fallbackLoadCsv(path);
+  return Promise.reject(new Error(`CSV não suportado. Use a API para carregar ${label}.`));
 }
 
 const OMEGA_PRIORITY_META = {
@@ -126,7 +119,6 @@ const OMEGA_STATUS_TONE_LABELS = {
   danger: "Crítico",
 };
 
-const OMEGA_STRUCTURE_SOURCE = "Bases/dEstruturaChamados.csv";
 
 const OMEGA_TRANSFER_EMPRESAS_LABEL = "Transferência - Empresas para Empresas";
 
@@ -233,7 +225,6 @@ const OMEGA_LEVEL_LABELS = {
   contrato: "Contrato",
 };
 
-const OMEGA_USERS_SOURCE = "Bases/omega_usuarios.csv";
 const OMEGA_USER_METADATA = {
   "usr-01": { teamId: "pobj" },
   "usr-02": { teamId: "orcamento" },
@@ -256,7 +247,6 @@ const OMEGA_AVATAR_PLACEHOLDER = "img/omega-avatar-placeholder.svg";
 
 const OMEGA_EXTERNAL_CONTACTS = new Map();
 
-const OMEGA_MESU_SOURCE = "Bases/mesu.csv";
 let OMEGA_MESU_DATA = [];
 let omegaMesuPromise = null;
 const OMEGA_MESU_BY_AGENCY = new Map();
@@ -388,7 +378,6 @@ let OMEGA_TICKETS = [];
 let omegaTicketCounter = 0;
 let omegaDataPromise = null;
 let omegaUsersPromise = null;
-const OMEGA_TICKETS_SOURCE = "Bases/omega_chamados.csv";
 
 let OMEGA_COMMENT_FACT = [];
 let OMEGA_NOTIFICATION_FACT = [];
@@ -411,12 +400,7 @@ function ensureOmegaData(){
   if (omegaDataPromise) return omegaDataPromise;
 
   resetOmegaFacts();
-  const loader = omegaShouldUseApi()
-    ? omegaApiGet('/omega/tickets').catch((err) => {
-        console.warn('Falha ao carregar chamados Omega pela API:', err);
-        return loadOmegaCsv(OMEGA_TICKETS_SOURCE, 'chamados Omega');
-      })
-    : loadOmegaCsv(OMEGA_TICKETS_SOURCE, 'chamados Omega');
+  const loader = omegaApiGet('/omega/tickets');
 
   omegaDataPromise = loader
     .then((rows) => {
@@ -449,12 +433,7 @@ function ensureOmegaUsers(){
   if (OMEGA_USERS.length) return Promise.resolve(OMEGA_USERS);
   if (omegaUsersPromise) return omegaUsersPromise;
 
-  const loader = omegaShouldUseApi()
-    ? omegaApiGet('/omega/users').catch((err) => {
-        console.warn('Falha ao carregar usuários Omega pela API:', err);
-        return loadOmegaCsv(OMEGA_USERS_SOURCE, 'usuários Omega');
-      })
-    : loadOmegaCsv(OMEGA_USERS_SOURCE, 'usuários Omega');
+  const loader = omegaApiGet('/omega/users');
 
   omegaUsersPromise = loader
     .then((rows) => {
@@ -515,12 +494,7 @@ function ensureOmegaStatuses(){
   if (OMEGA_STATUS_CATALOG.length) return Promise.resolve(OMEGA_STATUS_CATALOG);
   if (omegaStatusPromise) return omegaStatusPromise;
 
-  const loader = omegaShouldUseApi()
-    ? omegaApiGet('/omega/statuses').catch((err) => {
-        console.warn('Falha ao carregar status da Omega pela API:', err);
-        return loadOmegaCsv(OMEGA_STATUS_SOURCE, 'status da Omega');
-      })
-    : loadOmegaCsv(OMEGA_STATUS_SOURCE, 'status da Omega');
+  const loader = omegaApiGet('/omega/statuses');
 
   omegaStatusPromise = loader
     .then((rows) => {
@@ -864,12 +838,7 @@ function ensureOmegaStructure(){
   if (omegaStructureReady) return Promise.resolve(OMEGA_TICKET_TYPES_BY_DEPARTMENT);
   if (omegaStructurePromise) return omegaStructurePromise;
 
-  const loader = omegaShouldUseApi()
-    ? omegaApiGet('/omega/structure').catch((err) => {
-        console.warn('Falha ao carregar estrutura da Omega pela API:', err);
-        return loadOmegaCsv(OMEGA_STRUCTURE_SOURCE, 'estrutura Omega');
-      })
-    : loadOmegaCsv(OMEGA_STRUCTURE_SOURCE, 'estrutura Omega');
+  const loader = omegaApiGet('/omega/structure');
 
   omegaStructurePromise = loader
     .then((rows) => {
@@ -1198,7 +1167,7 @@ function ensureOmegaTemplate(){
   if (existing) return Promise.resolve(existing);
   if (omegaTemplatePromise) return omegaTemplatePromise;
 
-  omegaTemplatePromise = fetch("omega.html")
+  omegaTemplatePromise = fetch("public/omega.html")
     .then((res) => {
       if (!res.ok) throw new Error(`Falha ao carregar omega.html: ${res.status}`);
       return res.text();
@@ -3837,12 +3806,7 @@ function ensureOmegaMesu(){
   if (OMEGA_MESU_DATA.length) return Promise.resolve(OMEGA_MESU_DATA);
   if (omegaMesuPromise) return omegaMesuPromise;
 
-  const loader = omegaShouldUseApi()
-    ? omegaApiGet('/omega/mesu').catch((err) => {
-        console.warn('Falha ao carregar MESU da Omega pela API:', err);
-        return loadOmegaCsv(OMEGA_MESU_SOURCE, 'MESU');
-      })
-    : loadOmegaCsv(OMEGA_MESU_SOURCE, 'MESU');
+  const loader = omegaApiGet('/omega/mesu');
 
   omegaMesuPromise = loader
     .then((rows) => {
@@ -5136,7 +5100,7 @@ function resolveOmegaDefaultUserHint(detail){
 function buildOmegaLaunchUrl(detail){
   const baseHref = typeof window !== 'undefined' && window.TICKET_URL
     ? window.TICKET_URL
-    : 'omega.html';
+    : 'public/omega.html';
   const origin = (typeof window !== 'undefined' && window.location)
     ? window.location.href
     : 'http://localhost/';

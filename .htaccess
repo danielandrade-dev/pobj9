@@ -1,10 +1,16 @@
 RewriteEngine On
 
+DirectoryIndex index.php
+
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteRule ^api/(.*)$ index.php/$1 [QSA,L]
 
 RewriteCond %{REQUEST_URI} ^/$
 RewriteRule ^$ index.php [L]
+
+RewriteCond %{REQUEST_URI} ^/index\.html$ [OR]
+RewriteCond %{REQUEST_URI} ^/public/index\.html$
+RewriteRule . index.php [L]
 
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -19,4 +25,3 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -d
 RewriteRule ^(.*)$ public/$1 [L]
-

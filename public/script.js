@@ -3493,7 +3493,6 @@ function normalizarLinhasStatus(rows){
   const list = Array.isArray(rows) ? rows : [];
 
   if (!list.length) {
-    console.warn("Status_Indicadores.csv não encontrado ou vazio; aplicando valores padrão.");
   }
 
   const register = (candidate = {}) => {
@@ -4443,7 +4442,7 @@ async function loadBaseData(){
         const payload = await apiGet('/bootstrap');
         return processBaseDataSources({
           mesuRaw: payload?.mesu || [],
-          statusRaw: payload?.status || [],
+          statusRaw: payload?.statusIndicadores || payload?.status || [],
           produtosDimRaw: payload?.produtos || [],
           realizadosRaw: payload?.realizados || [],
           metasRaw: payload?.metas || [],
@@ -4453,55 +4452,16 @@ async function loadBaseData(){
           leadsRaw: payload?.leads || [],
           detalhesRaw: payload?.detalhes || [],
           historicoRaw: payload?.historico || [],
-          dimSegmentosRaw: payload?.dimSegmentos || payload?.segmentosDim || [],
-          dimDiretoriasRaw: payload?.dimDiretorias || payload?.diretoriasDim || [],
-          dimRegionaisRaw: payload?.dimRegionais || payload?.regionaisDim || [],
-          dimAgenciasRaw: payload?.dimAgencias || payload?.agenciasDim || [],
-          dimGerentesGestaoRaw: payload?.dimGerentesGestao || payload?.gerentesGestaoDim || [],
-          dimGerentesRaw: payload?.dimGerentes || payload?.gerentesDim || [],
+          dimSegmentosRaw: payload?.dimSegmentos || payload?.segmentosDim || payload?.segmentos || [],
+          dimDiretoriasRaw: payload?.dimDiretorias || payload?.diretoriasDim || payload?.diretorias || [],
+          dimRegionaisRaw: payload?.dimRegionais || payload?.regionaisDim || payload?.regionais || [],
+          dimAgenciasRaw: payload?.dimAgencias || payload?.agenciasDim || payload?.agencias || [],
+          dimGerentesGestaoRaw: payload?.dimGerentesGestao || payload?.gerentesGestaoDim || payload?.ggestoes || [],
+          dimGerentesRaw: payload?.dimGerentes || payload?.gerentesDim || payload?.gerentes || [],
         });
       }
 
-      const basePath = "Bases/";
-      const [
-        mesuRaw,
-        statusRaw,
-        produtosDimRaw,
-        realizadosRaw,
-        metasRaw,
-        variavelRaw,
-        campanhasRaw,
-        calendarioRaw,
-        leadsRaw,
-        detalhesRaw,
-        historicoRaw,
-      ] = await Promise.all([
-        loadCSVAuto(`${basePath}mesu.csv`),
-        loadCSVAuto(`${basePath}Status_Indicadores.csv`),
-        loadCSVAuto(`${basePath}dProdutos.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}fRealizados.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}fMetas.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}fVariavel.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}fCampanhas.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}dCalendario.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}leads_propensos.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}fDetalhes.csv`).catch(() => []),
-        loadCSVAuto(`${basePath}FHistoricoRankingPobj.csv`).catch(() => []),
-      ]);
-
-      return processBaseDataSources({
-        mesuRaw,
-        statusRaw,
-        produtosDimRaw,
-        realizadosRaw,
-        metasRaw,
-        variavelRaw,
-        campanhasRaw,
-        calendarioRaw,
-        leadsRaw,
-        detalhesRaw,
-        historicoRaw,
-      });
+      throw new Error('CSV não suportado. Use DATA_SOURCE="sql" para carregar dados via API.');
     } finally {
       hideLoader();
     }

@@ -315,7 +315,7 @@ const STATUS_LABELS = {
   atingidos: "Atingidos",
   nao: "Não atingidos",
 };
-// Aqui eu defino uma ordem padrão de status caso o CSV não traga essa informação.
+// Aqui eu defino uma ordem padrão de status.
 const DEFAULT_STATUS_ORDER = ["todos", "atingidos", "nao"];
 const DEFAULT_STATUS_INDICADORES = DEFAULT_STATUS_ORDER.map((key, idx) => ({
   id: key,
@@ -451,8 +451,6 @@ function getCurrentUserDisplayName(){
   return name || 'Equipe Comercial';
 }
 
-// Aqui eu aponto onde normalmente ficam os CSVs e guardo a Promise de carregamento para evitar múltiplos downloads.
-const BASE_CSV_PATH = "Base";
 let baseDataPromise = null;
 
 // Aqui eu limpo qualquer valor que vem das bases porque sei que sempre chega com espaços e formatos diferentes.
@@ -1439,189 +1437,6 @@ function obterRotuloStatus(key, fallback = "") {
   return normalized || key;
 }
 
-// Aqui eu faço uma gambiarra controlada para descobrir qual separador o CSV está usando (vírgula, ponto e vírgula, tab...).
-function descobrirDelimitadorCsv(headerLine, sampleLines = []){
-  const lines = [headerLine].concat(Array.isArray(sampleLines) ? sampleLines.slice(0, 5) : []).filter(Boolean);
-  if (!lines.length) return ",";
-  const candidates = [",", ";", "\t", "|"];
-  let best = ",";
-  let bestScore = -1;
-  candidates.forEach(delim => {
-    let score = 0;
-    lines.forEach(line => {
-      const pieces = line.split(delim);
-      if (pieces.length > 1){
-        score += pieces.length - 1;
-      }
-    });
-    if (score > bestScore){
-      best = delim;
-      bestScore = score;
-    }
-  });
-  if (bestScore <= 0){
-    if (headerLine?.includes(";")) return ";";
-    if (headerLine?.includes("\t")) return "\t";
-    if (headerLine?.includes("|")) return "|";
-  }
-  return best;
-}
-
-// Aqui eu separo uma linha de CSV respeitando aspas duplas porque algumas colunas trazem vírgula dentro do texto.
-function dividirLinhaCsv(line, delimiter){
-  const cols = [];
-  let current = "";
-  let insideQuotes = false;
-  for (let i = 0; i < line.length; i++){
-    const ch = line[i];
-    if (ch === '"'){
-      if (insideQuotes && line[i + 1] === '"'){
-        current += '"';
-        i += 1;
-      } else {
-        insideQuotes = !insideQuotes;
-      }
-    } else if (ch === delimiter && !insideQuotes){
-      cols.push(current);
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  cols.push(current);
-  return cols;
-}
-
-// Aqui eu transformo o texto cru do CSV em uma lista de objetos bonitinha, sempre limpando a sujeira de BOM e quebras.
-function converterCSV(text){
-  if (!text) return [];
-  const normalized = text.replace(/\uFEFF/g, "").replace(/\r\n?/g, "\n");
-  const lines = normalized.split("\n").filter(line => line.trim() !== "");
-  if (!lines.length) return [];
-  const header = lines.shift();
-  if (!header) return [];
-  const delimiter = descobrirDelimitadorCsv(header, lines);
-  const headers = dividirLinhaCsv(header, delimiter).map(h => limparTexto(h));
-  const rows = [];
-  for (const line of lines){
-    const cols = dividirLinhaCsv(line, delimiter);
-    if (!cols.length) continue;
-    const obj = {};
-    headers.forEach((key, idx) => {
-      obj[key] = limparTexto(idx < cols.length ? cols[idx] : "");
-    });
-    rows.push(obj);
-  }
-  return rows;
-}
-
-const SCRIPT_BASE_URL = (() => {
-  const current = document.currentScript;
-  if (current?.src) {
-    return new URL('.', current.src).href;
-  }
-  const fallback = Array.from(document.getElementsByTagName('script'))
-    .map(el => el.src)
-    .filter(Boolean)[0];
-  if (fallback) {
-    return new URL('.', fallback).href;
-  }
-  return new URL('.', window.location.href).href;
-})();
-
-const PAGE_BASE_URL = new URL('.', window.location.href).href;
-const PAGE_PATH_DEPTH = (() => {
-  try {
-    const path = new URL(PAGE_BASE_URL).pathname || '/';
-    return path.split('/').filter(Boolean).length;
-  } catch (err) {
-    const fallback = (window.location.pathname || '/').replace(/[^/]*$/, '');
-    return fallback.split('/').filter(Boolean).length;
-  }
-})();
-
-// Aqui eu gero uma lista de caminhos alternativos porque cada ambiente hospeda os CSVs em pastas diferentes.
-function montarTentativasCsvUrl(path){
-  if (!path) return [];
-  if (/^(?:https?|data|blob):/i.test(path)) {
-    return [path];
-  }
-
-  const raw = String(path);
-  const clean = raw.replace(/^\.\//, '').replace(/^\/+/, '');
-  const baseLess = clean.replace(/^Base\//i, '');
-  const filename = clean.split('/').filter(Boolean).pop() || '';
-
-  const variants = new Set([raw, clean]);
-  if (clean && !clean.startsWith('./')) variants.add(`./${clean}`);
-  if (clean && !clean.startsWith('/')) variants.add(`/${clean}`);
-  if (baseLess && baseLess !== clean) {
-    variants.add(baseLess);
-    variants.add(`./${baseLess}`);
-    variants.add(`/${baseLess}`);
-  } else if (clean && !/^Base\//i.test(clean)) {
-    variants.add(`Base/${clean}`);
-  }
-  if (filename) variants.add(filename);
-
-  for (let i = 1; i <= Math.min(5, PAGE_PATH_DEPTH); i += 1) {
-    const prefix = '../'.repeat(i);
-    variants.add(`${prefix}${clean}`);
-    if (baseLess && baseLess !== clean) {
-      variants.add(`${prefix}${baseLess}`);
-    }
-  }
-
-  const attempts = new Set();
-  const bases = [SCRIPT_BASE_URL, PAGE_BASE_URL];
-  const origin = window.location.origin || '';
-  if (origin) {
-    bases.push(origin.endsWith('/') ? origin : `${origin}/`);
-  }
-
-  variants.forEach(candidate => {
-    if (!candidate) return;
-    const normalized = candidate.startsWith('./') ? candidate.slice(2) : candidate;
-    bases.forEach(base => {
-      if (!base) return;
-      try {
-        attempts.add(new URL(normalized, base).href);
-      } catch (err) {
-        // ignore
-      }
-    });
-    if (!/^(?:https?|data|blob):/i.test(candidate)) {
-      attempts.add(candidate);
-    }
-  });
-
-  return [...attempts];
-}
-
-async function loadCsvFile(path){
-  const attempts = montarTentativasCsvUrl(path);
-  let lastError = null;
-  for (const attempt of attempts){
-    try {
-      const response = await fetch(attempt, { cache: 'no-store' });
-      if (!response.ok) {
-        lastError = new Error(`HTTP ${response.status}`);
-        continue;
-      }
-      const text = await response.text();
-      return converterCSV(text);
-    } catch (err) {
-      lastError = err;
-    }
-  }
-  const attemptList = attempts.join(', ');
-  if (lastError) {
-    console.error(`Falha ao carregar CSV em ${path}. Tentativas: ${attemptList}`, lastError);
-  } else {
-    console.error(`Falha ao carregar CSV em ${path}. Tentativas: ${attemptList}`);
-  }
-  return [];
-}
 
 // Aqui eu pego os dados MESU brutos e padronizo os campos para facilitar os filtros hierárquicos depois.
 function normalizarLinhasMesu(rows){
@@ -6376,75 +6191,6 @@ async function apiGet(path, params){
   return json;
 }
 
-// Aqui eu faço uma chamada POST simples contra a API para enviar JSON.
-async function apiPost(path, body = {}, params){
-  let baseUrl;
-  try {
-    baseUrl = resolveApiBaseUrl();
-  } catch (err) {
-    const error = new Error("Não foi possível resolver o endereço da API PHP.");
-    error.cause = err;
-    throw error;
-  }
-
-  const { url } = prepareApiUrl(baseUrl, path, params);
-
-  let response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: body === undefined ? "{}" : JSON.stringify(body),
-      cache: "no-store",
-    });
-  } catch (err) {
-    const error = new Error("Não foi possível contactar a API PHP em src/index.php.");
-    error.cause = err;
-    throw error;
-  }
-
-  let text;
-  try {
-    text = await response.text();
-  } catch (err) {
-    const error = new Error("Falha ao ler a resposta da API PHP.");
-    error.cause = err;
-    throw error;
-  }
-
-  let json;
-  try {
-    json = text ? JSON.parse(text) : null;
-  } catch (err) {
-    const error = new Error("A API PHP retornou um JSON inválido.");
-    error.cause = err;
-    error.responseText = text;
-    throw error;
-  }
-
-  if (!response.ok) {
-    const message = (json && typeof json === "object" && json.error)
-      ? String(json.error)
-      : `Falha ao enviar dados (HTTP ${response.status})`;
-    const error = new Error(message);
-    error.code = "HTTP_ERROR";
-    error.status = response.status;
-    error.payload = json;
-    throw error;
-  }
-
-  if (json && typeof json === "object" && json.error) {
-    const error = new Error(String(json.error));
-    error.code = "API_ERROR";
-    error.payload = json;
-    throw error;
-  }
-
-  return json;
-}
 
 function prepareApiUrl(baseUrl, path, params){
   // Sempre usa a raiz do site para construir URLs da API com prefixo /api/
@@ -6466,8 +6212,7 @@ function prepareApiUrl(baseUrl, path, params){
   const normalized = typeof path === "string" ? path.trim() : "";
   const endpoint = normalized.replace(/^\/+/, "").replace(/^api\//, ""); // Remove /api/ se já estiver presente
   if (endpoint){
-    searchParams.set(API_ENDPOINT_PARAM, endpoint);
-    // Usa /api/endpoint como pathname para que o .htaccess capture corretamente
+    // Usa /api/endpoint como pathname - o backend lê do PATH_INFO, não precisa do parâmetro na query string
     url.pathname = `/api/${endpoint}`;
   }
 
@@ -16837,64 +16582,6 @@ async function refresh(){
   }
 }
 
-/* ===== Aqui eu escrevi um loader de CSV que aguenta diferentes codificações e separadores ===== */
-async function loadCSVAuto(url) {
-  // Busca como binário para poder detectar a codificação.
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Falha ao carregar ${url}: ${res.status}`);
-  const buf = await res.arrayBuffer();
-
-  // Tenta decodificar como UTF-8; se vier com � (replacement char), refaz como latin-1.
-  let text = new TextDecoder("utf-8").decode(buf);
-  if (text.includes("\uFFFD")) {
-    text = new TextDecoder("iso-8859-1").decode(buf);
-  }
-  text = text.trim();
-  if (!text) return [];
-
-  // Se o Papa ainda não carregou (ex.: offline ou CDN bloqueada), faz o parse manual.
-  if (typeof Papa === "undefined" || typeof Papa.parse !== "function") {
-    return converterCSV(text);
-  }
-
-  // Descobre o separador pela 1ª linha (conta ; e ,)
-  const first = (text.split(/\r?\n/)[0] || "");
-  const semis = (first.match(/;/g) || []).length;
-  const commas = (first.match(/,/g) || []).length;
-  const delimiter = semis > commas ? ";" : ",";
-
-  // Faz o parse com cabeçalho
-  const parsed = Papa.parse(text, {
-    header: true,
-    delimiter,
-    skipEmptyLines: true
-  });
-
-  if (!parsed || !Array.isArray(parsed.data)) {
-    return converterCSV(text);
-  }
-
-  if (parsed.errors && parsed.errors.length) {
-    const simplified = parsed.errors.map(err => ({
-      type: err?.type,
-      code: err?.code,
-      row: err?.row,
-      message: err?.message,
-    }));
-    console.warn(`Avisos ao ler ${url}:`, simplified);
-  }
-
-  return parsed.data.map(record => {
-    if (!record || typeof record !== "object") return record;
-    const normalized = {};
-    Object.keys(record).forEach(key => {
-      const safeKey = typeof key === "string" ? key.trim() : key;
-      const value = record[key];
-      normalized[safeKey] = typeof value === "string" ? value.trim() : value;
-    });
-    return normalized;
-  });
-}
 
 /* ===== Aqui eu disparo o boot do painel assim que a página carrega ===== */
 (async function(){

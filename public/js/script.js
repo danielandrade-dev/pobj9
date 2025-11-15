@@ -66,8 +66,10 @@ const DATA_SOURCE = "sql";
 const API_PATH = typeof window !== "undefined" && window.API_URL
   ? String(window.API_URL)
   : "../src/index.php";
-const DEFAULT_HTTP_BASE = "http://localhost:8000";
-const API_HTTP_BASE = typeof window !== "undefined" && window.API_HTTP_BASE
+const DEFAULT_HTTP_BASE = typeof window !== "undefined" && window.location && window.location.origin
+  ? window.location.origin
+  : "http://localhost:8000";
+const API_HTTP_BASE = (typeof window !== "undefined" && window.API_HTTP_BASE)
   ? String(window.API_HTTP_BASE)
   : DEFAULT_HTTP_BASE;
 const API_ENDPOINT_PARAM = "endpoint";
@@ -82,7 +84,10 @@ function ensureHttpContext(){
     : DEFAULT_HTTP_BASE;
 
   try {
-    const candidate = new URL(targetBase, "http://localhost:8000");
+    const fallbackBase = typeof window !== "undefined" && window.location.origin
+      ? window.location.origin
+      : "http://localhost:8000";
+    const candidate = new URL(targetBase, fallbackBase);
     if (candidate.protocol === "http:" || candidate.protocol === "https:") {
       const candidateHref = candidate.href;
       const alreadyThere = candidateHref.replace(/\/?$/, "/") === window.location.href.replace(/\/?$/, "/");

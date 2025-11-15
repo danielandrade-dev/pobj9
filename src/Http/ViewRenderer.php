@@ -175,10 +175,11 @@ class ViewRenderer
                 $replacement = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             } elseif (is_bool($value)) {
                 $replacement = $value ? 'true' : 'false';
-            } elseif (is_null($value)) {
-                $replacement = '';
+            } elseif (is_null($value) || $value === '') {
+                $replacement = 'null';
             } else {
-                $replacement = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+                // Para strings, escapa e adiciona aspas para JavaScript
+                $replacement = json_encode((string) $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
             
             $content = str_replace($placeholder, $replacement, $content);

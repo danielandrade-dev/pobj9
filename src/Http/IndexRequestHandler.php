@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pobj\Api\Http;
 
 use Pobj\Api\Enums\HttpStatusCode;
+use Pobj\Api\Helpers\EnvHelper;
 
 class IndexRequestHandler
 {
@@ -17,7 +18,13 @@ class IndexRequestHandler
             exit('View index não encontrada.');
         }
 
-        $this->sendHtmlResponse($view->render('index'));
+        $apiUrl = EnvHelper::get('API_URL', '');
+        $apiHttpBase = EnvHelper::get('API_HTTP_BASE', '');
+
+        $this->sendHtmlResponse($view->render('index', [
+            'API_URL' => $apiUrl,
+            'API_HTTP_BASE' => $apiHttpBase,
+        ]));
     }
 
     private function sendHtmlResponse(string $content): void

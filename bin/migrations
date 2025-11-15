@@ -1,0 +1,33 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Doctrine\Migrations\Tools\Console\Command;
+use Pobj\Api\Database\MigrationsConfiguration;
+use Symfony\Component\Console\Application;
+
+$dependencyFactory = MigrationsConfiguration::getDependencyFactory();
+
+$cli = new Application('Doctrine Migrations');
+$cli->setCatchExceptions(true);
+
+// Adiciona os comandos do Doctrine Migrations
+$cli->addCommands([
+    new Command\DumpSchemaCommand($dependencyFactory),
+    new Command\ExecuteCommand($dependencyFactory),
+    new Command\GenerateCommand($dependencyFactory),
+    new Command\LatestCommand($dependencyFactory),
+    new Command\ListCommand($dependencyFactory),
+    new Command\MigrateCommand($dependencyFactory),
+    new Command\RollupCommand($dependencyFactory),
+    new Command\StatusCommand($dependencyFactory),
+    new Command\SyncMetadataCommand($dependencyFactory),
+    new Command\VersionCommand($dependencyFactory),
+]);
+
+$cli->run();
+
+

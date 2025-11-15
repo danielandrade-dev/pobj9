@@ -29,7 +29,7 @@ class StaticFileRequestHandler
         // Se não encontrou em public/, tenta em resources/views/ para arquivos HTML específicos
         if (!is_file($publicPath)) {
             $fileName = basename($requestPath);
-            $allowedViews = ['leads.html', 'omega.html'];
+            $allowedViews = ['omega.html'];
             
             if (in_array($fileName, $allowedViews, true)) {
                 $viewPath = $projectRoot . '/resources/views/' . $fileName;

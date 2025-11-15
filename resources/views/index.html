@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-@include('meta')
+@include('layouts/meta')
   <title>POBJ Produções</title>
-@include('favicon')
-@include('fonts')
-@include('styles-main')
+@include('assets/favicon')
+@include('assets/fonts')
+@include('assets/styles-main')
 </head>
 <body>
-@include('header-topbar')
+@include('layouts/header-topbar')
 
 
   <main class="container">
     <!-- Aqui eu organizei o card com todos os filtros principais -->
     <section class="card card--filters">
-@include('filters-card-header')
+@include('components/filters/filters-card-header')
 
-@include('filters-basic')
-@include('filters-advanced')
+@include('components/filters/filters-basic')
+@include('components/filters/filters-advanced')
     </section>
 
-@include('tabs-navigation')
+@include('components/sections/tabs-navigation')
 
     <!-- Aqui eu apresento a visão de resumo com opção de cards ou tabela clássica -->
     <section id="view-cards">
-@include('resumo-mode-toggle')
+@include('components/filters/resumo-mode-toggle')
 
       <div id="resumo-summary" class="resumo-summary">
         <div id="kpi-summary" class="kpi-summary"></div>
@@ -227,12 +227,12 @@
     </section>
   </main>
 
-@include('detail-designer')
-@include('filters-backdrop')
-@include('omega-modal')
-@include('leads-modal')
+@include('components/sections/detail-designer')
+@include('components/filters/filters-backdrop')
+@include('components/modals/omega-modal')
+@include('components/modals/leads-modal')
 
-@include('footer')
-@include('scripts')
+@include('layouts/footer')
+@include('layouts/scripts')
 </body>
 </html>

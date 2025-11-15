@@ -126,22 +126,39 @@ class ViewRenderer
 
     private function processIncludes(string $content, array $data): string
     {
-        // Suporta @include('componente') ou @include('components/componente')
+        // Suporta @include('componente') ou @include('pasta/componente')
         $pattern = '/@include\([\'"]([^\'"]+)[\'"]\)/';
         
         return preg_replace_callback($pattern, function ($matches) use ($data) {
             $includeName = $matches[1];
             
-            // Remove 'components/' se já estiver presente
-            $includeName = preg_replace('#^components/#', '', $includeName);
+            // Lista de diretórios para buscar (em ordem de prioridade)
+            $searchPaths = [
+                'layouts',
+                'components/modals',
+                'components/filters',
+                'components/sections',
+                'assets',
+                'components', // Fallback para compatibilidade
+            ];
             
-            // Busca apenas em components
-            $componentPath = $this->projectRoot . '/resources/views/components/' . $includeName . '.html';
+            // Se já tem caminho explícito (ex: layouts/meta), usa diretamente
+            if (strpos($includeName, '/') !== false) {
+                $componentPath = $this->projectRoot . '/resources/views/' . $includeName . '.html';
+                if (is_file($componentPath)) {
+                    $includeContent = file_get_contents($componentPath);
+                    return $this->processIncludes($includeContent, $data);
+                }
+            }
             
-            if (is_file($componentPath)) {
-                $includeContent = file_get_contents($componentPath);
-                // Processa recursivamente includes dentro do componente
-                return $this->processIncludes($includeContent, $data);
+            // Busca em todas as pastas
+            foreach ($searchPaths as $path) {
+                $componentPath = $this->projectRoot . '/resources/views/' . $path . '/' . $includeName . '.html';
+                if (is_file($componentPath)) {
+                    $includeContent = file_get_contents($componentPath);
+                    // Processa recursivamente includes dentro do componente
+                    return $this->processIncludes($includeContent, $data);
+                }
             }
             
             return ''; // Retorna vazio se não encontrar

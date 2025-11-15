@@ -25,19 +25,18 @@ final class VariavelDTO extends BaseFactDTO
     public function toArray(): array
     {
         return [
-            'Registro ID' => $this->registroId,
+            'registro_id' => $this->registroId,
             'id_indicador' => $this->idIndicador,
             'ds_indicador' => $this->dsIndicador,
-            'Familia ID' => $this->familiaId,
-            'Familia Nome' => $this->familiaNome,
-            'Familia Codigo' => $this->familiaCodigo,
-            'Indicador Codigo' => $this->indicadorCodigo,
-            'Subindicador Codigo' => $this->subindicadorCodigo,
-            'Data' => $this->data,
-            'Competencia' => $this->competencia,
-            'Variavel Real' => $this->variavelReal,
-            'Variavel Meta' => $this->variavelMeta,
+            'familia_id' => $this->familiaId,
+            'familia_nome' => $this->familiaNome,
+            'familia_codigo' => $this->familiaCodigo,
+            'indicador_codigo' => $this->indicadorCodigo,
+            'subindicador_codigo' => $this->subindicadorCodigo,
+            'data' => $this->data,
+            'competencia' => $this->competencia,
+            'variavel_real' => $this->variavelReal,
+            'variavel_meta' => $this->variavelMeta,
         ];
     }
 }
-

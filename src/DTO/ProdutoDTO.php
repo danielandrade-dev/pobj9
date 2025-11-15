@@ -22,14 +22,13 @@ final class ProdutoDTO extends BaseFactDTO
     {
         return [
             'id' => $this->id,
-            'idFamilia' => $this->idFamilia,
-            'Familia' => $this->familia,
-            'IdIndicador' => $this->idIndicador,
-            'Indicador' => $this->indicador,
-            'idSubindicador' => $this->idSubindicador,
-            'Subindicador' => $this->subindicador,
-            'Peso' => $this->peso,
+            'id_familia' => $this->idFamilia,
+            'familia' => $this->familia,
+            'id_indicador' => $this->idIndicador,
+            'indicador' => $this->indicador,
+            'id_subindicador' => $this->idSubindicador,
+            'subindicador' => $this->subindicador,
+            'peso' => $this->peso,
         ];
     }
 }
-

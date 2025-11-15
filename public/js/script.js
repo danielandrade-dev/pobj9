@@ -4404,6 +4404,11 @@ function processBaseDataSources({
   state.period = getDefaultPeriodRange();
   updatePeriodLabels();
 
+  // Garante que os combos sejam atualizados após processar os dados
+  if (typeof refreshHierarchyCombos === "function") {
+    refreshHierarchyCombos();
+  }
+
   state._raw = {
     mesu: mesuRows,
     dimSegmentos: segmentosDim,
@@ -9019,9 +9024,28 @@ function filterHierarchyRowsForField(targetField, selection, rows){
 function buildHierarchyOptions(fieldKey, selection, rows){
   const def = HIERARCHY_FIELD_MAP.get(fieldKey);
   if (!def) return [];
-  const fallbackRows = buildHierarchyFallbackRows(fieldKey);
+  
+  // Se há opções de dimensão pré-definidas, usa-as diretamente após filtrar
   const hasDimensionPreset = Array.isArray(DIMENSION_FILTER_OPTIONS[fieldKey])
     && DIMENSION_FILTER_OPTIONS[fieldKey].length > 0;
+  
+  // Se há preset e não há rows, usa diretamente as opções de dimensão
+  if (hasDimensionPreset && (!Array.isArray(rows) || !rows.length)) {
+    const baseOption = { value: def.defaultValue, label: def.defaultLabel };
+    const options = [baseOption].concat(
+      DIMENSION_FILTER_OPTIONS[fieldKey].map(opt => {
+        const normalized = normOpt(opt);
+        return {
+          value: normalized.id || normalized.label,
+          label: normalized.label || normalized.id,
+          aliases: Array.isArray(opt.aliases) ? opt.aliases : [],
+        };
+      })
+    );
+    return uniqById(options);
+  }
+  
+  const fallbackRows = buildHierarchyFallbackRows(fieldKey);
   const sourceRows = Array.isArray(rows)
     ? (fallbackRows.length ? rows.concat(fallbackRows) : rows)
     : fallbackRows;
@@ -10534,17 +10558,6 @@ function initCombos() {
   }
 }
 function bindEvents() {
-  $("#btn-consultar")?.addEventListener("click", async () => {
-    await withSpinner(async () => {
-      autoSnapViewToFilters();
-      applyFiltersAndRender();
-      renderAppliedFilters();
-      renderCampanhasView();
-      if (state.activeView === "ranking") renderRanking();
-    }, "Aplicando filtros…");
-    closeMobileFilters();
-  });
-
   $("#btn-abrir-filtros")?.addEventListener("click", () => {
     const adv = $("#advanced-filters");
     const isOpen = adv.classList.toggle("is-open");
@@ -13969,9 +13982,7 @@ function createExecutiveView(){
     execSel.forEach(sel => $(sel)?.addEventListener("change", () => {
       if (state.activeView === 'exec') renderExecutiveView();
     }));
-    $("#btn-consultar")?.addEventListener("click", () => {
-      if (state.activeView === 'exec') renderExecutiveView();
-    });
+    // Botão consultar removido - filtros são aplicados automaticamente quando mudam
     host.dataset.execFiltersBound = "true";
   }
 }

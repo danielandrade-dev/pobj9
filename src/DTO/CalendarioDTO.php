@@ -24,18 +24,17 @@ final class CalendarioDTO extends BaseFactDTO
     public function toArray(): array
     {
         return [
-            'Data' => $this->data,
-            'Competencia' => $this->competencia,
-            'Ano' => $this->ano,
-            'Mes' => $this->mes,
-            'Mes Nome' => $this->mesNome,
-            'Dia' => $this->dia,
-            'Dia da Semana' => $this->diaDaSemana,
-            'Semana' => $this->semana,
-            'Trimestre' => $this->trimestre,
-            'Semestre' => $this->semestre,
-            'Eh Dia Util' => $this->ehDiaUtil,
+            'data' => $this->data,
+            'competencia' => $this->competencia,
+            'ano' => $this->ano,
+            'mes' => $this->mes,
+            'mes_nome' => $this->mesNome,
+            'dia' => $this->dia,
+            'dia_da_semana' => $this->diaDaSemana,
+            'semana' => $this->semana,
+            'trimestre' => $this->trimestre,
+            'semestre' => $this->semestre,
+            'eh_dia_util' => $this->ehDiaUtil,
         ];
     }
 }
-

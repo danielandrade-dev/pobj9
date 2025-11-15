@@ -4259,7 +4259,7 @@ async function loadBaseData(){
     showLoader("Carregando dados…");
     try {
       if (DATA_SOURCE === "sql") {
-        const payload = await apiGet('/bootstrap');
+        const payload = await apiGet('/init-data');
         return processBaseDataSources({
           mesuRaw: payload?.mesu || [],
           statusRaw: payload?.statusIndicadores || payload?.status || [],
@@ -7404,7 +7404,7 @@ function openDatePopover(anchor){
     document.getElementById("lbl-periodo-inicio").textContent = formatBRDate(s);
     document.getElementById("lbl-periodo-fim").textContent    = formatBRDate(e);
     closeDatePopover();
-    refresh().catch(handleBootstrapError);
+    refresh().catch(handleInitDataError);
   });
 
   const outside = (ev)=>{ if(ev.target===pop || pop.contains(ev.target) || ev.target===anchor) return; closeDatePopover(); };
@@ -16663,7 +16663,7 @@ async function refresh(){
   try {
     await loadBaseData();
   } catch (error) {
-    handleBootstrapError(error);
+    handleInitDataError(error);
     return;
   }
 
@@ -16680,7 +16680,7 @@ async function refresh(){
   try {
     await refresh();
   } catch (error) {
-    handleBootstrapError(error);
+    handleInitDataError(error);
     return;
   }
 
@@ -16750,7 +16750,7 @@ function showFatalError(options){
   FATAL_ERROR_VISIBLE = true;
 }
 
-function buildBootstrapHelpSteps(error){
+function buildInitDataHelpSteps(error){
   const steps = [];
   if (window.location.protocol === "file:") {
     steps.push("Mova a pasta 'POBJ SQL php71' para o diretório htdocs do XAMPP ou publique via Apache.");
@@ -16772,7 +16772,7 @@ function buildBootstrapHelpSteps(error){
   return steps;
 }
 
-function handleBootstrapError(error){
+function handleInitDataError(error){
   console.error("Falha ao iniciar o painel", error);
   hideLoader();
 
@@ -16784,7 +16784,7 @@ function handleBootstrapError(error){
     ? error.stack
     : (error && error.message ? error.message : "");
   const subtitle = "O painel precisa acessar o PHP do XAMPP para ler o MySQL.";
-  const steps = buildBootstrapHelpSteps(error);
+  const steps = buildInitDataHelpSteps(error);
 
   showFatalError({
     title: "Não foi possível conectar ao banco de dados",

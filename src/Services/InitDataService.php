@@ -17,7 +17,7 @@ use Pobj\Api\Repositories\RealizadoRepository;
 use Pobj\Api\Repositories\StatusIndicadoresRepository;
 use Pobj\Api\Repositories\VariavelRepository;
 
-class BootstrapService
+class InitDataService
 {
     private EstruturaRepository $estruturaRepository;
     private StatusIndicadoresRepository $statusRepository;
@@ -60,9 +60,8 @@ class BootstrapService
         $this->leadsRepository = $leadsRepository;
     }
 
-    public function getBootstrapData(): array
+    public function getInitData(): array
     {
-        // Carrega dados uma vez para reutilizar
         $segmentos = $this->estruturaRepository->findAllSegmentos();
         $diretorias = $this->estruturaRepository->findAllDiretorias();
         $regionais = $this->estruturaRepository->findAllRegionais();
@@ -72,7 +71,6 @@ class BootstrapService
         $status = $this->statusRepository->findAllAsArray();
         
         return [
-            // Estrutura organizacional (para dimensões) - chaves principais
             'dimSegmentos' => $segmentos,
             'dimDiretorias' => $diretorias,
             'dimRegionais' => $regionais,
@@ -80,7 +78,6 @@ class BootstrapService
             'dimGerentesGestao' => $ggestoes,
             'dimGerentes' => $gerentes,
             
-            // Aliases alternativos para compatibilidade com script.js
             'segmentosDim' => $segmentos,
             'diretoriasDim' => $diretorias,
             'regionaisDim' => $regionais,
@@ -88,7 +85,6 @@ class BootstrapService
             'gerentesGestaoDim' => $ggestoes,
             'gerentesDim' => $gerentes,
             
-            // Aliases simples para compatibilidade
             'segmentos' => $segmentos,
             'diretorias' => $diretorias,
             'regionais' => $regionais,
@@ -96,21 +92,17 @@ class BootstrapService
             'ggestoes' => $ggestoes,
             'gerentes' => $gerentes,
             
-            // Status - chaves principais e aliases
             'statusIndicadores' => $status,
             'status' => $status,
             
-            // Dados de fatos
             'realizados' => $this->realizadoRepository->findAllAsArray(),
             'metas' => $this->metaRepository->findAllAsArray(),
             'variavel' => $this->variavelRepository->findAllAsArray(),
             
-            // Dimensões
             'mesu' => $this->mesuRepository->findAll(),
             'produtos' => $this->produtoRepository->findAllAsArray(),
             'calendario' => $this->calendarioRepository->findAllAsArray(),
             
-            // Dados opcionais
             'campanhas' => $this->campanhasRepository->findAllAsArray(),
             'detalhes' => $this->detalhesRepository->findAllAsArray(),
             'historico' => $this->historicoRepository->findAllAsArray(),
@@ -118,3 +110,4 @@ class BootstrapService
         ];
     }
 }
+

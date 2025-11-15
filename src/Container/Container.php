@@ -25,7 +25,7 @@ use Pobj\Api\Repositories\RealizadoRepository;
 use Pobj\Api\Repositories\StatusIndicadoresRepository;
 use Pobj\Api\Repositories\VariavelRepository;
 use Pobj\Api\Services\AgentService;
-use Pobj\Api\Services\BootstrapService;
+use Pobj\Api\Services\InitDataService;
 use Pobj\Api\Services\FiltrosService;
 use Pobj\Api\Services\OmegaMesuService;
 use Pobj\Api\Services\OmegaStatusService;
@@ -109,8 +109,8 @@ class Container
             return new LeadsRepository($container->get(EntityManager::class));
         });
 
-        $this->singleton(BootstrapService::class, function (Container $container) {
-            return new BootstrapService(
+        $this->singleton(InitDataService::class, function (Container $container) {
+            return new InitDataService(
                 $container->get(EstruturaRepository::class),
                 $container->get(StatusIndicadoresRepository::class),
                 $container->get(RealizadoRepository::class),

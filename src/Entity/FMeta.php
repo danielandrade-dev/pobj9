@@ -7,117 +7,74 @@ namespace Pobj\Api\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'f_metas')]
+#[ORM\Table(name: 'f_meta')]
 class FMeta
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'registro_id', type: 'string', length: 60)]
-    private string $registroId;
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    private int $id;
 
-    #[ORM\Column(type: 'string', length: 100)]
-    private string $segmento;
+    #[ORM\Column(name: 'data_meta', type: 'date')]
+    private \DateTimeInterface $dataMeta;
 
-    #[ORM\Column(name: 'segmento_id', type: 'string', length: 50)]
-    private string $segmentoId;
+    #[ORM\Column(type: 'string', length: 16)]
+    private string $funcional;
 
-    #[ORM\Column(name: 'diretoria_id', type: 'string', length: 50)]
-    private string $diretoriaId;
-
-    #[ORM\Column(name: 'diretoria_nome', type: 'string', length: 150)]
-    private string $diretoriaNome;
-
-    #[ORM\Column(name: 'gerencia_regional_id', type: 'string', length: 50)]
-    private string $gerenciaRegionalId;
-
-    #[ORM\Column(name: 'gerencia_regional_nome', type: 'string', length: 150)]
-    private string $gerenciaRegionalNome;
-
-    #[ORM\Column(name: 'regional_nome', type: 'string', length: 150)]
-    private string $regionalNome;
-
-    #[ORM\Column(name: 'agencia_id', type: 'string', length: 50)]
-    private string $agenciaId;
-
-    #[ORM\Column(name: 'agencia_nome', type: 'string', length: 150)]
-    private string $agenciaNome;
-
-    #[ORM\Column(name: 'gerente_gestao_id', type: 'string', length: 50, nullable: true)]
-    private ?string $gerenteGestaoId = null;
-
-    #[ORM\Column(name: 'gerente_gestao_nome', type: 'string', length: 150, nullable: true)]
-    private ?string $gerenteGestaoNome = null;
-
-    #[ORM\Column(name: 'gerente_id', type: 'string', length: 50, nullable: true)]
-    private ?string $gerenteId = null;
-
-    #[ORM\Column(name: 'gerente_nome', type: 'string', length: 150, nullable: true)]
-    private ?string $gerenteNome = null;
-
-    #[ORM\Column(name: 'familia_id', type: 'string', length: 20)]
-    private string $familiaId;
-
-    #[ORM\Column(name: 'familia_nome', type: 'string', length: 150)]
-    private string $familiaNome;
-
-    #[ORM\Column(name: 'id_indicador', type: 'string', length: 80)]
-    private string $idIndicador;
-
-    #[ORM\Column(name: 'ds_indicador', type: 'string', length: 150)]
-    private string $dsIndicador;
-
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
-    private ?string $subproduto = null;
-
-    #[ORM\Column(name: 'id_subindicador', type: 'string', length: 80, options: ['default' => '0'])]
-    private string $idSubindicador = '0';
-
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
-    private ?string $carteira = null;
-
-    #[ORM\Column(name: 'canal_venda', type: 'string', length: 150, nullable: true)]
-    private ?string $canalVenda = null;
-
-    #[ORM\Column(name: 'tipo_venda', type: 'string', length: 100, nullable: true)]
-    private ?string $tipoVenda = null;
-
-    #[ORM\Column(name: 'modalidade_pagamento', type: 'string', length: 100, nullable: true)]
-    private ?string $modalidadePagamento = null;
-
-    #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $data;
-
-    #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $competencia;
-
-    #[ORM\Column(name: 'meta_mensal', type: 'decimal', precision: 18, scale: 2)]
+    #[ORM\Column(name: 'meta_mensal', type: 'decimal', precision: 18, scale: 2, options: ['default' => '0.00'])]
     private string $metaMensal;
 
-    #[ORM\Column(name: 'meta_acumulada', type: 'decimal', precision: 18, scale: 2, nullable: true)]
-    private ?string $metaAcumulada = null;
+    #[ORM\Column(name: 'created_at', type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private \DateTimeInterface $createdAt;
 
-    #[ORM\Column(name: 'variavel_meta', type: 'decimal', precision: 18, scale: 2, nullable: true)]
-    private ?string $variavelMeta = null;
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(type: 'decimal', precision: 9, scale: 4, nullable: true)]
-    private ?string $peso = null;
+    #[ORM\Column(name: 'id_familia', type: 'integer', nullable: true)]
+    private ?int $idFamilia = null;
 
-    #[ORM\Column(name: 'familia_codigo', type: 'string', length: 20, nullable: true)]
-    private ?string $familiaCodigo = null;
+    #[ORM\Column(name: 'id_indicador', type: 'integer', nullable: true)]
+    private ?int $idIndicador = null;
 
-    #[ORM\Column(name: 'indicador_codigo', type: 'string', length: 20, nullable: true)]
-    private ?string $indicadorCodigo = null;
+    #[ORM\Column(name: 'id_subindicador', type: 'integer', nullable: true)]
+    private ?int $idSubindicador = null;
 
-    #[ORM\Column(name: 'subindicador_codigo', type: 'string', length: 20, nullable: true)]
-    private ?string $subindicadorCodigo = null;
+    #[ORM\Column(name: 'segmento_id', type: 'integer', nullable: true)]
+    private ?int $segmentoId = null;
 
-    public function getRegistroId(): string
+    #[ORM\Column(name: 'diretoria_id', type: 'integer', nullable: true)]
+    private ?int $diretoriaId = null;
+
+    #[ORM\Column(name: 'gerencia_regional_id', type: 'integer', nullable: true)]
+    private ?int $gerenciaRegionalId = null;
+
+    #[ORM\Column(name: 'agencia_id', type: 'integer', nullable: true)]
+    private ?int $agenciaId = null;
+
+    public function getId(): int
     {
-        return $this->registroId;
+        return $this->id;
     }
 
-    public function setRegistroId(string $registroId): self
+    public function getDataMeta(): \DateTimeInterface
     {
-        $this->registroId = $registroId;
+        return $this->dataMeta;
+    }
+
+    public function setDataMeta(\DateTimeInterface $dataMeta): self
+    {
+        $this->dataMeta = $dataMeta;
+        return $this;
+    }
+
+    public function getFuncional(): string
+    {
+        return $this->funcional;
+    }
+
+    public function setFuncional(string $funcional): self
+    {
+        $this->funcional = $funcional;
         return $this;
     }
 
@@ -132,25 +89,102 @@ class FMeta
         return $this;
     }
 
-    public function getData(): \DateTimeInterface
+    public function getCreatedAt(): \DateTimeInterface
     {
-        return $this->data;
+        return $this->createdAt;
     }
 
-    public function setData(\DateTimeInterface $data): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->data = $data;
+        $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getIdIndicador(): string
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getIdFamilia(): ?int
+    {
+        return $this->idFamilia;
+    }
+
+    public function setIdFamilia(?int $idFamilia): self
+    {
+        $this->idFamilia = $idFamilia;
+        return $this;
+    }
+
+    public function getIdIndicador(): ?int
     {
         return $this->idIndicador;
     }
 
-    public function setIdIndicador(string $idIndicador): self
+    public function setIdIndicador(?int $idIndicador): self
     {
         $this->idIndicador = $idIndicador;
+        return $this;
+    }
+
+    public function getIdSubindicador(): ?int
+    {
+        return $this->idSubindicador;
+    }
+
+    public function setIdSubindicador(?int $idSubindicador): self
+    {
+        $this->idSubindicador = $idSubindicador;
+        return $this;
+    }
+
+    public function getSegmentoId(): ?int
+    {
+        return $this->segmentoId;
+    }
+
+    public function setSegmentoId(?int $segmentoId): self
+    {
+        $this->segmentoId = $segmentoId;
+        return $this;
+    }
+
+    public function getDiretoriaId(): ?int
+    {
+        return $this->diretoriaId;
+    }
+
+    public function setDiretoriaId(?int $diretoriaId): self
+    {
+        $this->diretoriaId = $diretoriaId;
+        return $this;
+    }
+
+    public function getGerenciaRegionalId(): ?int
+    {
+        return $this->gerenciaRegionalId;
+    }
+
+    public function setGerenciaRegionalId(?int $gerenciaRegionalId): self
+    {
+        $this->gerenciaRegionalId = $gerenciaRegionalId;
+        return $this;
+    }
+
+    public function getAgenciaId(): ?int
+    {
+        return $this->agenciaId;
+    }
+
+    public function setAgenciaId(?int $agenciaId): self
+    {
+        $this->agenciaId = $agenciaId;
         return $this;
     }
 }

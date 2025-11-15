@@ -3,7 +3,7 @@
         'name' => 'pobj/api',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1e7009fe6fbfdad130a4f8c09125eaeb70e464e6',
+        'reference' => '57fc934df66d1e5f5a360ba6b2640260aa75813c',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -211,7 +211,7 @@
         'pobj/api' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1e7009fe6fbfdad130a4f8c09125eaeb70e464e6',
+            'reference' => '57fc934df66d1e5f5a360ba6b2640260aa75813c',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -16,6 +16,11 @@ class DoctrineManager
 {
     private static ?EntityManager $entityManager = null;
 
+    public static function reset(): void
+    {
+        self::$entityManager = null;
+    }
+
     public static function getEntityManager(): EntityManager
     {
         if (self::$entityManager !== null) {
@@ -52,6 +57,13 @@ class DoctrineManager
         ];
 
         $connection = DriverManager::getConnection($connectionParams, $config);
+        
+        // Mapeia tinyint do MySQL para smallint do Doctrine
+        // Por padrão, o Doctrine mapeia tinyint como boolean, mas precisamos de smallint
+        $platform = $connection->getDatabasePlatform();
+        $platform->registerDoctrineTypeMapping('tinyint', 'smallint');
+        $platform->registerDoctrineTypeMapping('TINYINT', 'smallint');
+        
         self::$entityManager = new EntityManager($connection, $config);
 
         return self::$entityManager;

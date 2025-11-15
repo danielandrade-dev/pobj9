@@ -8,15 +8,22 @@ use Doctrine\ORM\EntityManager;
 use PDO;
 use Pobj\Api\Database\DatabaseConnection;
 use Pobj\Api\Database\DoctrineManager;
+use Pobj\Api\Repositories\CalendarioRepository;
+use Pobj\Api\Repositories\CampanhasRepository;
+use Pobj\Api\Repositories\DetalhesRepository;
 use Pobj\Api\Repositories\EstruturaRepository;
+use Pobj\Api\Repositories\HistoricoRepository;
+use Pobj\Api\Repositories\LeadsRepository;
 use Pobj\Api\Repositories\MetaRepository;
 use Pobj\Api\Repositories\OmegaMesuRepository;
 use Pobj\Api\Repositories\OmegaStatusRepository;
 use Pobj\Api\Repositories\OmegaStructureRepository;
 use Pobj\Api\Repositories\OmegaTicketsRepository;
 use Pobj\Api\Repositories\OmegaUsersRepository;
+use Pobj\Api\Repositories\ProdutoRepository;
 use Pobj\Api\Repositories\RealizadoRepository;
 use Pobj\Api\Repositories\StatusIndicadoresRepository;
+use Pobj\Api\Repositories\VariavelRepository;
 use Pobj\Api\Services\AgentService;
 use Pobj\Api\Services\BootstrapService;
 use Pobj\Api\Services\FiltrosService;
@@ -74,10 +81,48 @@ class Container
             return new MetaRepository($container->get(EntityManager::class));
         });
 
+        $this->singleton(VariavelRepository::class, function (Container $container) {
+            return new VariavelRepository($container->get(EntityManager::class));
+        });
+
+        $this->singleton(ProdutoRepository::class, function (Container $container) {
+            return new ProdutoRepository($container->get(EntityManager::class));
+        });
+
+        $this->singleton(CalendarioRepository::class, function (Container $container) {
+            return new CalendarioRepository($container->get(EntityManager::class));
+        });
+
+        $this->singleton(CampanhasRepository::class, function (Container $container) {
+            return new CampanhasRepository($container->get(EntityManager::class));
+        });
+
+        $this->singleton(DetalhesRepository::class, function (Container $container) {
+            return new DetalhesRepository($container->get(EntityManager::class));
+        });
+
+        $this->singleton(HistoricoRepository::class, function (Container $container) {
+            return new HistoricoRepository($container->get(EntityManager::class));
+        });
+
+        $this->singleton(LeadsRepository::class, function (Container $container) {
+            return new LeadsRepository($container->get(EntityManager::class));
+        });
+
         $this->singleton(BootstrapService::class, function (Container $container) {
             return new BootstrapService(
                 $container->get(EstruturaRepository::class),
-                $container->get(StatusIndicadoresRepository::class)
+                $container->get(StatusIndicadoresRepository::class),
+                $container->get(RealizadoRepository::class),
+                $container->get(MetaRepository::class),
+                $container->get(VariavelRepository::class),
+                $container->get(OmegaMesuRepository::class),
+                $container->get(ProdutoRepository::class),
+                $container->get(CalendarioRepository::class),
+                $container->get(CampanhasRepository::class),
+                $container->get(DetalhesRepository::class),
+                $container->get(HistoricoRepository::class),
+                $container->get(LeadsRepository::class)
             );
         });
 

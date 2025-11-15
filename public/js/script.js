@@ -7785,6 +7785,32 @@ function setupUserMenu(){
   menu.addEventListener("click", (ev) => {
     const item = ev.target?.closest?.(".userbox__menu-item");
     if (!item || item.hasAttribute("data-submenu")) return;
+    
+    const action = item.getAttribute("data-action");
+    if (action === "leads") {
+      ev.preventDefault();
+      ev.stopPropagation();
+      closeMenu();
+      if (typeof openLeadsWithoutFilters === "function") {
+        openLeadsWithoutFilters();
+      } else {
+        console.warn("Função openLeadsWithoutFilters não disponível");
+      }
+      return;
+    }
+    
+    if (action === "omega") {
+      ev.preventDefault();
+      ev.stopPropagation();
+      closeMenu();
+      if (typeof openOmegaWithoutFilters === "function") {
+        openOmegaWithoutFilters();
+      } else {
+        console.warn("Função openOmegaWithoutFilters não disponível");
+      }
+      return;
+    }
+    
     closeMenu();
   });
 

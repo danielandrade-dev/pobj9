@@ -11,58 +11,44 @@ use Doctrine\ORM\Mapping as ORM;
 class DCalendario
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $data;
-
-    #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $competencia;
+    #[ORM\Column(type: 'date_immutable')]
+    private \DateTimeImmutable $data;
 
     #[ORM\Column(type: 'integer')]
     private int $ano;
 
-    #[ORM\Column(type: 'tinyint')]
+    #[ORM\Column(type: 'smallint')]
     private int $mes;
 
     #[ORM\Column(name: 'mes_nome', type: 'string', length: 20)]
     private string $mesNome;
 
-    #[ORM\Column(type: 'tinyint')]
+    #[ORM\Column(type: 'smallint')]
     private int $dia;
 
     #[ORM\Column(name: 'dia_da_semana', type: 'string', length: 20)]
     private string $diaDaSemana;
 
-    #[ORM\Column(type: 'tinyint')]
+    #[ORM\Column(type: 'smallint')]
     private int $semana;
 
-    #[ORM\Column(type: 'tinyint')]
+    #[ORM\Column(type: 'smallint')]
     private int $trimestre;
 
-    #[ORM\Column(type: 'tinyint')]
+    #[ORM\Column(type: 'smallint')]
     private int $semestre;
 
-    #[ORM\Column(name: 'eh_dia_util', type: 'boolean')]
-    private bool $ehDiaUtil;
+    #[ORM\Column(name: 'eh_dia_util', type: 'boolean', options: ['default' => false])]
+    private bool $ehDiaUtil = false;
 
-    public function getData(): \DateTimeInterface
+    public function getData(): \DateTimeImmutable
     {
         return $this->data;
     }
 
-    public function setData(\DateTimeInterface $data): self
+    public function setData(\DateTimeImmutable $data): self
     {
         $this->data = $data;
-        return $this;
-    }
-
-    public function getCompetencia(): \DateTimeInterface
-    {
-        return $this->competencia;
-    }
-
-    public function setCompetencia(\DateTimeInterface $competencia): self
-    {
-        $this->competencia = $competencia;
         return $this;
     }
 
@@ -163,6 +149,11 @@ class DCalendario
     {
         $this->ehDiaUtil = $ehDiaUtil;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->data->format('Y-m-d');
     }
 }
 

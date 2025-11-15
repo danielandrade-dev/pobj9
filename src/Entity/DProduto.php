@@ -11,54 +11,34 @@ use Doctrine\ORM\Mapping as ORM;
 class DProduto
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'id_indicador', type: 'string', length: 50)]
-    private string $idIndicador;
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
+    private int $id;
 
-    #[ORM\Id]
-    #[ORM\Column(name: 'id_subindicador', type: 'string', length: 50, options: ['default' => '0'])]
-    private string $idSubindicador;
-
-    #[ORM\Column(name: 'id_familia', type: 'tinyint')]
+    #[ORM\Column(name: 'id_familia', type: 'integer')]
     private int $idFamilia;
 
-    #[ORM\Column(type: 'string', length: 100)]
+    #[ORM\Column(type: 'string', length: 120)]
     private string $familia;
 
-    #[ORM\Column(name: 'familia_slug', type: 'string', length: 100)]
-    private string $familiaSlug;
+    #[ORM\Column(name: 'id_indicador', type: 'integer')]
+    private int $idIndicador;
 
-    #[ORM\Column(type: 'string', length: 150)]
+    #[ORM\Column(type: 'string', length: 120)]
     private string $indicador;
 
-    #[ORM\Column(name: 'indicador_slug', type: 'string', length: 150, unique: true)]
-    private string $indicadorSlug;
+    #[ORM\Column(name: 'id_subindicador', type: 'integer', nullable: true)]
+    private ?int $idSubindicador = null;
 
-    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[ORM\Column(type: 'string', length: 120, nullable: true)]
     private ?string $subindicador = null;
 
-    #[ORM\Column(name: 'subindicador_slug', type: 'string', length: 150, nullable: true)]
-    private ?string $subindicadorSlug = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['default' => '0.00'])]
+    private string $peso;
 
-    public function getIdIndicador(): string
+    public function getId(): int
     {
-        return $this->idIndicador;
-    }
-
-    public function setIdIndicador(string $idIndicador): self
-    {
-        $this->idIndicador = $idIndicador;
-        return $this;
-    }
-
-    public function getIdSubindicador(): string
-    {
-        return $this->idSubindicador;
-    }
-
-    public function setIdSubindicador(string $idSubindicador): self
-    {
-        $this->idSubindicador = $idSubindicador;
-        return $this;
+        return $this->id;
     }
 
     public function getIdFamilia(): int
@@ -83,14 +63,14 @@ class DProduto
         return $this;
     }
 
-    public function getFamiliaSlug(): string
+    public function getIdIndicador(): int
     {
-        return $this->familiaSlug;
+        return $this->idIndicador;
     }
 
-    public function setFamiliaSlug(string $familiaSlug): self
+    public function setIdIndicador(int $idIndicador): self
     {
-        $this->familiaSlug = $familiaSlug;
+        $this->idIndicador = $idIndicador;
         return $this;
     }
 
@@ -105,14 +85,14 @@ class DProduto
         return $this;
     }
 
-    public function getIndicadorSlug(): string
+    public function getIdSubindicador(): ?int
     {
-        return $this->indicadorSlug;
+        return $this->idSubindicador;
     }
 
-    public function setIndicadorSlug(string $indicadorSlug): self
+    public function setIdSubindicador(?int $idSubindicador): self
     {
-        $this->indicadorSlug = $indicadorSlug;
+        $this->idSubindicador = $idSubindicador;
         return $this;
     }
 
@@ -127,15 +107,14 @@ class DProduto
         return $this;
     }
 
-    public function getSubindicadorSlug(): ?string
+    public function getPeso(): string
     {
-        return $this->subindicadorSlug;
+        return $this->peso;
     }
 
-    public function setSubindicadorSlug(?string $subindicadorSlug): self
+    public function setPeso(string $peso): self
     {
-        $this->subindicadorSlug = $subindicadorSlug;
+        $this->peso = $peso;
         return $this;
     }
 }
-

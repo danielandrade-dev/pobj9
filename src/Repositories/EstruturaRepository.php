@@ -21,9 +21,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllSegmentos(): array
     {
-        $sql = 'SELECT DISTINCT segmento_id AS id, segmento AS nome
+        $sql = 'SELECT DISTINCT segmento_id AS id, segmento_label AS nome
                 FROM d_unidade
-                WHERE segmento_id IS NOT NULL AND segmento IS NOT NULL
+                WHERE segmento_id IS NOT NULL AND segmento_label IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -51,9 +51,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllAgencias(): array
     {
-        $sql = 'SELECT DISTINCT agencia_id AS id, agencia AS nome, NULL AS porte
+        $sql = 'SELECT DISTINCT agencia_id AS id, agencia_label AS nome, porte
                 FROM d_unidade
-                WHERE agencia_id IS NOT NULL AND agencia IS NOT NULL
+                WHERE agencia_id IS NOT NULL AND agencia_label IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -63,7 +63,10 @@ class EstruturaRepository implements RepositoryInterface
     {
         $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS nome
                 FROM d_unidade
-                WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao IS NOT NULL
+                WHERE gerente_gestao_id IS NOT NULL 
+                    AND gerente_gestao_id != ''
+                    AND gerente_gestao IS NOT NULL
+                    AND gerente_gestao != ''
                 ORDER BY nome";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -73,7 +76,10 @@ class EstruturaRepository implements RepositoryInterface
     {
         $sql = "SELECT DISTINCT gerente_id AS id, gerente AS nome
                 FROM d_unidade
-                WHERE gerente_id IS NOT NULL AND gerente IS NOT NULL
+                WHERE gerente_id IS NOT NULL 
+                    AND gerente_id != ''
+                    AND gerente IS NOT NULL
+                    AND gerente != ''
                 ORDER BY nome";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();

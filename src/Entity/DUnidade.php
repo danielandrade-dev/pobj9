@@ -11,86 +11,76 @@ use Doctrine\ORM\Mapping as ORM;
 class DUnidade
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'segmento_id', type: 'string', length: 50)]
-    private string $segmentoId;
+    #[ORM\Column(name: 'agencia_id', type: 'smallint', options: ['unsigned' => true])]
+    private int $agenciaId;
 
-    #[ORM\Id]
-    #[ORM\Column(name: 'diretoria_id', type: 'string', length: 50)]
-    private string $diretoriaId;
+    #[ORM\Column(name: 'segmento_id', type: 'smallint', options: ['unsigned' => true])]
+    private int $segmentoId;
 
-    #[ORM\Id]
-    #[ORM\Column(name: 'gerencia_regional_id', type: 'string', length: 50)]
-    private string $gerenciaRegionalId;
-
-    #[ORM\Id]
-    #[ORM\Column(name: 'agencia_id', type: 'string', length: 50, unique: true)]
-    private string $agenciaId;
-
-    #[ORM\Column(type: 'string', length: 100)]
+    #[ORM\Column(type: 'string', length: 150)]
     private string $segmento;
 
-    #[ORM\Column(name: 'diretoria_regional', type: 'string', length: 150)]
-    private string $diretoriaRegional;
+    #[ORM\Column(name: 'segmento_label', type: 'string', length: 150)]
+    private string $segmentoLabel;
 
-    #[ORM\Column(name: 'gerencia_regional', type: 'string', length: 150)]
-    private string $gerenciaRegional;
+    #[ORM\Column(name: 'diretoria_id', type: 'smallint', options: ['unsigned' => true])]
+    private int $diretoriaId;
+
+    #[ORM\Column(type: 'string', length: 150)]
+    private string $diretoria;
+
+    #[ORM\Column(name: 'diretoria_label', type: 'string', length: 150)]
+    private string $diretoriaLabel;
+
+    #[ORM\Column(name: 'regional_id', type: 'smallint', options: ['unsigned' => true])]
+    private int $regionalId;
+
+    #[ORM\Column(type: 'string', length: 150)]
+    private string $regional;
+
+    #[ORM\Column(name: 'regional_label', type: 'string', length: 150)]
+    private string $regionalLabel;
 
     #[ORM\Column(type: 'string', length: 150)]
     private string $agencia;
 
-    #[ORM\Column(name: 'gerente_gestao', type: 'string', length: 150, nullable: true)]
-    private ?string $gerenteGestao = null;
+    #[ORM\Column(name: 'agencia_label', type: 'string', length: 150)]
+    private string $agenciaLabel;
 
-    #[ORM\Column(name: 'gerente_gestao_id', type: 'string', length: 50, nullable: true)]
-    private ?string $gerenteGestaoId = null;
+    #[ORM\Column(name: 'gerente_id', type: 'string', length: 16, nullable: true)]
+    private ?string $gerenteId = null;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     private ?string $gerente = null;
 
-    #[ORM\Column(name: 'gerente_id', type: 'string', length: 50, nullable: true)]
-    private ?string $gerenteId = null;
+    #[ORM\Column(name: 'gerente_gestao_id', type: 'string', length: 16, nullable: true)]
+    private ?string $gerenteGestaoId = null;
 
-    public function getSegmentoId(): string
-    {
-        return $this->segmentoId;
-    }
+    #[ORM\Column(name: 'gerente_gestao', type: 'string', length: 150, nullable: true)]
+    private ?string $gerenteGestao = null;
 
-    public function setSegmentoId(string $segmentoId): self
-    {
-        $this->segmentoId = $segmentoId;
-        return $this;
-    }
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $porte = null;
 
-    public function getDiretoriaId(): string
-    {
-        return $this->diretoriaId;
-    }
-
-    public function setDiretoriaId(string $diretoriaId): self
-    {
-        $this->diretoriaId = $diretoriaId;
-        return $this;
-    }
-
-    public function getGerenciaRegionalId(): string
-    {
-        return $this->gerenciaRegionalId;
-    }
-
-    public function setGerenciaRegionalId(string $gerenciaRegionalId): self
-    {
-        $this->gerenciaRegionalId = $gerenciaRegionalId;
-        return $this;
-    }
-
-    public function getAgenciaId(): string
+    public function getAgenciaId(): int
     {
         return $this->agenciaId;
     }
 
-    public function setAgenciaId(string $agenciaId): self
+    public function setAgenciaId(int $agenciaId): self
     {
         $this->agenciaId = $agenciaId;
+        return $this;
+    }
+
+    public function getSegmentoId(): int
+    {
+        return $this->segmentoId;
+    }
+
+    public function setSegmentoId(int $segmentoId): self
+    {
+        $this->segmentoId = $segmentoId;
         return $this;
     }
 
@@ -105,25 +95,80 @@ class DUnidade
         return $this;
     }
 
-    public function getDiretoriaRegional(): string
+    public function getSegmentoLabel(): string
     {
-        return $this->diretoriaRegional;
+        return $this->segmentoLabel;
     }
 
-    public function setDiretoriaRegional(string $diretoriaRegional): self
+    public function setSegmentoLabel(string $segmentoLabel): self
     {
-        $this->diretoriaRegional = $diretoriaRegional;
+        $this->segmentoLabel = $segmentoLabel;
         return $this;
     }
 
-    public function getGerenciaRegional(): string
+    public function getDiretoriaId(): int
     {
-        return $this->gerenciaRegional;
+        return $this->diretoriaId;
     }
 
-    public function setGerenciaRegional(string $gerenciaRegional): self
+    public function setDiretoriaId(int $diretoriaId): self
     {
-        $this->gerenciaRegional = $gerenciaRegional;
+        $this->diretoriaId = $diretoriaId;
+        return $this;
+    }
+
+    public function getDiretoria(): string
+    {
+        return $this->diretoria;
+    }
+
+    public function setDiretoria(string $diretoria): self
+    {
+        $this->diretoria = $diretoria;
+        return $this;
+    }
+
+    public function getDiretoriaLabel(): string
+    {
+        return $this->diretoriaLabel;
+    }
+
+    public function setDiretoriaLabel(string $diretoriaLabel): self
+    {
+        $this->diretoriaLabel = $diretoriaLabel;
+        return $this;
+    }
+
+    public function getRegionalId(): int
+    {
+        return $this->regionalId;
+    }
+
+    public function setRegionalId(int $regionalId): self
+    {
+        $this->regionalId = $regionalId;
+        return $this;
+    }
+
+    public function getRegional(): string
+    {
+        return $this->regional;
+    }
+
+    public function setRegional(string $regional): self
+    {
+        $this->regional = $regional;
+        return $this;
+    }
+
+    public function getRegionalLabel(): string
+    {
+        return $this->regionalLabel;
+    }
+
+    public function setRegionalLabel(string $regionalLabel): self
+    {
+        $this->regionalLabel = $regionalLabel;
         return $this;
     }
 
@@ -138,25 +183,25 @@ class DUnidade
         return $this;
     }
 
-    public function getGerenteGestao(): ?string
+    public function getAgenciaLabel(): string
     {
-        return $this->gerenteGestao;
+        return $this->agenciaLabel;
     }
 
-    public function setGerenteGestao(?string $gerenteGestao): self
+    public function setAgenciaLabel(string $agenciaLabel): self
     {
-        $this->gerenteGestao = $gerenteGestao;
+        $this->agenciaLabel = $agenciaLabel;
         return $this;
     }
 
-    public function getGerenteGestaoId(): ?string
+    public function getGerenteId(): ?string
     {
-        return $this->gerenteGestaoId;
+        return $this->gerenteId;
     }
 
-    public function setGerenteGestaoId(?string $gerenteGestaoId): self
+    public function setGerenteId(?string $gerenteId): self
     {
-        $this->gerenteGestaoId = $gerenteGestaoId;
+        $this->gerenteId = $gerenteId;
         return $this;
     }
 
@@ -171,15 +216,36 @@ class DUnidade
         return $this;
     }
 
-    public function getGerenteId(): ?string
+    public function getGerenteGestaoId(): ?string
     {
-        return $this->gerenteId;
+        return $this->gerenteGestaoId;
     }
 
-    public function setGerenteId(?string $gerenteId): self
+    public function setGerenteGestaoId(?string $gerenteGestaoId): self
     {
-        $this->gerenteId = $gerenteId;
+        $this->gerenteGestaoId = $gerenteGestaoId;
+        return $this;
+    }
+
+    public function getGerenteGestao(): ?string
+    {
+        return $this->gerenteGestao;
+    }
+
+    public function setGerenteGestao(?string $gerenteGestao): self
+    {
+        $this->gerenteGestao = $gerenteGestao;
+        return $this;
+    }
+
+    public function getPorte(): ?string
+    {
+        return $this->porte;
+    }
+
+    public function setPorte(?string $porte): self
+    {
+        $this->porte = $porte;
         return $this;
     }
 }
-

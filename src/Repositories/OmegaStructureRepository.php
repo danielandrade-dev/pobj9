@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pobj\Api\Repositories;
 
 use Doctrine\ORM\EntityManager;
+use Pobj\Api\DTO\OmegaStructureDTO;
 use Pobj\Api\Entity\OmegaDepartamento;
 use Pobj\Api\Interfaces\RepositoryInterface;
 
@@ -33,26 +34,21 @@ class OmegaStructureRepository implements RepositoryInterface
             ->getResult();
     }
 
-    /**
-     * Converte entidades para array associativo (compatibilidade com código existente)
-     * @return array<int, array<string, mixed>>
-     */
     public function findAllAsArray(): array
     {
         $entities = $this->findAll();
-        $result = [];
         
-        foreach ($entities as $entity) {
-            $result[] = [
-                'departamento' => $entity->getDepartamento(),
-                'departamento_id' => $entity->getDepartamentoId(),
-                'ordem_departamento' => $entity->getOrdemDepartamento(),
-                'tipo' => $entity->getTipo(),
-                'ordem_tipo' => $entity->getOrdemTipo(),
-            ];
-        }
-        
-        return $result;
+        return array_map(function (OmegaDepartamento $entity) {
+            $dto = new OmegaStructureDTO(
+                departamento: $entity->getDepartamento(),
+                tipo: $entity->getTipo(),
+                departamentoId: $entity->getDepartamentoId(),
+                ordemDepartamento: $entity->getOrdemDepartamento(),
+                ordemTipo: $entity->getOrdemTipo(),
+            );
+            
+            return $dto->toArray();
+        }, $entities);
     }
 }
 

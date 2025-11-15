@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pobj\Api\Repositories;
 
 use Doctrine\ORM\EntityManager;
+use Pobj\Api\DTO\OmegaStatusDTO;
 use Pobj\Api\Entity\OmegaStatus;
 use Pobj\Api\Interfaces\RepositoryInterface;
 
@@ -31,27 +32,22 @@ class OmegaStatusRepository implements RepositoryInterface
             ->getResult();
     }
 
-    /**
-     * Converte entidades para array associativo (compatibilidade com código existente)
-     * @return array<int, array<string, mixed>>
-     */
     public function findAllAsArray(): array
     {
         $entities = $this->findAll();
-        $result = [];
         
-        foreach ($entities as $entity) {
-            $result[] = [
-                'id' => $entity->getId(),
-                'label' => $entity->getLabel(),
-                'tone' => $entity->getTone(),
-                'descricao' => $entity->getDescricao(),
-                'ordem' => $entity->getOrdem(),
-                'departamento_id' => $entity->getDepartamentoId(),
-            ];
-        }
-        
-        return $result;
+        return array_map(function (OmegaStatus $entity) {
+            $dto = new OmegaStatusDTO(
+                id: $entity->getId(),
+                label: $entity->getLabel(),
+                tone: $entity->getTone(),
+                descricao: $entity->getDescricao(),
+                ordem: $entity->getOrdem(),
+                departamentoId: $entity->getDepartamentoId(),
+            );
+            
+            return $dto->toArray();
+        }, $entities);
     }
 }
 

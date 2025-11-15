@@ -6191,6 +6191,75 @@ async function apiGet(path, params){
   return json;
 }
 
+// Aqui eu faço uma chamada POST simples contra a API para enviar JSON.
+async function apiPost(path, body = {}, params){
+  let baseUrl;
+  try {
+    baseUrl = resolveApiBaseUrl();
+  } catch (err) {
+    const error = new Error("Não foi possível resolver o endereço da API PHP.");
+    error.cause = err;
+    throw error;
+  }
+
+  const { url } = prepareApiUrl(baseUrl, path, params);
+
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: body === undefined ? "{}" : JSON.stringify(body),
+      cache: "no-store",
+    });
+  } catch (err) {
+    const error = new Error("Não foi possível contactar a API PHP em src/index.php.");
+    error.cause = err;
+    throw error;
+  }
+
+  let text;
+  try {
+    text = await response.text();
+  } catch (err) {
+    const error = new Error("Falha ao ler a resposta da API PHP.");
+    error.cause = err;
+    throw error;
+  }
+
+  let json;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch (err) {
+    const error = new Error("A API PHP retornou um JSON inválido.");
+    error.cause = err;
+    error.responseText = text;
+    throw error;
+  }
+
+  if (!response.ok) {
+    const message = (json && typeof json === "object" && json.error)
+      ? String(json.error)
+      : `Falha ao enviar dados (HTTP ${response.status})`;
+    const error = new Error(message);
+    error.code = "HTTP_ERROR";
+    error.status = response.status;
+    error.payload = json;
+    throw error;
+  }
+
+  if (json && typeof json === "object" && json.error) {
+    const error = new Error(String(json.error));
+    error.code = "API_ERROR";
+    error.payload = json;
+    throw error;
+  }
+
+  return json;
+}
 
 function prepareApiUrl(baseUrl, path, params){
   // Sempre usa a raiz do site para construir URLs da API com prefixo /api/

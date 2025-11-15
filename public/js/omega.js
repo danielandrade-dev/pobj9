@@ -1164,32 +1164,14 @@ function ingestHistoryFacts(ticket, { initial = false } = {}){
 
 function ensureOmegaTemplate(){
   const existing = document.getElementById("omega-modal");
-  if (existing) return Promise.resolve(existing);
-  if (omegaTemplatePromise) return omegaTemplatePromise;
-
-  omegaTemplatePromise = fetch("/omega.html")
-    .then((res) => {
-      if (!res.ok) throw new Error(`Falha ao carregar omega.html: ${res.status}`);
-      return res.text();
-    })
-    .then((html) => {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = html;
-      const templateRoot = wrapper.querySelector("#omega-modal");
-      if (!templateRoot) throw new Error("Template Omega não encontrado em omega.html");
-      const clone = templateRoot.cloneNode(true);
-      clone.removeAttribute("data-omega-standalone");
-      clone.hidden = true;
-      document.body.appendChild(clone);
-      return clone;
-    })
-    .catch((err) => {
-      console.error("Não foi possível carregar o template da Omega:", err);
-      omegaTemplatePromise = null;
-      throw err;
-    });
-
-  return omegaTemplatePromise;
+  if (existing) {
+    // Remove o atributo data-omega-standalone se existir (vindo do omega.html standalone)
+    existing.removeAttribute("data-omega-standalone");
+    return Promise.resolve(existing);
+  }
+  
+  // Se não encontrou no DOM, retorna erro
+  return Promise.reject(new Error("Template Omega não encontrado no DOM. Certifique-se de que o componente omega-modal está incluído na página."));
 }
 
 function openOmega(detail = null){

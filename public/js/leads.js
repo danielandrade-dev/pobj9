@@ -3,29 +3,12 @@ let leadsTemplatePromise = null;
 
 function ensureLeadsTemplate(){
   const existing = document.getElementById("leads-modal");
-  if (existing) return Promise.resolve(existing);
-  if (leadsTemplatePromise) return leadsTemplatePromise;
-
-  leadsTemplatePromise = fetch("/leads.html")
-    .then(res => {
-      if (!res.ok) throw new Error(`Falha ao carregar leads.html: ${res.status}`);
-      return res.text();
-    })
-    .then(html => {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = html.trim();
-      const fragment = document.createDocumentFragment();
-      while (wrapper.firstChild) fragment.appendChild(wrapper.firstChild);
-      document.body.appendChild(fragment);
-      return document.getElementById("leads-modal");
-    })
-    .catch(err => {
-      console.error("Não foi possível carregar o template de leads:", err);
-      leadsTemplatePromise = null;
-      throw err;
-    });
-
-  return leadsTemplatePromise;
+  if (existing) {
+    return Promise.resolve(existing);
+  }
+  
+  // Se não encontrou no DOM, retorna erro
+  return Promise.reject(new Error("Template de leads não encontrado no DOM. Certifique-se de que o componente leads-modal está incluído na página."));
 }
 
 const OPPORTUNITY_DIMENSION_FIELD = {

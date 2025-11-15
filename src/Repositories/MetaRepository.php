@@ -42,7 +42,7 @@ class MetaRepository implements RepositoryInterface
         $sql = "SELECT SUM(m.meta_mensal) AS total_meta
                 FROM f_metas m
                 JOIN d_calendario c ON c.data = m.data
-                JOIN d_unidades u ON u.segmento_id = m.segmento_id 
+                JOIN d_unidade u ON u.segmento_id = m.segmento_id 
                     AND u.diretoria_id = m.diretoria_id 
                     AND u.gerencia_regional_id = m.gerencia_regional_id 
                     AND u.agencia_id = m.agencia_id

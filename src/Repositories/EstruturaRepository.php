@@ -22,7 +22,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findAllSegmentos(): array
     {
         $sql = 'SELECT DISTINCT segmento_id AS id, segmento AS nome
-                FROM d_unidades
+                FROM d_unidade
                 WHERE segmento_id IS NOT NULL AND segmento IS NOT NULL
                 ORDER BY nome';
         
@@ -31,9 +31,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllDiretorias(): array
     {
-        $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_regional AS nome
-                FROM d_unidades
-                WHERE diretoria_id IS NOT NULL AND diretoria_regional IS NOT NULL
+        $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_label AS nome
+                FROM d_unidade 
+                WHERE diretoria_id IS NOT NULL AND diretoria_label IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -41,9 +41,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllRegionais(): array
     {
-        $sql = 'SELECT DISTINCT gerencia_regional_id AS id, gerencia_regional AS nome
-                FROM d_unidades
-                WHERE gerencia_regional_id IS NOT NULL AND gerencia_regional IS NOT NULL
+        $sql = 'SELECT DISTINCT regional_id AS id, regional_label AS nome
+                FROM d_unidade
+                WHERE regional_id IS NOT NULL AND regional_label IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -52,7 +52,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findAllAgencias(): array
     {
         $sql = 'SELECT DISTINCT agencia_id AS id, agencia AS nome, NULL AS porte
-                FROM d_unidades
+                FROM d_unidade
                 WHERE agencia_id IS NOT NULL AND agencia IS NOT NULL
                 ORDER BY nome';
         
@@ -62,7 +62,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findAllGGestoes(): array
     {
         $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS nome
-                FROM d_unidades
+                FROM d_unidade
                 WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao IS NOT NULL
                 ORDER BY nome";
         
@@ -72,7 +72,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findAllGerentes(): array
     {
         $sql = "SELECT DISTINCT gerente_id AS id, gerente AS nome
-                FROM d_unidades
+                FROM d_unidade
                 WHERE gerente_id IS NOT NULL AND gerente IS NOT NULL
                 ORDER BY nome";
         
@@ -82,7 +82,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findSegmentosForFilter(): array
     {
         $sql = 'SELECT DISTINCT segmento_id AS id, segmento AS label
-                FROM d_unidades
+                FROM d_unidade
                 WHERE segmento_id IS NOT NULL AND segmento IS NOT NULL
                 ORDER BY label';
         
@@ -92,7 +92,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findDiretoriasForFilter(): array
     {
         $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_regional AS label
-                FROM d_unidades
+                FROM d_unidade
                 WHERE diretoria_id IS NOT NULL AND diretoria_regional IS NOT NULL
                 ORDER BY label';
         
@@ -102,7 +102,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findRegionaisForFilter(): array
     {
         $sql = 'SELECT DISTINCT gerencia_regional_id AS id, gerencia_regional AS label
-                FROM d_unidades
+                FROM d_unidade
                 WHERE gerencia_regional_id IS NOT NULL AND gerencia_regional IS NOT NULL
                 ORDER BY label';
         
@@ -112,7 +112,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findAgenciasForFilter(): array
     {
         $sql = 'SELECT DISTINCT agencia_id AS id, agencia AS label, NULL AS porte
-                FROM d_unidades
+                FROM d_unidade
                 WHERE agencia_id IS NOT NULL AND agencia IS NOT NULL
                 ORDER BY label';
         
@@ -122,7 +122,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findGGestoesForFilter(): array
     {
         $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS label
-                FROM d_unidades
+                FROM d_unidade
                 WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao IS NOT NULL
                 ORDER BY label";
         
@@ -132,7 +132,7 @@ class EstruturaRepository implements RepositoryInterface
     public function findGerentesForFilter(): array
     {
         $sql = "SELECT DISTINCT gerente_id AS id, gerente AS label
-                FROM d_unidades
+                FROM d_unidade
                 WHERE gerente_id IS NOT NULL AND gerente IS NOT NULL
                 ORDER BY label";
         

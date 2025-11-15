@@ -42,7 +42,7 @@ class RealizadoRepository implements RepositoryInterface
         $sql = "SELECT SUM(r.realizado_mensal) AS total_realizado
                 FROM f_realizados r
                 JOIN d_calendario c ON c.data = r.data
-                JOIN d_unidades u ON u.segmento_id = r.segmento_id 
+                JOIN d_unidade u ON u.segmento_id = r.segmento_id 
                     AND u.diretoria_id = r.diretoria_id 
                     AND u.gerencia_regional_id = r.gerencia_regional_id 
                     AND u.agencia_id = r.agencia_id

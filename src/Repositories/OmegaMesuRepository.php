@@ -34,7 +34,7 @@ class OmegaMesuRepository implements RepositoryInterface
                     gerente_gestao_id AS 'Id Gerente de Gestao',
                     gerente AS Gerente,
                     gerente_id AS 'Id Gerente'
-                FROM d_unidades
+                FROM d_unidade
                 WHERE segmento IS NOT NULL
                 ORDER BY segmento, diretoria_regional, gerencia_regional, agencia";
 

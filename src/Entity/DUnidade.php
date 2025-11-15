@@ -7,7 +7,7 @@ namespace Pobj\Api\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'd_unidades')]
+#[ORM\Table(name: 'd_unidade')]
 class DUnidade
 {
     #[ORM\Id]

@@ -2563,56 +2563,40 @@ function montarCatalogoDeProdutos(dimRows){
 
 function normalizarLinhasFatoRealizados(rows){
   return rows.map(raw => {
-    const registroId = lerCelula(raw, ["Registro ID", "ID", "registro", "registro_id"]);
+    const registroId = raw.registro_id;
     if (!registroId) return null;
 
-    const segmento = lerCelula(raw, ["Segmento"]);
-    const segmentoId = lerCelula(raw, ["Segmento ID", "Id Segmento"]);
-    const diretoriaId = lerCelula(raw, ["Diretoria ID", "Diretoria", "Id Diretoria", "Diretoria Codigo"]);
-    const diretoriaNome = lerCelula(raw, ["Diretoria Nome", "Diretoria Regional"]) || diretoriaId;
-    const gerenciaId = lerCelula(raw, ["Gerencia ID", "Gerencia Regional", "Id Gerencia Regional"]);
-    const gerenciaNome = lerCelula(raw, ["Gerencia Nome", "Gerencia Regional", "Regional Nome"]) || gerenciaId;
-    const regionalNome = lerCelula(raw, ["Regional Nome", "Regional"]) || gerenciaNome;
-    const agenciaIdRaw = lerCelula(raw, ["Agencia ID", "Id Agencia", "Agência ID", "Agencia"]);
-    const agenciaNome = lerCelula(raw, ["Agencia Nome", "Agência Nome", "Agencia"]);
-    const agenciaCodigoRaw = lerCelula(raw, ["Agencia Codigo", "Código Agência", "Codigo Agencia"]);
+    const segmento = raw.segmento;
+    const segmentoId = raw.segmento_id;
+    const diretoriaId = raw.diretoria_id;
+    const diretoriaNome = raw.diretoria_nome || diretoriaId;
+    const gerenciaId = raw.gerencia_id;
+    const gerenciaNome = raw.gerencia_nome || raw.regional_nome || gerenciaId;
+    const regionalNome = raw.regional_nome || gerenciaNome;
+    const agenciaIdRaw = raw.agencia_id;
+    const agenciaNome = raw.agencia_nome;
+    const agenciaCodigoRaw = raw.agencia_codigo;
     const agenciaCodigo = agenciaCodigoRaw || agenciaIdRaw || agenciaNome;
     const agenciaId = agenciaIdRaw || agenciaCodigoRaw || agenciaNome;
-    const gerenteGestaoIdRaw = lerCelula(raw, [
-      "Gerente Gestao ID",
-      "Gerente Gestao",
-      "Id Gerente de Gestao",
-      "Id Gerente de Gestão",
-      "gerenteGestaoId",
-      "gerente_gestao_id"
-    ]);
-    const gerenteGestaoNomeRaw = lerCelula(raw, [
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "Gerente Gestao",
-      "gerenteGestaoNome",
-      "gerente_gestao_nome"
-    ]);
+    const gerenteGestaoIdRaw = raw.gerente_gestao_id;
+    const gerenteGestaoNomeRaw = raw.gerente_gestao_nome;
     const gerenteGestaoParsed = normalizeFuncionalPair(gerenteGestaoIdRaw, gerenteGestaoNomeRaw);
     const gerenteGestaoId = gerenteGestaoParsed.id;
     const gerenteGestaoNome = gerenteGestaoParsed.nome || gerenteGestaoParsed.label || gerenteGestaoId;
-    const gerenteIdRaw = lerCelula(raw, ["Gerente ID", "Gerente"]);
-    const gerenteNomeRaw = lerCelula(raw, ["Gerente Nome", "Gerente"]);
+    const gerenteIdRaw = raw.gerente_id;
+    const gerenteNomeRaw = raw.gerente_nome;
     const gerenteParsed = normalizeFuncionalPair(gerenteIdRaw, gerenteNomeRaw);
     const gerenteId = gerenteParsed.id;
     const gerenteNome = gerenteParsed.nome || gerenteParsed.label || gerenteId;
-    let familiaId = lerCelula(raw, ["Familia ID", "Familia", "Família ID"]) || "";
-    let familiaNome = lerCelula(raw, ["Familia Nome", "Família", "Familia"]) || familiaId;
-    let produtoId = lerCelula(raw, ["id_indicador", "Produto ID", "Produto", "Id Produto"]);
+    let familiaId = raw.familia_id || "";
+    let familiaNome = raw.familia_nome || familiaId;
+    let produtoId = raw.id_indicador;
     if (!produtoId) return null;
-    let produtoNome = lerCelula(raw, ["ds_indicador", "Produto Nome", "Produto"]) || produtoId;
-    let subproduto = lerCelula(raw, ["Subproduto", "Sub produto", "Sub-Produto"]);
-    const familiaCodigoExtra = lerCelula(raw, ["Familia Codigo", "Familia Código", "FamiliaCod"]);
-    const indicadorCodigoExtra = lerCelula(raw, ["Indicador Codigo", "Indicador Código", "IndicadorCod"]);
-    const subCodigoExtra = lerCelula(raw, ["Subindicador Codigo", "Subindicador Código", "SubindicadorCod"]);
+    let produtoNome = raw.ds_indicador || produtoId;
+    let subproduto = raw.subproduto || "";
+    const familiaCodigoExtra = raw.familia_codigo;
+    const indicadorCodigoExtra = raw.indicador_codigo;
+    const subCodigoExtra = raw.subindicador_codigo;
     const familiaCodigo = limparTexto(familiaCodigoExtra);
     if (familiaCodigo) {
       const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
@@ -2633,22 +2617,22 @@ function normalizarLinhasFatoRealizados(rows){
     }
     const subCodigo = limparTexto(subCodigoExtra);
     const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const carteira = lerCelula(raw, ["Carteira"]);
-    const canalVenda = lerCelula(raw, ["Canal Venda", "Canal"]);
-    const tipoVenda = lerCelula(raw, ["Tipo Venda", "Tipo"]);
-    const modalidadePagamento = lerCelula(raw, ["Modalidade Pagamento", "Modalidade"]);
-    let data = converterDataISO(lerCelula(raw, ["Data", "Data Movimento", "Data Movimentacao", "Data Movimentação"]));
-    let competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"]));
+    const carteira = raw.carteira;
+    const canalVenda = raw.canal_venda;
+    const tipoVenda = raw.tipo_venda;
+    const modalidadePagamento = raw.modalidade_pagamento;
+    let data = converterDataISO(raw.data);
+    let competencia = converterDataISO(raw.competencia);
     if (!data && competencia) {
       data = competencia;
     }
     if (!competencia && data) {
       competencia = `${data.slice(0, 7)}-01`;
     }
-    const realizadoMens = toNumber(lerCelula(raw, ["Realizado Mensal", "Realizado"]));
-    const realizadoAcum = toNumber(lerCelula(raw, ["Realizado Acumulado", "Realizado Acum"]));
-    const quantidade = toNumber(lerCelula(raw, ["Quantidade", "Qtd"]));
-    const variavelReal = toNumber(lerCelula(raw, ["Variavel Real", "Variável Real"]));
+    const realizadoMens = toNumber(raw.realizado_mensal);
+    const realizadoAcum = toNumber(raw.realizado_acumulado);
+    const quantidade = toNumber(raw.quantidade);
+    const variavelReal = toNumber(raw.variavel_real);
 
     const scenarioHint = getSegmentScenarioFromValue(segmento) || getSegmentScenarioFromValue(segmentoId) || "";
     const indicadorRes = resolveIndicatorFromDimension([produtoId, produtoNome, indicadorCodigoExtra], scenarioHint);
@@ -2748,59 +2732,41 @@ function normalizarLinhasFatoRealizados(rows){
 // Aqui eu deixo o fato de metas com os mesmos padrões de datas e chaves dos realizados para facilitar os cruzamentos.
 function normalizarLinhasFatoMetas(rows){
   return rows.map(raw => {
-    const registroId = lerCelula(raw, ["Registro ID", "ID", "registro"]);
+    const registroId = raw.registro_id;
     if (!registroId) return null;
 
-    const segmento = lerCelula(raw, ["Segmento"]);
-    const segmentoId = lerCelula(raw, ["Segmento ID", "Id Segmento"]);
-    const diretoriaId = lerCelula(raw, ["Diretoria ID", "Diretoria", "Id Diretoria"]);
-    const diretoriaNome = lerCelula(raw, ["Diretoria Nome", "Diretoria Regional"]) || diretoriaId;
-    const gerenciaId = lerCelula(raw, ["Gerencia ID", "Gerencia Regional", "Id Gerencia Regional"]);
-    const gerenciaNome = lerCelula(raw, ["Gerencia Nome", "Gerencia Regional", "Regional Nome"]) || gerenciaId;
-    const regionalNome = lerCelula(raw, ["Regional Nome", "Regional"]) || gerenciaNome;
-    const agenciaIdRaw = lerCelula(raw, ["Agencia ID", "Agência ID", "Id Agencia"]);
-    const agenciaCodigoRaw = lerCelula(raw, ["Agencia Codigo", "Agência Codigo", "Codigo Agencia"]);
-    const agenciaNome = lerCelula(raw, ["Agencia Nome", "Agência Nome", "Agencia"])
-      || agenciaCodigoRaw
-      || agenciaIdRaw;
+    const segmento = raw.segmento;
+    const segmentoId = raw.segmento_id;
+    const diretoriaId = raw.diretoria_id;
+    const diretoriaNome = raw.diretoria_nome || diretoriaId;
+    const gerenciaId = raw.gerencia_id;
+    const gerenciaNome = raw.gerencia_nome || raw.regional_nome || gerenciaId;
+    const regionalNome = raw.regional_nome || gerenciaNome;
+    const agenciaIdRaw = raw.agencia_id;
+    const agenciaCodigoRaw = raw.agencia_codigo;
+    const agenciaNome = raw.agencia_nome || agenciaCodigoRaw || agenciaIdRaw;
     const agenciaCodigo = agenciaCodigoRaw || agenciaIdRaw || agenciaNome;
     const agenciaId = agenciaIdRaw || agenciaCodigoRaw || agenciaNome;
-    const gerenteGestaoIdRaw = lerCelula(raw, [
-      "Gerente Gestao ID",
-      "Gerente Gestao",
-      "Id Gerente de Gestao",
-      "Id Gerente de Gestão",
-      "gerenteGestaoId",
-      "gerente_gestao_id"
-    ]);
-    const gerenteGestaoNomeRaw = lerCelula(raw, [
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "Gerente Gestao",
-      "gerenteGestaoNome",
-      "gerente_gestao_nome"
-    ]);
+    const gerenteGestaoIdRaw = raw.gerente_gestao_id;
+    const gerenteGestaoNomeRaw = raw.gerente_gestao_nome;
     const gerenteGestaoParsed = normalizeFuncionalPair(gerenteGestaoIdRaw, gerenteGestaoNomeRaw);
     const gerenteGestaoId = gerenteGestaoParsed.id;
     const gerenteGestaoNome = gerenteGestaoParsed.nome || gerenteGestaoParsed.label || gerenteGestaoId;
-    const gerenteIdRaw = lerCelula(raw, ["Gerente ID", "Gerente"]);
-    const gerenteNomeRaw = lerCelula(raw, ["Gerente Nome", "Gerente"]);
+    const gerenteIdRaw = raw.gerente_id;
+    const gerenteNomeRaw = raw.gerente_nome;
     const gerenteParsed = normalizeFuncionalPair(gerenteIdRaw, gerenteNomeRaw);
     const gerenteId = gerenteParsed.id;
     const gerenteNome = gerenteParsed.nome || gerenteParsed.label || gerenteId;
 
-    let familiaId = lerCelula(raw, ["Familia ID", "Familia", "Família ID"]);
-    let familiaNome = lerCelula(raw, ["Familia Nome", "Família Nome", "Familia"]) || familiaId;
-    let produtoId = lerCelula(raw, ["id_indicador", "Produto ID", "Produto", "Id Produto"]);
-    let produtoNome = lerCelula(raw, ["ds_indicador", "Produto Nome", "Produto"]) || produtoId;
-    let subproduto = lerCelula(raw, ["Subproduto", "Sub produto", "Sub-Produto"]);
+    let familiaId = raw.familia_id || "";
+    let familiaNome = raw.familia_nome || familiaId;
+    let produtoId = raw.id_indicador;
+    let produtoNome = raw.ds_indicador || produtoId;
+    let subproduto = raw.subproduto || "";
 
-    const familiaCodigoExtra = lerCelula(raw, ["Familia Codigo", "Familia Código", "FamiliaCod"]);
-    const indicadorCodigoExtra = lerCelula(raw, ["Indicador Codigo", "Indicador Código", "IndicadorCod"]);
-    const subCodigoExtra = lerCelula(raw, ["Subindicador Codigo", "Subindicador Código", "SubindicadorCod"]);
+    const familiaCodigoExtra = raw.familia_codigo;
+    const indicadorCodigoExtra = raw.indicador_codigo;
+    const subCodigoExtra = raw.subindicador_codigo;
     const familiaCodigo = limparTexto(familiaCodigoExtra);
     if (familiaCodigo) {
       const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
@@ -2823,16 +2789,16 @@ function normalizarLinhasFatoMetas(rows){
 
     const subCodigo = limparTexto(subCodigoExtra);
     const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const carteira = lerCelula(raw, ["Carteira"]);
-    const canalVenda = lerCelula(raw, ["Canal Venda", "Canal"]);
-    const tipoVenda = lerCelula(raw, ["Tipo Venda", "Tipo"]);
-    const modalidadePagamento = lerCelula(raw, ["Modalidade Pagamento", "Modalidade"]);
-    const metaMens = toNumber(lerCelula(raw, ["Meta Mensal", "Meta"]));
-    const metaAcum = toNumber(lerCelula(raw, ["Meta Acumulada", "Meta Acum"]));
-    const variavelMeta = toNumber(lerCelula(raw, ["Variavel Meta", "Variável Meta"]));
-    const peso = toNumber(lerCelula(raw, ["Peso"]));
-    let data = converterDataISO(lerCelula(raw, ["Data", "Data Competencia", "Data da Meta"]));
-    let competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"]));
+    const carteira = raw.carteira;
+    const canalVenda = raw.canal_venda;
+    const tipoVenda = raw.tipo_venda;
+    const modalidadePagamento = raw.modalidade_pagamento;
+    const metaMens = toNumber(raw.meta_mensal);
+    const metaAcum = toNumber(raw.meta_acumulada);
+    const variavelMeta = toNumber(raw.variavel_meta);
+    const peso = toNumber(raw.peso);
+    let data = converterDataISO(raw.data);
+    let competencia = converterDataISO(raw.competencia);
     if (!data && competencia) {
       data = competencia;
     }
@@ -2938,15 +2904,15 @@ function normalizarLinhasFatoMetas(rows){
 // Aqui eu trato o fato variável (pontos) porque ele vem com os nomes de colunas diferentes das outras bases.
 function normalizarLinhasFatoVariavel(rows){
   return rows.map(raw => {
-    const registroId = lerCelula(raw, ["Registro ID", "ID", "registro"]);
+    const registroId = raw.registro_id;
     if (!registroId) return null;
-    let produtoId = lerCelula(raw, ["id_indicador", "Produto ID", "Produto", "Id Produto"]);
-    let produtoNome = lerCelula(raw, ["ds_indicador", "Produto Nome", "Produto"]) || produtoId;
-    let familiaId = lerCelula(raw, ["Familia ID", "Familia", "Família ID"]);
-    let familiaNome = lerCelula(raw, ["Familia Nome", "Família Nome", "Familia"]) || familiaId;
-    const familiaCodigoExtra = lerCelula(raw, ["Familia Codigo", "Familia Código", "FamiliaCod"]);
-    const indicadorCodigoExtra = lerCelula(raw, ["Indicador Codigo", "Indicador Código", "IndicadorCod"]);
-    const subCodigoExtra = lerCelula(raw, ["Subindicador Codigo", "Subindicador Código", "SubindicadorCod"]);
+    let produtoId = raw.id_indicador;
+    let produtoNome = raw.ds_indicador || produtoId;
+    let familiaId = raw.familia_id || "";
+    let familiaNome = raw.familia_nome || familiaId;
+    const familiaCodigoExtra = raw.familia_codigo;
+    const indicadorCodigoExtra = raw.indicador_codigo;
+    const subCodigoExtra = raw.subindicador_codigo;
     const familiaCodigo = limparTexto(familiaCodigoExtra);
     if (familiaCodigo) {
       const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
@@ -2967,10 +2933,10 @@ function normalizarLinhasFatoVariavel(rows){
     }
     const subCodigo = limparTexto(subCodigoExtra);
     const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const variavelMeta = toNumber(lerCelula(raw, ["Variavel Meta", "Variável Meta"]));
-    const variavelReal = toNumber(lerCelula(raw, ["Variavel Real", "Variável Real"]));
-    let data = converterDataISO(lerCelula(raw, ["Data"]));
-    let competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"]));
+    const variavelMeta = toNumber(raw.variavel_meta);
+    const variavelReal = toNumber(raw.variavel_real);
+    let data = converterDataISO(raw.data);
+    let competencia = converterDataISO(raw.competencia);
     if (!data && competencia) {
       data = competencia;
     }
@@ -4901,7 +4867,6 @@ function buildCardSectionsFromDimension(rows = []) {
   };
 
   normalizedRows.forEach(row => {
-    const meta = CARD_INDICATOR_META[row.indicadorId] || {};
     const familiaCodigo = limparTexto(row.familiaCodigo);
     if (familiaCodigo && row.familiaId && !FAMILIA_CODE_TO_SLUG.has(familiaCodigo)) {
       FAMILIA_CODE_TO_SLUG.set(familiaCodigo, row.familiaId);
@@ -4914,12 +4879,45 @@ function buildCardSectionsFromDimension(rows = []) {
     if (subCodigo && row.subId && !SUB_CODE_TO_SLUG.has(subCodigo)) {
       SUB_CODE_TO_SLUG.set(subCodigo, row.subId);
     }
-    const section = ensureSection(meta.sectionId || row.familiaId, row.familiaNome, meta);
-    const item = ensureItem(section, row.indicadorId, row.indicadorNome, meta);
+    
+    const familiaId = row.familiaId || row.familia_id || "";
+    const familiaNome = row.familiaNome || row.familia_nome || "";
+    const indicadorId = row.indicadorId || row.id_indicador || "";
+    const indicadorNome = row.indicadorNome || row.ds_indicador || row.indicador || "";
+    const peso = toNumber(row.peso) || 1;
+    const metric = row.metric || "valor";
+    const icon = row.icon || DEFAULT_CARD_ICON;
+    const order = toNumber(row.order) || Number.MAX_SAFE_INTEGER;
+    
+    const sectionMeta = {
+      sectionLabel: familiaNome || familiaId,
+      order: toNumber(row.sectionOrder) || order
+    };
+    const section = ensureSection(familiaId, familiaNome, sectionMeta);
+    
+    const itemMeta = {
+      nome: indicadorNome,
+      icon: icon,
+      peso: peso,
+      metric: metric,
+      order: order
+    };
+    const item = ensureItem(section, indicadorId, indicadorNome, itemMeta);
     if (!item) return;
-    const subMeta = meta.subMeta && row.subId ? meta.subMeta[row.subId] : undefined;
-    if (row.subId) {
-      registerSubIndicator(item, row.subId, row.subNome, subMeta || {}, row);
+    
+    if (row.subId || row.id_subindicador) {
+      const subId = row.subId || row.id_subindicador || "";
+      const subNome = row.subNome || row.subindicador || "";
+      const subPeso = toNumber(row.subPeso) || peso;
+      const subMetric = row.subMetric || metric;
+      const subOrder = toNumber(row.subOrder) || Number.MAX_SAFE_INTEGER;
+      const subMeta = {
+        nome: subNome,
+        peso: subPeso,
+        metric: subMetric,
+        order: subOrder
+      };
+      registerSubIndicator(item, subId, subNome, subMeta, row);
     }
   });
 

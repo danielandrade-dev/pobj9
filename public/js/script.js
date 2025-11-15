@@ -3335,73 +3335,39 @@ function normalizarLinhasStatus(rows){
 function normalizarDimProdutos(rows){
   const list = Array.isArray(rows) ? rows : [];
   return list.map(raw => {
-    const familiaCodigoRaw = lerCelula(raw, [
-      "idFamilia", "IdFamilia", "ID Familia", "Id Familia", "Familia ID"
-    ]);
-    const familiaSlugRaw = lerCelula(raw, [
-      "FamiliaSlug", "SlugFamilia", "Familia Slug", "Familia Chave", "Familia Codigo Alternativo"
-    ]);
-    const familiaNomeRaw = lerCelula(raw, [
-      "Familia", "Família", "Nome Familia", "Nome Família"
-    ]);
-    const indicadorCodigoRaw = lerCelula(raw, [
-      "IdIndicador", "ID Indicador", "Indicador ID", "Indicador Codigo", "Indicador Código"
-    ]);
-    const indicadorSlugRaw = lerCelula(raw, [
-      "IndicadorSlug", "SlugIndicador", "Indicador Slug", "Indicador Chave", "CardId"
-    ]);
-    const indicadorNomeRaw = lerCelula(raw, [
-      "Indicador", "Nome Indicador", "Nome indicador"
-    ]);
-    const indicadorAliasesRaw = raw?.indicadorAliases
-      ?? raw?.IndicadorAliases
-      ?? raw?.aliases
-      ?? raw?.Aliases
-      ?? lerCelula(raw, ["Indicador Aliases", "Indicador Alias", "Aliases Indicador", "IndicadorAliases"]);
-    const subCodigoRaw = lerCelula(raw, [
-      "idSubindicador", "IdSubindicador", "ID Subindicador", "Subindicador ID", "Subindicador Codigo", "Subindicador Código"
-    ]);
-    const subSlugRaw = lerCelula(raw, [
-      "SubindicadorSlug", "SlugSubindicador", "Subindicador Slug", "Subindicador Chave", "SubprodutoSlug"
-    ]);
-    const subNomeRaw = lerCelula(raw, [
-      "Subindicador", "Nome Subindicador", "Sub Indicador"
-    ]);
-    const subAliasesRaw = raw?.subIndicadorAliases
-      ?? raw?.SubIndicadorAliases
-      ?? raw?.subAliases
-      ?? raw?.SubAliases
-      ?? lerCelula(raw, ["Subindicador Aliases", "Subindicador Alias", "Aliases Subindicador", "SubindicadorAliases"]);
+    const familiaCodigoRaw = raw.id_familia || raw.familia_codigo || "";
+    const familiaNomeRaw = raw.familia || raw.familia_nome || "";
+    const indicadorCodigoRaw = raw.id_indicador || raw.indicador_codigo || "";
+    const indicadorNomeRaw = raw.indicador || raw.ds_indicador || "";
+    const subCodigoRaw = raw.id_subindicador || raw.subindicador_codigo || "";
+    const subNomeRaw = raw.subindicador || "";
+    const pesoRaw = raw.peso || 0;
 
     const familiaNome = limparTexto(familiaNomeRaw) || "Indicador";
-    const familiaCodigo = limparTexto(familiaCodigoRaw);
-    let familiaId = limparTexto(familiaSlugRaw);
-    if (!familiaId) {
-      if (familiaCodigo && /[^0-9]/.test(familiaCodigo)) {
-        familiaId = familiaCodigo;
-      } else {
-        const slug = simplificarTexto(familiaNome);
-        familiaId = slug ? slug.replace(/\s+/g, "_") : "";
-      }
+    const familiaCodigo = limparTexto(String(familiaCodigoRaw));
+    let familiaId = "";
+    if (familiaCodigo && /[^0-9]/.test(familiaCodigo)) {
+      familiaId = familiaCodigo;
+    } else {
+      const slug = simplificarTexto(familiaNome);
+      familiaId = slug ? slug.replace(/\s+/g, "_") : String(familiaCodigo || "");
     }
 
     const indicadorNome = limparTexto(indicadorNomeRaw) || "Indicador";
-    const indicadorCodigo = limparTexto(indicadorCodigoRaw);
-    let indicadorId = limparTexto(indicadorSlugRaw);
-    if (!indicadorId) {
-      if (indicadorCodigo && /[^0-9]/.test(indicadorCodigo)) {
-        indicadorId = indicadorCodigo;
-      } else {
-        const slug = simplificarTexto(indicadorNome);
-        indicadorId = slug ? slug.replace(/\s+/g, "_") : "";
-      }
+    const indicadorCodigo = limparTexto(String(indicadorCodigoRaw));
+    let indicadorId = "";
+    if (indicadorCodigo && /[^0-9]/.test(indicadorCodigo)) {
+      indicadorId = indicadorCodigo;
+    } else {
+      const slug = simplificarTexto(indicadorNome);
+      indicadorId = slug ? slug.replace(/\s+/g, "_") : String(indicadorCodigo || "");
     }
 
     const subNomeLimpo = limparTexto(subNomeRaw);
-    const subCodigo = limparTexto(subCodigoRaw);
-    let subId = limparTexto(subSlugRaw);
-    const subCodigoValido = subCodigo && subCodigo !== "-" ? subCodigo : "";
-    const hasSub = Boolean(subId) || Boolean(subCodigoValido && subCodigoValido !== "0") || Boolean(subNomeLimpo);
+    const subCodigo = limparTexto(String(subCodigoRaw));
+    const subCodigoValido = subCodigo && subCodigo !== "-" && subCodigo !== "0" ? subCodigo : "";
+    const hasSub = Boolean(subCodigoValido) || Boolean(subNomeLimpo);
+    
     if (!hasSub) {
       return {
         familiaCodigo,
@@ -3410,24 +3376,22 @@ function normalizarDimProdutos(rows){
         indicadorCodigo,
         indicadorId,
         indicadorNome,
+        peso: toNumber(pesoRaw) || 0,
         subCodigo: "",
         subId: "",
         subNome: ""
       };
     }
 
-    if (!subId) {
-      if (subCodigoValido && /[^0-9]/.test(subCodigoValido) && !subNomeLimpo) {
-        subId = subCodigoValido;
-      } else {
-        const slug = subNomeLimpo ? simplificarTexto(subNomeLimpo) : simplificarTexto(subCodigoValido);
-        subId = slug ? slug.replace(/\s+/g, "_") : subCodigoValido;
-      }
+    let subId = "";
+    if (subCodigoValido && /[^0-9]/.test(subCodigoValido) && !subNomeLimpo) {
+      subId = subCodigoValido;
+    } else {
+      const slug = subNomeLimpo ? simplificarTexto(subNomeLimpo) : simplificarTexto(subCodigoValido);
+      subId = slug ? slug.replace(/\s+/g, "_") : subCodigoValido;
     }
 
     const subNome = subNomeLimpo || subId || subCodigoValido || "";
-    const indicadorAliases = parseAliasList(indicadorAliasesRaw);
-    const subAliases = parseAliasList(subAliasesRaw);
 
     return {
       familiaCodigo,
@@ -3436,11 +3400,10 @@ function normalizarDimProdutos(rows){
       indicadorCodigo,
       indicadorId,
       indicadorNome,
-      indicadorAliases,
+      peso: toNumber(pesoRaw) || 0,
       subCodigo: subCodigoValido,
       subId,
-      subNome,
-      subAliases
+      subNome
     };
   }).filter(row => row.indicadorId);
 }
@@ -4225,25 +4188,52 @@ async function loadBaseData(){
     showLoader("Carregando dados…");
     try {
       if (DATA_SOURCE === "sql") {
-        const payload = await apiGet('/init-data');
+        const [
+          dimensions,
+          status,
+          produtos,
+          calendario,
+          realizados,
+          metas,
+          variavel,
+          mesu,
+          campanhas,
+          detalhes,
+          historico,
+          leads
+        ] = await Promise.all([
+          apiGet('/dimensions').catch(() => ({})),
+          apiGet('/status_indicadores').catch(() => []),
+          apiGet('/produtos').catch(() => []),
+          apiGet('/calendario').catch(() => []),
+          apiGet('/realizados').catch(() => []),
+          apiGet('/metas').catch(() => []),
+          apiGet('/variavel').catch(() => []),
+          apiGet('/mesu').catch(() => []),
+          apiGet('/campanhas').catch(() => []),
+          apiGet('/detalhes').catch(() => []),
+          apiGet('/historico').catch(() => []),
+          apiGet('/leads').catch(() => [])
+        ]);
+
         return processBaseDataSources({
-          mesuRaw: payload?.mesu || [],
-          statusRaw: payload?.statusIndicadores || payload?.status || [],
-          produtosDimRaw: payload?.produtos || [],
-          realizadosRaw: payload?.realizados || [],
-          metasRaw: payload?.metas || [],
-          variavelRaw: payload?.variavel || [],
-          campanhasRaw: payload?.campanhas || [],
-          calendarioRaw: payload?.calendario || [],
-          leadsRaw: payload?.leads || [],
-          detalhesRaw: payload?.detalhes || [],
-          historicoRaw: payload?.historico || [],
-          dimSegmentosRaw: payload?.dimSegmentos || payload?.segmentosDim || payload?.segmentos || [],
-          dimDiretoriasRaw: payload?.dimDiretorias || payload?.diretoriasDim || payload?.diretorias || [],
-          dimRegionaisRaw: payload?.dimRegionais || payload?.regionaisDim || payload?.regionais || [],
-          dimAgenciasRaw: payload?.dimAgencias || payload?.agenciasDim || payload?.agencias || [],
-          dimGerentesGestaoRaw: payload?.dimGerentesGestao || payload?.gerentesGestaoDim || payload?.ggestoes || [],
-          dimGerentesRaw: payload?.dimGerentes || payload?.gerentesDim || payload?.gerentes || [],
+          mesuRaw: mesu || [],
+          statusRaw: status || [],
+          produtosDimRaw: produtos || [],
+          realizadosRaw: realizados || [],
+          metasRaw: metas || [],
+          variavelRaw: variavel || [],
+          campanhasRaw: campanhas || [],
+          calendarioRaw: calendario || [],
+          leadsRaw: leads || [],
+          detalhesRaw: detalhes || [],
+          historicoRaw: historico || [],
+          dimSegmentosRaw: dimensions?.dimSegmentos || dimensions?.segmentosDim || dimensions?.segmentos || [],
+          dimDiretoriasRaw: dimensions?.dimDiretorias || dimensions?.diretoriasDim || dimensions?.diretorias || [],
+          dimRegionaisRaw: dimensions?.dimRegionais || dimensions?.regionaisDim || dimensions?.regionais || [],
+          dimAgenciasRaw: dimensions?.dimAgencias || dimensions?.agenciasDim || dimensions?.agencias || [],
+          dimGerentesGestaoRaw: dimensions?.dimGerentesGestao || dimensions?.gerentesGestaoDim || dimensions?.ggestoes || [],
+          dimGerentesRaw: dimensions?.dimGerentes || dimensions?.gerentesDim || dimensions?.gerentes || [],
         });
       }
 
@@ -4284,17 +4274,21 @@ const TABLE_VIEWS = [
 // Aqui eu construo os grupos de indicadores dinamicamente a partir da dimensão dProdutos.
 const DEFAULT_CARD_ICON = "ti ti-chart-bar";
 
-const CARD_SECTION_ORDER = [
-  { id: "captacao", label: "CAPTAÇÃO", order: 10 },
-  { id: "financeiro", label: "FINANCEIRO", order: 20 },
-  { id: "credito", label: "CRÉDITO", order: 30 },
-  { id: "ligadas", label: "LIGADAS", order: 40 },
-  { id: "produtividade", label: "PRODUTIVIDADE", order: 50 },
-  { id: "clientes", label: "CLIENTES", order: 60 },
-  { id: "relacionamento_emp", label: "RELACIONAMENTO", order: 15 },
-  { id: "negocios_emp", label: "NEGÓCIOS", order: 35 },
-  { id: "adicionais_emp", label: "ADICIONAIS", order: 45 },
-];
+// DEPRECATED: CARD_SECTION_ORDER e CARD_INDICATOR_META não são mais usados.
+// As seções e indicadores são construídos dinamicamente a partir dos dados do backend.
+// Mantido apenas para referência histórica.
+
+// const CARD_SECTION_ORDER = [
+//   { id: "captacao", label: "CAPTAÇÃO", order: 10 },
+//   { id: "financeiro", label: "FINANCEIRO", order: 20 },
+//   { id: "credito", label: "CRÉDITO", order: 30 },
+//   { id: "ligadas", label: "LIGADAS", order: 40 },
+//   { id: "produtividade", label: "PRODUTIVIDADE", order: 50 },
+//   { id: "clientes", label: "CLIENTES", order: 60 },
+//   { id: "relacionamento_emp", label: "RELACIONAMENTO", order: 15 },
+//   { id: "negocios_emp", label: "NEGÓCIOS", order: 35 },
+//   { id: "adicionais_emp", label: "ADICIONAIS", order: 45 },
+// ];
 
 const CARD_INDICATOR_META = {
   captacao_bruta: {
@@ -4749,7 +4743,6 @@ let PRODUCT_INDEX = new Map();
 
 function buildCardSectionsFromDimension(rows = []) {
   const normalizedRows = Array.isArray(rows) ? rows : [];
-  const sectionOrderMap = new Map(CARD_SECTION_ORDER.map(entry => [entry.id, entry.order]));
   const sectionsMap = new Map();
   let dynamicOrderSeed = 1000;
 
@@ -4769,7 +4762,7 @@ function buildCardSectionsFromDimension(rows = []) {
     const baseId = resolveSectionId(sectionId, meta.sectionLabel || label);
     let section = sectionsMap.get(baseId);
     if (!section) {
-      const orderHint = meta.sectionOrder ?? sectionOrderMap.get(baseId) ?? sectionOrderMap.get(sectionId) ?? meta.order ?? (dynamicOrderSeed++);
+      const orderHint = meta.sectionOrder ?? meta.order ?? (dynamicOrderSeed++);
       section = {
         id: baseId,
         label: meta.sectionLabel || label || baseId,
@@ -4884,7 +4877,7 @@ function buildCardSectionsFromDimension(rows = []) {
     const familiaNome = row.familiaNome || row.familia_nome || "";
     const indicadorId = row.indicadorId || row.id_indicador || "";
     const indicadorNome = row.indicadorNome || row.ds_indicador || row.indicador || "";
-    const peso = toNumber(row.peso) || 1;
+    const peso = toNumber(row.peso) || 0;
     const metric = row.metric || "valor";
     const icon = row.icon || DEFAULT_CARD_ICON;
     const order = toNumber(row.order) || Number.MAX_SAFE_INTEGER;

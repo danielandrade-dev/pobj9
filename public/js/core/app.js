@@ -394,7 +394,6 @@ let PRODUTO_TO_FAMILIA = new Map();
 let RESUMO_HIERARCHY = [];
 let SUBINDICADORES_BY_INDICADOR = new Map();
 let FORCED_EMPTY_SUBINDICADORES = new Set();
-let SUB_INDICADOR_FLAT_CACHE = new Map();
 
 // Aqui eu deixo caches das bases fact/dim para usar em várias telas.
 let fDados = [];
@@ -613,14 +612,9 @@ function matchesSegmentFilter(filterValue, ...candidates){
   });
 }
 
-function resetSubIndicatorOptionCache(){
-  SUB_INDICADOR_FLAT_CACHE = new Map();
-}
-
 function getFlatSubIndicatorOptions(indicadorId){
   const key = limparTexto(indicadorId);
   if (!key) return [];
-  if (SUB_INDICADOR_FLAT_CACHE.has(key)) return SUB_INDICADOR_FLAT_CACHE.get(key);
   const defs = SUBINDICADORES_BY_INDICADOR.get(key) || [];
   const list = [];
   const stack = Array.isArray(defs) ? defs.map(entry => ({ entry, parents: [] })) : [];
@@ -648,7 +642,6 @@ function getFlatSubIndicatorOptions(indicadorId){
     }
   }
   list.sort((a, b) => String(a.label || "").localeCompare(String(b.label || ""), "pt-BR", { sensitivity: "base" }));
-  SUB_INDICADOR_FLAT_CACHE.set(key, list);
   return list;
 }
 
@@ -1249,8 +1242,6 @@ function applyHierarchyFallback(rows){
 }
 
 // Aqui eu tento ler uma célula usando várias chaves possíveis porque cada base vem com um nome diferente.
-const NORMALIZED_KEY_CACHE = new WeakMap();
-
 function normalizeKeyForLookup(key){
   if (key == null) return "";
   return String(key)
@@ -1262,12 +1253,10 @@ function normalizeKeyForLookup(key){
 
 function getNormalizedKeyEntries(raw){
   if (!raw || typeof raw !== "object") return [];
-  if (NORMALIZED_KEY_CACHE.has(raw)) return NORMALIZED_KEY_CACHE.get(raw);
   const entries = Object.keys(raw).map(original => ({
     key: original,
     normalized: normalizeKeyForLookup(original),
   }));
-  NORMALIZED_KEY_CACHE.set(raw, entries);
   return entries;
 }
 
@@ -2154,7 +2143,6 @@ function montarCatalogoDeProdutos(dimRows){
   PRODUTO_TO_FAMILIA = new Map();
   SUBPRODUTO_TO_INDICADOR.clear();
   FORCED_EMPTY_SUBINDICADORES = new Set();
-  resetSubIndicatorOptionCache();
 
   CARD_SECTIONS_DEF.forEach(section => {
     if (!section || !section.id) return;

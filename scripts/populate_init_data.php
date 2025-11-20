@@ -25,9 +25,6 @@ try {
     // $pdo->exec("DELETE FROM d_calendario WHERE ano >= 2025");
     // echo "Dados limpos.\n\n";
 
-    // 2. Popular d_unidade (estrutura organizacional) - REMOVIDO: agora usando d_estrutura
-    // A estrutura organizacional é populada na seção 5.5 abaixo (d_estrutura)
-
     // 3. Popular d_status_indicadores
     echo "Populando d_status_indicadores...\n";
     $status = [

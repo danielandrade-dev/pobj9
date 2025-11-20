@@ -88,37 +88,6 @@ CREATE TABLE `d_status_indicadores` (
   UNIQUE KEY `uq_d_status_nome` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- POBJ.d_unidade definição
-
-CREATE TABLE `d_unidade` (
-  `segmento_id` smallint(5) unsigned NOT NULL,
-  `segmento` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `segmento_label` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `diretoria_id` smallint(5) unsigned NOT NULL,
-  `diretoria` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `diretoria_label` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `regional_id` smallint(5) unsigned NOT NULL,
-  `regional` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `regional_label` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `agencia_id` smallint(5) unsigned NOT NULL,
-  `agencia` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `agencia_label` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `gerente_id` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gerente` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gerente_gestao_id` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gerente_gestao` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `porte` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`agencia_id`),
-  KEY `ix_unidade_path` (`segmento_id`,`diretoria_id`,`regional_id`),
-  KEY `ix_unidade_reg_ag` (`regional_id`,`agencia_id`),
-  KEY `ix_unidade_diretoria` (`diretoria_id`),
-  KEY `ix_unidade_segmento` (`segmento_id`),
-  KEY `ix_unid_gerente` (`gerente_id`),
-  KEY `ix_unid_gerente_gestao` (`gerente_gestao_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
 -- POBJ.f_pontos definição
 
 CREATE TABLE `f_pontos` (

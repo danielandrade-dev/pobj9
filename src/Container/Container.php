@@ -25,15 +25,25 @@ use Pobj\Api\Repositories\RealizadoRepository;
 use Pobj\Api\Repositories\StatusIndicadoresRepository;
 use Pobj\Api\Repositories\VariavelRepository;
 use Pobj\Api\Services\AgentService;
-use Pobj\Api\Services\InitDataService;
+use Pobj\Api\Services\CalendarioService;
+use Pobj\Api\Services\CampanhasService;
+use Pobj\Api\Services\DetalhesService;
+use Pobj\Api\Services\EstruturaService;
 use Pobj\Api\Services\FiltrosService;
+use Pobj\Api\Services\HistoricoService;
+use Pobj\Api\Services\InitDataService;
+use Pobj\Api\Services\LeadsService;
+use Pobj\Api\Services\MetaService;
 use Pobj\Api\Services\OmegaMesuService;
 use Pobj\Api\Services\OmegaStatusService;
 use Pobj\Api\Services\OmegaStructureService;
 use Pobj\Api\Services\OmegaTicketsService;
 use Pobj\Api\Services\OmegaUsersService;
+use Pobj\Api\Services\ProdutoService;
+use Pobj\Api\Services\RealizadoService;
 use Pobj\Api\Services\ResumoService;
 use Pobj\Api\Services\StatusIndicadoresService;
+use Pobj\Api\Services\VariavelService;
 use RuntimeException;
 
 class Container
@@ -188,6 +198,46 @@ class Container
 
         $this->singleton(OmegaMesuService::class, function (Container $container) {
             return new OmegaMesuService($container->get(OmegaMesuRepository::class));
+        });
+
+        $this->singleton(DetalhesService::class, function (Container $container) {
+            return new DetalhesService($container->get(DetalhesRepository::class));
+        });
+
+        $this->singleton(EstruturaService::class, function (Container $container) {
+            return new EstruturaService($container->get(EstruturaRepository::class));
+        });
+
+        $this->singleton(LeadsService::class, function (Container $container) {
+            return new LeadsService($container->get(LeadsRepository::class));
+        });
+
+        $this->singleton(RealizadoService::class, function (Container $container) {
+            return new RealizadoService($container->get(RealizadoRepository::class));
+        });
+
+        $this->singleton(VariavelService::class, function (Container $container) {
+            return new VariavelService($container->get(VariavelRepository::class));
+        });
+
+        $this->singleton(CampanhasService::class, function (Container $container) {
+            return new CampanhasService($container->get(CampanhasRepository::class));
+        });
+
+        $this->singleton(ProdutoService::class, function (Container $container) {
+            return new ProdutoService($container->get(ProdutoRepository::class));
+        });
+
+        $this->singleton(MetaService::class, function (Container $container) {
+            return new MetaService($container->get(MetaRepository::class));
+        });
+
+        $this->singleton(HistoricoService::class, function (Container $container) {
+            return new HistoricoService($container->get(HistoricoRepository::class));
+        });
+
+        $this->singleton(CalendarioService::class, function (Container $container) {
+            return new CalendarioService($container->get(CalendarioRepository::class));
         });
     }
 

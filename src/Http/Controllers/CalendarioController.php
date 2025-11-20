@@ -6,15 +6,15 @@ namespace Pobj\Api\Http\Controllers;
 
 use Pobj\Api\Container\Container;
 use Pobj\Api\Response\ResponseHelper;
-use Pobj\Api\Repositories\CalendarioRepository;
+use Pobj\Api\Services\CalendarioService;
 
 class CalendarioController
 {
     public function handle(array $params, $payload = null): void
     {
         $container = Container::getInstance();
-        $repository = $container->get(CalendarioRepository::class);
-        $result = $repository->findAllAsArray();
+        $service = $container->get(CalendarioService::class);
+        $result = $service->getAllCalendario();
         ResponseHelper::json($result);
     }
 }

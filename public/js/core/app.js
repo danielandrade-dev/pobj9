@@ -427,12 +427,6 @@ function getCurrentUserDisplayName(){
 
 let baseDataPromise = null;
 
-// TODO: Implementar limpeza completa de cache de dados base para forçar recarregamento
-// Limpa o cache de dados base para forçar recarregamento
-function resetBaseDataCache() {
-  baseDataPromise = null;
-}
-
 // Aqui eu limpo qualquer valor que vem das bases porque sei que sempre chega com espaços e formatos diferentes.
 function limparTexto(value){
   if (value == null) return "";
@@ -448,19 +442,6 @@ function simplificarTexto(value){
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
-}
-
-function parseAliasList(source){
-  if (!source) return [];
-  if (Array.isArray(source)) {
-    return source.map(limparTexto).filter(Boolean);
-  }
-  const texto = limparTexto(source);
-  if (!texto) return [];
-  return texto
-    .split(/[;,|]/)
-    .map(segment => limparTexto(segment))
-    .filter(Boolean);
 }
 
 function formatTitleCase(text){
@@ -3769,29 +3750,6 @@ function resolveSectionMetaFromRow(row) {
   return { id: sectionId, label: label || sectionId };
 }
 
-// Aqui eu garanto que cada linha tenha uma família associada, buscando informações extras quando necessário.
-function resolveFamilyMetaFromRow(row) {
-  if (!row) return { id: "", label: "" };
-  const prodMeta = row.produtoId ? PRODUTO_TO_FAMILIA.get(row.produtoId) : null;
-  let familiaId = row.familiaId || row.familia || prodMeta?.id || "";
-  let familiaLabel = row.familiaNome || prodMeta?.nome || "";
-
-  if (familiaId && !familiaLabel) {
-    const famRow = FAMILIA_BY_ID.get(familiaId);
-    if (famRow?.nome) familiaLabel = famRow.nome;
-  }
-
-  if (!familiaId) {
-    const sectionMeta = resolveSectionMetaFromRow(row);
-    familiaId = sectionMeta.id || "";
-    familiaLabel = sectionMeta.label || familiaId;
-  }
-
-  if (!familiaLabel) familiaLabel = familiaId;
-
-  return { id: familiaId, label: familiaLabel };
-}
-
 // DEFAULT_CAMPAIGN_UNIT_DATA, CAMPAIGN_UNIT_DATA e replaceCampaignUnitData movidos para campanhas.js
 const CAMPAIGN_SPRINTS = [
   {
@@ -4588,13 +4546,6 @@ function businessDaysElapsedUntilToday(startISO,endISO){
   if(today > end) today = end;
   return businessDaysBetweenInclusive(startISO, isoFromUTCDate(today));
 }
-// Aqui eu calculo quantos dias úteis ainda faltam a partir de hoje até o fim de um período.
-function businessDaysRemainingFromToday(startISO,endISO){
-  if(!startISO || !endISO) return 0;
-  const total = businessDaysBetweenInclusive(startISO, endISO);
-  const elapsed = businessDaysElapsedUntilToday(startISO, endISO);
-  return Math.max(0, total - elapsed);
-}
 
 /* ===== Aqui eu deixo funções auxiliares para métricas e números ===== */
 // Aqui eu converto qualquer valor para número sem deixar NaN escapar.
@@ -4668,9 +4619,6 @@ function formatByMetric(metric, value){
   if(metric === "perc") return `${toNumber(value).toFixed(1)}%`;
   if(metric === "qtd")  return formatIntReadable(value);
   return formatBRLReadable(value);
-}
-function formatCompactBRL(value){
-  return formatNumberWithSuffix(value, { currency: true });
 }
 function makeRandomForMetric(metric){
   if(metric === "perc"){
@@ -6500,25 +6448,6 @@ function ensureChipBarAndToolbar() {
   $$('#table-section input[placeholder*="Contrato" i]').forEach(el => { if (el !== headerSearch) el.remove(); });
 
   renderAppliedFilters();
-}
-
-function openLeadsForCurrentFilters(){
-  if (typeof openOpportunityModal !== "function") {
-    console.warn("Módulo de leads não disponível.");
-    return;
-  }
-  const filters = getFilterValues();
-  const lineage = buildLineageFromFilters(filters);
-  const lastEntry = lineage.length ? lineage[lineage.length - 1] : null;
-  const detail = {
-    node: {
-      label: lastEntry?.label || "Leads propensos",
-      levelKey: lastEntry?.levelKey || "",
-      type: "filters"
-    },
-    lineage,
-  };
-  openOpportunityModal(detail);
 }
 
 function openLeadsWithoutFilters(){

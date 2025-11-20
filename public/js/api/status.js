@@ -39,9 +39,10 @@ function normalizarChaveStatus(value) {
   const ascii = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const lower = ascii.toLowerCase().replace(/\s+/g, " ").trim();
   if (!lower) return "";
-  if (/^(?:1|todos?)$/.test(lower) || lower.includes("todos")) return "todos";
-  if (/^(?:2)$/.test(lower)) return "atingidos";
-  if (/^(?:3)$/.test(lower)) return "nao";
+  // Verifica padrões numéricos com zeros à esquerda também
+  if (/^(?:0?1|todos?)$/.test(lower) || lower.includes("todos")) return "todos";
+  if (/^(?:0?2)$/.test(lower)) return "atingidos";
+  if (/^(?:0?3)$/.test(lower)) return "nao";
   if (/(?:^|\b)(?:nao|na|no)\s+atingid/.test(lower)) return "nao";
   if (lower.includes("atingid")) return "atingidos";
   if (lower.includes("nao")) return "nao";
@@ -113,7 +114,9 @@ function normalizarLinhasStatus(rows){
     const codigo = raw.codigo || raw.id || raw.status_id || raw.statusId || "";
     const chave = raw.chave || raw.key || raw.status_chave || raw.statusChave || raw.slug || "";
     const ordem = raw.ordem || raw.order || raw.posicao || raw.posição || raw.sequencia || raw.sequência || "";
-    const key = pegarPrimeiroPreenchido(chave, codigo, nome);
+    // Prioriza o nome (status) para normalizar a chave, pois é mais descritivo
+    // Se o nome contém "Todos", "Atingido", etc., isso será normalizado corretamente
+    const key = pegarPrimeiroPreenchido(chave, nome, codigo);
     const ok = register({ id: codigo || key, codigo, nome, key, ordem });
     if (!ok) {
       const fallback = pegarPrimeiroPreenchido(nome, codigo, chave);
@@ -210,8 +213,18 @@ function buildStatusFilterEntries() {
     };
   }).filter(Boolean);
 
-  if (!entries.some(entry => entry.key === "todos")) {
-    entries.unshift({
+  // Remove duplicatas baseadas na chave 'key'
+  const seenKeys = new Set();
+  const uniqueEntries = [];
+  entries.forEach(entry => {
+    if (!seenKeys.has(entry.key)) {
+      seenKeys.add(entry.key);
+      uniqueEntries.push(entry);
+    }
+  });
+
+  if (!uniqueEntries.some(entry => entry.key === "todos")) {
+    uniqueEntries.unshift({
       key: "todos",
       value: "todos",
       label: STATUS_LABELS.todos,
@@ -221,20 +234,27 @@ function buildStatusFilterEntries() {
     });
   }
 
-  entries.sort((a, b) => {
+  uniqueEntries.sort((a, b) => {
     if (a.key === "todos") return -1;
     if (b.key === "todos") return 1;
     if (a.ordem !== b.ordem) return a.ordem - b.ordem;
     return String(a.label || "").localeCompare(String(b.label || ""), "pt-BR", { sensitivity: "base" });
   });
 
-  return entries;
+  return uniqueEntries;
 }
 
 /* ===== Função para atualizar opções de filtro de status ===== */
+let _updatingStatusFilter = false;
 function updateStatusFilterOptions(preserveSelection = true) {
   const select = document.getElementById("f-status-kpi");
   if (!select) return;
+  
+  // Evita execuções simultâneas
+  if (_updatingStatusFilter) return;
+  _updatingStatusFilter = true;
+  
+  try {
 
   const previousOption = select.selectedOptions?.[0] || null;
   const previousKey = preserveSelection
@@ -244,7 +264,13 @@ function updateStatusFilterOptions(preserveSelection = true) {
   const entries = buildStatusFilterEntries();
   select.innerHTML = "";
 
+  // Garante que não há duplicatas antes de adicionar
+  const addedValues = new Set();
   entries.forEach(entry => {
+    // Pula se já foi adicionado (proteção adicional)
+    if (addedValues.has(entry.value)) return;
+    addedValues.add(entry.value);
+    
     const opt = document.createElement("option");
     opt.value = entry.value;
     opt.textContent = entry.label;
@@ -266,6 +292,10 @@ function updateStatusFilterOptions(preserveSelection = true) {
     if (fallback) {
       select.value = fallback.value;
     }
+  }
+  
+  } finally {
+    _updatingStatusFilter = false;
   }
 }
 

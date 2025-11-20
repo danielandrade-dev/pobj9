@@ -1762,7 +1762,7 @@ function montarHierarquiaMesu(rows){
 
   const ggestaoOptions = DIMENSION_FILTER_OPTIONS.gerenteGestao.length
     ? DIMENSION_FILTER_OPTIONS.gerenteGestao
-    : Array.from(DIM_GGESTAO_LOOKUP.values()).map(entry => ({ id: entry.id, label: entry.nome || entry.label || entry.id }));
+    : Array.from(ggMap.values()).map(entry => ({ id: entry.id, label: entry.label }));
   GERENTES_GESTAO = ggestaoOptions.map(opt => {
     const normalized = normOpt(opt);
     const id = limparTexto(normalized.id);
@@ -2146,24 +2146,6 @@ function montarCatalogoDeProdutos(dimRows){
 
   CARD_SECTIONS_DEF.forEach(section => {
     if (!section || !section.id) return;
-    if (section.id === "outros") {
-      section.items.forEach(item => {
-        if (!item || !item.id) return;
-        PRODUTO_TO_FAMILIA.set(item.id, {
-          id: section.id,
-          nome: section.label || section.id,
-          secaoId: section.id,
-          secaoNome: section.label || section.id
-        });
-        FORCED_EMPTY_SUBINDICADORES.add(item.id);
-        const forcedSlug = simplificarTexto(item.id);
-        if (forcedSlug && forcedSlug !== item.id) {
-          FORCED_EMPTY_SUBINDICADORES.add(forcedSlug);
-        }
-        SUBINDICADORES_BY_INDICADOR.set(item.id, []);
-      });
-      return;
-    }
     const familiaId = section.id;
     const familiaNome = section.label || familiaId;
     const entry = famMap.get(familiaId) || {
@@ -2273,9 +2255,6 @@ function montarCatalogoDeProdutos(dimRows){
 
   FAMILIA_DATA = Array.from(famMap.values()).sort((a,b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), 'pt-BR', { sensitivity: 'base' }));
   FAMILIA_BY_ID = new Map(FAMILIA_DATA.map(f => [f.id, f]));
-  if (!FAMILIA_BY_ID.has('outros') && PRODUCT_INDEX.has('desconhecido')) {
-    FAMILIA_BY_ID.set('outros', { id: 'outros', nome: 'Outros', secaoId: 'outros', secaoNome: 'Outros' });
-  }
   PRODUTOS_BY_FAMILIA = byFamilia;
   PRODUTOS_DATA = rows;
 
@@ -3494,26 +3473,6 @@ function buildCardSectionsFromDimension(rows = []) {
       registerSubIndicator(item, subId, subNome, subMeta, row);
     }
   });
-
-  const fallbackSection = ensureSection("outros", "Outros", { sectionLabel: "Outros", order: Number.MAX_SAFE_INTEGER });
-  const fallbackMeta = {
-    sectionId: "outros",
-    sectionLabel: "Outros",
-    order: Number.MAX_SAFE_INTEGER,
-    icon: "ti ti-help",
-    metric: "valor",
-    forceEmptySubIndicators: true
-  };
-  const fallbackItem = ensureItem(fallbackSection, "desconhecido", "Desconhecido", fallbackMeta);
-  if (fallbackItem) {
-    fallbackItem.icon = fallbackMeta.icon;
-    fallbackItem.metric = fallbackMeta.metric;
-    fallbackItem.peso = 0;
-    fallbackItem.hiddenInCards = false;
-    fallbackItem.forceEmptySubIndicators = true;
-  }
-
-
 
   const sections = Array.from(sectionsMap.values());
   sections.sort((a, b) => {
@@ -11126,8 +11085,8 @@ function buildDashboardDatasetFromRows(rows = [], period = state.period || {}) {
       resolvedId = "desconhecido";
       meta = productMeta.get(resolvedId) || {};
     }
-    const secaoId = meta.sectionId || row.secaoId || row.familiaId || "outros";
-    const secaoLabel = meta.sectionLabel || row.secaoNome || row.familiaNome || row.familia || getSectionLabel(secaoId) || "Outros";
+    const secaoId = meta.sectionId || row.secaoId || row.familiaId || null;
+    const secaoLabel = meta.sectionLabel || row.secaoNome || row.familiaNome || row.familia || (secaoId ? getSectionLabel(secaoId) : null) || null;
     const familiaId = row.familiaId || row.familia || secaoId;
     const familiaLabel = row.familiaNome || row.familia || (familiaId === secaoId ? secaoLabel : familiaId) || secaoLabel;
     let agg = aggregated.get(resolvedId);
@@ -11520,9 +11479,6 @@ function buildDashboardDatasetFromRows(rows = [], period = state.period || {}) {
   });
 
   sections = sections.filter(section => {
-    if (section.id === "outros") {
-      return section.items.some(item => item.hasData);
-    }
     return true;
   });
 
@@ -14609,7 +14565,7 @@ function ensureSyntheticDashboardRowsForTree(rows = [], sections = []) {
 
   const sectionList = Array.isArray(sections) ? sections : [];
   sectionList.forEach(section => {
-    if (!section || section.id === "outros") return;
+    if (!section) return;
     const secaoId = limparTexto(section.id) || simplificarTexto(section.label) || "secao";
     const secaoNome = section.label || getSectionLabel(secaoId) || secaoId;
     const items = Array.isArray(section.items) ? section.items : [];

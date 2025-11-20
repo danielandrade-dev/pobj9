@@ -21,132 +21,147 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllSegmentos(): array
     {
-        $sql = 'SELECT DISTINCT id_segmento AS id, segmento AS nome
-                FROM d_estrutura
-                WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
-                ORDER BY nome';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findSegmentos('nome');
     }
 
     public function findAllDiretorias(): array
     {
-        $sql = 'SELECT DISTINCT id_diretoria AS id, diretoria AS nome
-                FROM d_estrutura 
-                WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
-                ORDER BY nome';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findDiretorias('nome');
     }
 
     public function findAllRegionais(): array
     {
-        $sql = 'SELECT DISTINCT id_regional AS id, regional AS nome
-                FROM d_estrutura
-                WHERE id_regional IS NOT NULL AND regional IS NOT NULL
-                ORDER BY nome';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findRegionais('nome');
     }
 
     public function findAllAgencias(): array
     {
-        $sql = 'SELECT DISTINCT id_agencia AS id, agencia AS nome, porte
-                FROM d_estrutura
-                WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
-                ORDER BY nome';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findAgencias('nome');
     }
 
     public function findAllGGestoes(): array
     {
-        $sql = "SELECT DISTINCT funcional AS id, nome AS nome
-                FROM d_estrutura
-                WHERE cargo LIKE '%Gerente Gestão%'
-                    AND funcional IS NOT NULL 
-                    AND funcional != ''
-                    AND nome IS NOT NULL
-                    AND nome != ''
-                ORDER BY nome";
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findGGestoes('nome', true);
     }
 
     public function findAllGerentes(): array
     {
-        $sql = "SELECT DISTINCT funcional AS id, nome AS nome
-                FROM d_estrutura
-                WHERE cargo LIKE '%Gerente%'
-                    AND funcional IS NOT NULL 
-                    AND funcional != ''
-                    AND nome IS NOT NULL
-                    AND nome != ''
-                ORDER BY nome";
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findGerentes('nome', true);
     }
 
     public function findSegmentosForFilter(): array
     {
-        $sql = 'SELECT DISTINCT id_segmento AS id, segmento AS label
-                FROM d_estrutura
-                WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
-                ORDER BY label';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findSegmentos('label');
     }
 
     public function findDiretoriasForFilter(): array
     {
-        $sql = 'SELECT DISTINCT id_diretoria AS id, diretoria AS label
-                FROM d_estrutura
-                WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
-                ORDER BY label';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findDiretorias('label');
     }
 
     public function findRegionaisForFilter(): array
     {
-        $sql = 'SELECT DISTINCT id_regional AS id, regional AS label
-                FROM d_estrutura
-                WHERE id_regional IS NOT NULL AND regional IS NOT NULL
-                ORDER BY label';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findRegionais('label');
     }
 
     public function findAgenciasForFilter(): array
     {
-        $sql = 'SELECT DISTINCT id_agencia AS id, agencia AS label, porte
-                FROM d_estrutura
-                WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
-                ORDER BY label';
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findAgencias('label');
     }
 
     public function findGGestoesForFilter(): array
     {
-        $sql = "SELECT DISTINCT funcional AS id, nome AS label
-                FROM d_estrutura
-                WHERE cargo LIKE '%Gerente Gestão%'
-                    AND funcional IS NOT NULL AND nome IS NOT NULL
-                ORDER BY label";
-        
-        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+        return $this->findGGestoes('label', false);
     }
 
     public function findGerentesForFilter(): array
     {
-        $sql = "SELECT DISTINCT funcional AS id, nome AS label
+        return $this->findGerentes('label', false);
+    }
+
+    private function findSegmentos(string $alias): array
+    {
+        $alias = $this->validateAlias($alias);
+        $sql = "SELECT DISTINCT id_segmento AS id, segmento AS {$alias}
                 FROM d_estrutura
-                WHERE cargo LIKE '%Gerente%'
-                    AND funcional IS NOT NULL AND nome IS NOT NULL
-                ORDER BY label";
+                WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
+                ORDER BY {$alias}";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    private function findDiretorias(string $alias): array
+    {
+        $alias = $this->validateAlias($alias);
+        $sql = "SELECT DISTINCT id_diretoria AS id, diretoria AS {$alias}
+                FROM d_estrutura 
+                WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
+                ORDER BY {$alias}";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    private function findRegionais(string $alias): array
+    {
+        $alias = $this->validateAlias($alias);
+        $sql = "SELECT DISTINCT id_regional AS id, regional AS {$alias}
+                FROM d_estrutura
+                WHERE id_regional IS NOT NULL AND regional IS NOT NULL
+                ORDER BY {$alias}";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    private function findAgencias(string $alias): array
+    {
+        $alias = $this->validateAlias($alias);
+        $sql = "SELECT DISTINCT id_agencia AS id, agencia AS {$alias}, porte
+                FROM d_estrutura
+                WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
+                ORDER BY {$alias}";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    private function findGGestoes(string $alias, bool $checkEmptyStrings): array
+    {
+        $alias = $this->validateAlias($alias);
+        $emptyCheck = $checkEmptyStrings 
+            ? "AND funcional != '' AND nome != ''" 
+            : '';
+        
+        $sql = "SELECT DISTINCT funcional AS id, nome AS {$alias}
+                FROM d_estrutura
+                WHERE cargo = 'Gerente de Gestão'
+                    AND funcional IS NOT NULL 
+                    AND nome IS NOT NULL
+                    {$emptyCheck}
+                ORDER BY {$alias}";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    private function findGerentes(string $alias, bool $checkEmptyStrings): array
+    {
+        $alias = $this->validateAlias($alias);
+        $emptyCheck = $checkEmptyStrings 
+            ? "AND funcional != '' AND nome != ''" 
+            : '';
+        
+        $sql = "SELECT DISTINCT funcional AS id, nome AS {$alias}
+                FROM d_estrutura
+                WHERE cargo = 'Gerente'
+                    AND funcional IS NOT NULL 
+                    AND nome IS NOT NULL
+                    {$emptyCheck}
+                ORDER BY {$alias}";
+        
+        return $this->connection->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    private function validateAlias(string $alias): string
+    {
+        return in_array($alias, ['nome', 'label'], true) ? $alias : 'nome';
     }
 }
 

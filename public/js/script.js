@@ -298,57 +298,27 @@ const MOTIVOS_CANCELAMENTO = [
   "Migração de produto"
 ];
 
-let MESU_DATA = [];
+// MESU_DATA e variáveis relacionadas movidas para mesu.js
 let PRODUTOS_DATA = [];
-let DIM_SEGMENTOS_LOOKUP = new Map();
-let DIM_DIRETORIAS_LOOKUP = new Map();
-let DIM_REGIONAIS_LOOKUP = new Map();
-let DIM_AGENCIAS_LOOKUP = new Map();
-let DIM_GGESTAO_LOOKUP = new Map();
-let DIM_GERENTES_LOOKUP = new Map();
-const DIMENSION_FILTER_OPTIONS = {
-  segmento: [],
-  diretoria: [],
-  gerencia: [],
-  agencia: [],
-  gerenteGestao: [],
-  gerente: [],
-};
+// DIM_*_LOOKUP movidos para estrutura.js
+// DIMENSION_FILTER_OPTIONS movido para estrutura.js
+// A variável já está disponível globalmente via estrutura.js
+// Usamos window.DIMENSION_FILTER_OPTIONS ou a referência direta se disponível
 // Aqui eu mapeio as chaves de status para nomes amigáveis que vão aparecer nos filtros e cards.
-const STATUS_LABELS = {
-  todos: "Todos",
-  atingidos: "Atingidos",
-  nao: "Não atingidos",
-};
-// Aqui eu defino uma ordem padrão de status.
-const DEFAULT_STATUS_ORDER = ["todos", "atingidos", "nao"];
-const DEFAULT_STATUS_INDICADORES = DEFAULT_STATUS_ORDER.map((key, idx) => ({
-  id: key,
-  codigo: key,
-  nome: STATUS_LABELS[key] || key,
-  key,
-  ordem: idx,
-}));
-let STATUS_INDICADORES_DATA = DEFAULT_STATUS_INDICADORES.map(item => ({ ...item }));
-// Aqui eu mantenho um Map para buscar status pelo código sem precisar ficar percorrendo arrays.
-let STATUS_BY_KEY = new Map(DEFAULT_STATUS_INDICADORES.map(entry => [entry.key, { ...entry }]));
+// Constantes e variáveis de status movidas para status.js
+// STATUS_LABELS, DEFAULT_STATUS_ORDER, DEFAULT_STATUS_INDICADORES
+// STATUS_INDICADORES_DATA, STATUS_BY_KEY
 
 const FATAL_ERROR_ID = "__fatal_error";
 let FATAL_ERROR_VISIBLE = false;
 
 // Aqui eu preparo vários mapas auxiliares para navegar na hierarquia (diretoria → gerente) sem sofrimento.
-let MESU_BY_AGENCIA = new Map();
-let MESU_AGENCIA_LOOKUP = new Map();
-let MESU_FALLBACK_ROWS = [];
+// MESU_BY_AGENCIA, MESU_AGENCIA_LOOKUP, MESU_FALLBACK_ROWS, GERENCIAS_BY_DIRETORIA, AGENCIAS_BY_GERENCIA, GGESTAO_BY_AGENCIA, GERENTES_BY_AGENCIA movidos para mesu.js
 let DIRETORIA_INDEX = new Map();
 let GERENCIA_INDEX = new Map();
 let AGENCIA_INDEX = new Map();
 let GGESTAO_INDEX = new Map();
 let GERENTE_INDEX = new Map();
-let GERENCIAS_BY_DIRETORIA = new Map();
-let AGENCIAS_BY_GERENCIA = new Map();
-let GGESTAO_BY_AGENCIA = new Map();
-let GERENTES_BY_AGENCIA = new Map();
 let DIRETORIA_LABEL_INDEX = new Map();
 let GERENCIA_LABEL_INDEX = new Map();
 let AGENCIA_LABEL_INDEX = new Map();
@@ -400,7 +370,9 @@ let RANKING_AGENCIAS = [];
 let RANKING_GERENTES = [];
 let GERENTES_GESTAO = [];
 let SEGMENTOS_DATA = [];
-const SEGMENT_SCENARIO_DEFAULT = "varejo";
+// SEGMENT_SCENARIO_DEFAULT movido para produtos.js
+// A variável já está disponível globalmente via produtos.js
+// Usa window.SEGMENT_SCENARIO_DEFAULT ou a referência direta se disponível
 const SEGMENT_SCENARIO_PRESETS = [
   { id: "D.R. VAREJO DIGITAL",          nome: "D.R. VAREJO DIGITAL",          slug: "dr_varejo_digital",          scenario: "varejo",   order: 10 },
   { id: "SUPER. PJ NEGÓCIOS DIG.",      nome: "SUPER. PJ NEGÓCIOS DIG.",      slug: "super_pj_negocios_dig",      scenario: "varejo",   order: 20 },
@@ -412,8 +384,7 @@ const SEGMENT_SCENARIO_PRESETS = [
   { id: "Empresas",                     nome: "Empresas",                     slug: "empresas",                   scenario: "empresas", order: 80, hidden: true },
 ];
 let SEGMENT_SCENARIO_INDEX = new Map();
-const SEGMENT_DIMENSION_MAP = new Map();
-let CURRENT_SEGMENT_SCENARIO = SEGMENT_SCENARIO_DEFAULT;
+// SEGMENT_DIMENSION_MAP e CURRENT_SEGMENT_SCENARIO movidos para produtos.js
 
 // Aqui eu tenho mapas auxiliares para ligar produto, família e seção.
 let PRODUTOS_BY_FAMILIA = new Map();
@@ -429,16 +400,14 @@ let SUB_INDICADOR_FLAT_CACHE = new Map();
 let fDados = [];
 let fCampanhas = [];
 let fVariavel = [];
-let FACT_REALIZADOS = [];
-let FACT_METAS = [];
-let FACT_VARIAVEL = [];
-let FACT_CAMPANHAS = [];
-let DIM_CALENDARIO = [];
-let FACT_HISTORICO_RANKING_POBJ = [];
-let FACT_DETALHES = [];
-let DIM_PRODUTOS = [];
-let DETAIL_BY_REGISTRO = new Map();
-let DETAIL_CONTRACT_IDS = new Set();
+// FACT_REALIZADOS movido para realizados.js
+// FACT_METAS movido para metas.js
+// FACT_VARIAVEL movido para variavel.js
+// FACT_CAMPANHAS movido para campanhas.js
+// DIM_CALENDARIO movido para calendario.js
+// FACT_HISTORICO_RANKING_POBJ movido para historico.js
+// FACT_DETALHES, DETAIL_BY_REGISTRO e DETAIL_CONTRACT_IDS movidos para detalhes.js
+// DIM_PRODUTOS movido para produtos.js
 let AVAILABLE_DATE_MAX = "";
 let AVAILABLE_DATE_MIN = "";
 
@@ -457,6 +426,12 @@ function getCurrentUserDisplayName(){
 }
 
 let baseDataPromise = null;
+
+// TODO: Implementar limpeza completa de cache de dados base para forçar recarregamento
+// Limpa o cache de dados base para forçar recarregamento
+function resetBaseDataCache() {
+  baseDataPromise = null;
+}
 
 // Aqui eu limpo qualquer valor que vem das bases porque sei que sempre chega com espaços e formatos diferentes.
 function limparTexto(value){
@@ -1411,231 +1386,23 @@ function aplicarIndicadorAliases(target = {}, idBruto = "", nomeBruto = "") {
 }
 
 // Aqui eu converto o texto do status para um formato previsível (sem acento e em minúsculas) para montar os filtros.
-function normalizarChaveStatus(value) {
-  const text = limparTexto(value);
-  if (!text) return "";
-  const ascii = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const lower = ascii.toLowerCase().replace(/\s+/g, " ").trim();
-  if (!lower) return "";
-  if (/^(?:1|todos?)$/.test(lower) || lower.includes("todos")) return "todos";
-  if (/^(?:2)$/.test(lower)) return "atingidos";
-  if (/^(?:3)$/.test(lower)) return "nao";
-  if (/(?:^|\b)(?:nao|na|no)\s+atingid/.test(lower)) return "nao";
-  if (lower.includes("atingid")) return "atingidos";
-  if (lower.includes("nao")) return "nao";
-  const slug = lower.replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-  if (slug === "no_atingidos") return "nao";
-  return slug;
-}
-
-// Aqui eu traduzo a chave do status para o rótulo certo exibido na tela, sempre tentando usar as descrições oficiais.
-function obterRotuloStatus(key, fallback = "") {
-  const normalized = normalizarChaveStatus(key);
-  if (normalized && STATUS_BY_KEY.has(normalized)) {
-    const entry = STATUS_BY_KEY.get(normalized);
-    if (entry?.nome) return entry.nome;
-  }
-  if (normalized && STATUS_LABELS[normalized]) return STATUS_LABELS[normalized];
-  if (STATUS_LABELS[key]) return STATUS_LABELS[key];
-  const fallbackText = limparTexto(fallback);
-  if (fallbackText) return fallbackText;
-  return normalized || key;
-}
+// Funções de normalização de status movidas para status.js:
+// - normalizarChaveStatus
+// - obterRotuloStatus
 
 
 // Aqui eu pego os dados MESU brutos e padronizo os campos para facilitar os filtros hierárquicos depois.
-function normalizarLinhasMesu(rows){
-  return rows.map(raw => {
-    const segmentoNome = lerCelula(raw, ["Segmento", "segmento"]);
-    const segmentoId = lerCelula(raw, ["Id Segmento", "ID Segmento", "id segmento", "Id segmento", "segmento_id", "segmentoId", "segmentoID"]) || segmentoNome;
-    const segmentoLabelRaw = lerCelula(raw, ["Segmento Label", "segmento_label", "segmentoLabel"]);
-    const diretoriaNome = lerCelula(raw, ["Diretoria", "Diretoria Regional", "diretoria", "Diretoria regional", "diretoria_regional", "Diretoria_regional"]);
-    const diretoriaId = lerCelula(raw, ["Id Diretoria", "ID Diretoria", "Diretoria ID", "Id Diretoria Regional", "id diretoria", "diretoria_id", "diretoriaId"]) || diretoriaNome;
-    const diretoriaLabelRaw = lerCelula(raw, ["Diretoria Label", "diretoria_label", "diretoriaLabel", "Diretoria Rotulo", "diretoria_rotulo"]);
-    const regionalNomeOriginal = lerCelula(raw, ["Regional", "Gerencia Regional", "Gerência Regional", "Gerencia regional", "Regional Nome", "gerencia_regional", "Gerencia_regional"]);
-    const regionalId = lerCelula(raw, ["Id Regional", "ID Regional", "Id Gerencia Regional", "Id Gerência Regional", "Gerencia ID", "gerencia_regional_id", "regional_id", "regionalId"]) || regionalNomeOriginal;
-    const regionalLabelRaw = lerCelula(raw, ["Gerencia Regional Label", "Gerência Regional Label", "regional_label", "gerencia_regional_label", "gerenciaRegionalLabel"]);
-    const regionalNome = (regionalLabelRaw || buildHierarchyLabel(regionalId, regionalNomeOriginal));
-    const regionalNomeAliases = [];
-    if (regionalNomeOriginal && regionalNomeOriginal !== regionalNome) regionalNomeAliases.push(regionalNomeOriginal);
-    const agenciaNomeOriginal = lerCelula(raw, ["Agencia", "Agência", "Agencia Nome", "Agência Nome", "agencia", "agencia_nome"]);
-    const agenciaId = lerCelula(raw, ["Id Agencia", "ID Agencia", "Id Agência", "Agencia ID", "Agência ID", "agencia_id", "agenciaId"]) || agenciaNomeOriginal;
-    const agenciaCodigo = lerCelula(raw, ["Agencia Codigo", "Agência Codigo", "Codigo Agencia", "Código Agência", "agencia_codigo", "codigo_agencia"]) || agenciaId || agenciaNomeOriginal;
-    const agenciaLabelRaw = lerCelula(raw, ["Agencia Label", "Agência Label", "agencia_label", "agenciaLabel"]);
-    const agenciaNome = (agenciaLabelRaw || buildHierarchyLabel(agenciaId, agenciaNomeOriginal));
-    const agenciaNomeAliases = [];
-    if (agenciaNomeOriginal && agenciaNomeOriginal !== agenciaNome) agenciaNomeAliases.push(agenciaNomeOriginal);
-    const gerenteGestaoNome = lerCelula(raw, [
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "Gerente Gestao",
-      "gerente_gestao_nome",
-      "gerente_gestao"
-    ]);
-    const gerenteGestaoId = lerCelula(raw, ["Id Gerente de Gestao", "ID Gerente de Gestao", "Id Gerente de Gestão", "Gerente de Gestao Id", "gerenteGestaoId", "gerente_gestao_id"]) || gerenteGestaoNome;
-    const gerenteGestaoLabelRaw = lerCelula(raw, ["Gerente Gestao Label", "gerente_gestao_label", "gerenteGestaoLabel"]);
-    const gerenteNome = lerCelula(raw, ["Gerente", "Gerente Nome", "Nome Gerente", "Gerente Geral", "Gerente geral", "gerente"]);
-    const gerenteId = lerCelula(raw, ["Id Gerente", "ID Gerente", "Gerente Id", "gerente_id", "gerenteId"]) || gerenteNome;
-    const gerenteLabelRaw = lerCelula(raw, ["Gerente Label", "gerente_label", "gerenteLabel"]);
+// Função normalizarLinhasMesu movida para mesu.js
 
-    return {
-      segmentoNome,
-      segmentoId,
-      segmentoLabel: segmentoLabelRaw || buildHierarchyLabel(segmentoId, segmentoNome),
-      segmentoNomeOriginal: segmentoNome,
-      diretoriaNome,
-      diretoriaId,
-      diretoriaLabel: diretoriaLabelRaw || buildHierarchyLabel(diretoriaId, diretoriaNome),
-      diretoriaNomeOriginal: diretoriaNome,
-      regionalNome,
-      regionalId,
-      regionalLabel: regionalLabelRaw || regionalNome,
-      regionalNomeOriginal,
-      regionalNomeAliases,
-      agenciaNome,
-      agenciaId,
-      agenciaCodigo,
-      agenciaLabel: agenciaLabelRaw || agenciaNome,
-      agenciaNomeOriginal,
-      agenciaNomeAliases,
-      gerenteGestaoNome,
-      gerenteGestaoId,
-      gerenteGestaoLabel: gerenteGestaoLabelRaw || buildHierarchyLabel(gerenteGestaoId, gerenteGestaoNome),
-      gerenteNome,
-      gerenteId,
-      gerenteLabel: gerenteLabelRaw || buildHierarchyLabel(gerenteId, gerenteNome)
-    };
-  }).filter(row => row.diretoriaId || row.regionalId || row.agenciaId);
-}
-
-function buildDimensionLookup(rows){
-  const map = new Map();
-  const list = Array.isArray(rows) ? rows : [];
-  list.forEach(raw => {
-    if (!raw || typeof raw !== "object") return;
-    const candidates = [
-      raw.id,
-      raw.codigo,
-      raw.id_segmento,
-      raw.segmento_id,
-      raw.id_diretoria,
-      raw.diretoria_id,
-      raw.id_regional,
-      raw.regional_id,
-      raw.gerencia_regional_id,
-      raw.id_agencia,
-      raw.agencia_id,
-    ];
-    const key = limparTexto(candidates.find(value => limparTexto(value)));
-    if (!key) return;
-    const nome = limparTexto(raw.nome || raw.name || raw.descricao || raw.label) || key;
-    const labelRaw = limparTexto(raw.label) || nome || key;
-    map.set(key, {
-      ...raw,
-      id: key,
-      nome,
-      label: labelRaw,
-    });
-  });
-  return map;
-}
-
-function registerDimensionLookups({
-  segmentos = [],
-  diretorias = [],
-  regionais = [],
-  agencias = [],
-  gerentesGestao = [],
-  gerentes = [],
-} = {}){
-  DIM_SEGMENTOS_LOOKUP = buildDimensionLookup(segmentos);
-  DIM_DIRETORIAS_LOOKUP = buildDimensionLookup(diretorias);
-  DIM_REGIONAIS_LOOKUP = buildDimensionLookup(regionais);
-  DIM_AGENCIAS_LOOKUP = buildDimensionLookup(agencias);
-  DIM_GGESTAO_LOOKUP = buildDimensionLookup(gerentesGestao);
-  DIM_GERENTES_LOOKUP = buildDimensionLookup(gerentes);
-}
-
-function getGerenteGestaoEntry(id){
-  const key = limparTexto(id);
-  if (!key) return null;
-  if (DIM_GGESTAO_LOOKUP?.has?.(key)) return DIM_GGESTAO_LOOKUP.get(key);
-  if (ggMap instanceof Map && ggMap.has(key)) return ggMap.get(key);
-  return null;
-}
-
-function getGerenteEntry(id){
-  const key = limparTexto(id);
-  if (!key) return null;
-  if (DIM_GERENTES_LOOKUP?.has?.(key)) return DIM_GERENTES_LOOKUP.get(key);
-  if (gerMap instanceof Map && gerMap.has(key)) return gerMap.get(key);
-  return null;
-}
-
-function labelFromEntry(entry, fallbackId = "", fallbackName = ""){
-  if (!entry) {
-    const cleanId = limparTexto(fallbackId);
-    const cleanName = limparTexto(fallbackName);
-    if (cleanName && cleanName.includes(" - ")) return cleanName;
-    if (cleanId && cleanName && cleanId !== cleanName) return `${cleanId} - ${cleanName}`;
-    return cleanName || cleanId || "";
-  }
-  const entryId = limparTexto(entry.id) || limparTexto(fallbackId);
-  const explicitLabel = limparTexto(entry.label);
-  if (explicitLabel) return explicitLabel;
-  const entryName = limparTexto(entry.nome) || limparTexto(fallbackName);
-  if (entryName && entryName.includes(" - ")) return entryName;
-  if (entryId && entryName && entryId !== entryName) return `${entryId} - ${entryName}`;
-  return entryName || entryId || limparTexto(fallbackName) || "";
-}
-
-function labelGerenteGestao(id, fallbackName = ""){
-  return labelFromEntry(getGerenteGestaoEntry(id), id, fallbackName);
-}
-
-function labelGerente(id, fallbackName = ""){
-  return labelFromEntry(getGerenteEntry(id), id, fallbackName);
-}
-
-function deriveGerenteGestaoIdFromAgency(agencia){
-  const key = limparTexto(agencia);
-  if (!key) return "";
-  const candidates = [];
-
-  const dim = DIM_AGENCIAS_LOOKUP?.get?.(key);
-  if (dim) {
-    candidates.push(dim.gerente_gestao_id, dim.gerenteGestaoId, dim.gerente_gestao, dim.gerenteGestao);
-  }
-
-  if (GGESTAO_BY_AGENCIA instanceof Map && GGESTAO_BY_AGENCIA.has(key)) {
-    candidates.push(...Array.from(GGESTAO_BY_AGENCIA.get(key) || []));
-  }
-
-  if (MESU_BY_AGENCIA instanceof Map && MESU_BY_AGENCIA.has(key)) {
-    const meta = MESU_BY_AGENCIA.get(key);
-    if (meta) candidates.push(meta.gerenteGestaoId, meta.gerenteGestao);
-  }
-
-  const simple = simplificarTexto(key);
-  if (simple && MESU_AGENCIA_LOOKUP instanceof Map && MESU_AGENCIA_LOOKUP.has(simple)) {
-    const meta = MESU_AGENCIA_LOOKUP.get(simple);
-    if (meta) candidates.push(meta.gerenteGestaoId, meta.gerenteGestao);
-  }
-
-  if (!candidates.length) {
-    const meta = resolveAgencyHierarchyMeta({ agenciaId: key, agencia: key, agenciaCodigo: key });
-    if (meta) candidates.push(meta.gerenteGestaoId, meta.gerenteGestao);
-  }
-
-  for (const candidate of candidates) {
-    const clean = limparTexto(candidate);
-    if (clean) return clean;
-  }
-  return "";
-}
+// Funções de estrutura movidas para estrutura.js:
+// - buildDimensionLookup
+// - registerDimensionLookups
+// - getGerenteGestaoEntry
+// - getGerenteEntry
+// - labelFromEntry
+// - labelGerenteGestao
+// - labelGerente
+// - deriveGerenteGestaoIdFromAgency
 
 // Aqui eu aproveito os dados MESU já limpos para montar índices (diretoria → gerência → agência...) e acelerar os combos.
 function montarHierarquiaMesu(rows){
@@ -2566,435 +2333,11 @@ function montarCatalogoDeProdutos(dimRows){
   });
 }
 
-function normalizarLinhasFatoRealizados(rows){
-  return rows.map(raw => {
-    const registroId = raw.registro_id;
-    if (!registroId) return null;
+// Função normalizarLinhasFatoRealizados movida para realizados.js
 
-    const segmento = raw.segmento;
-    const segmentoId = raw.segmento_id;
-    const diretoriaId = raw.diretoria_id;
-    const diretoriaNome = raw.diretoria_nome || diretoriaId;
-    const gerenciaId = raw.gerencia_id;
-    const gerenciaNome = raw.gerencia_nome || raw.regional_nome || gerenciaId;
-    const regionalNome = raw.regional_nome || gerenciaNome;
-    const agenciaIdRaw = raw.agencia_id;
-    const agenciaNome = raw.agencia_nome;
-    const agenciaCodigoRaw = raw.agencia_codigo;
-    const agenciaCodigo = agenciaCodigoRaw || agenciaIdRaw || agenciaNome;
-    const agenciaId = agenciaIdRaw || agenciaCodigoRaw || agenciaNome;
-    const gerenteGestaoIdRaw = raw.gerente_gestao_id;
-    const gerenteGestaoNomeRaw = raw.gerente_gestao_nome;
-    const gerenteGestaoParsed = normalizeFuncionalPair(gerenteGestaoIdRaw, gerenteGestaoNomeRaw);
-    const gerenteGestaoId = gerenteGestaoParsed.id;
-    const gerenteGestaoNome = gerenteGestaoParsed.nome || gerenteGestaoParsed.label || gerenteGestaoId;
-    const gerenteIdRaw = raw.gerente_id;
-    const gerenteNomeRaw = raw.gerente_nome;
-    const gerenteParsed = normalizeFuncionalPair(gerenteIdRaw, gerenteNomeRaw);
-    const gerenteId = gerenteParsed.id;
-    const gerenteNome = gerenteParsed.nome || gerenteParsed.label || gerenteId;
-    let familiaId = raw.familia_id || "";
-    let familiaNome = raw.familia_nome || familiaId;
-    let produtoId = raw.id_indicador;
-    if (!produtoId) return null;
-    let produtoNome = raw.ds_indicador || produtoId;
-    let subproduto = raw.subproduto || "";
-    const familiaCodigoExtra = raw.familia_codigo;
-    const indicadorCodigoExtra = raw.indicador_codigo;
-    const subCodigoExtra = raw.subindicador_codigo;
-    const familiaCodigo = limparTexto(familiaCodigoExtra);
-    if (familiaCodigo) {
-      const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
-      if (familiaSlug && (!familiaId || familiaId === familiaCodigo)) {
-        familiaId = familiaSlug;
-        if (!familiaNome || familiaNome === familiaCodigo) {
-          const famMeta = FAMILIA_BY_ID.get(familiaSlug);
-          if (famMeta?.nome) familiaNome = famMeta.nome;
-        }
-      }
-    }
-    const indicadorCodigo = limparTexto(indicadorCodigoExtra);
-    if (indicadorCodigo) {
-      const indicadorSlug = INDICADOR_CODE_TO_SLUG.get(indicadorCodigo);
-      if (indicadorSlug) {
-        produtoId = indicadorSlug;
-      }
-    }
-    const subCodigo = limparTexto(subCodigoExtra);
-    const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const carteira = raw.carteira;
-    const canalVenda = raw.canal_venda;
-    const tipoVenda = raw.tipo_venda;
-    const modalidadePagamento = raw.modalidade_pagamento;
-    let data = converterDataISO(raw.data);
-    let competencia = converterDataISO(raw.competencia);
-    if (!data && competencia) {
-      data = competencia;
-    }
-    if (!competencia && data) {
-      competencia = `${data.slice(0, 7)}-01`;
-    }
-    const realizadoMens = toNumber(raw.realizado_mensal);
-    const realizadoAcum = toNumber(raw.realizado_acumulado);
-    const quantidade = toNumber(raw.quantidade);
-    const variavelReal = toNumber(raw.variavel_real);
+// Função normalizarLinhasFatoMetas movida para metas.js
 
-    const scenarioHint = getSegmentScenarioFromValue(segmento) || getSegmentScenarioFromValue(segmentoId) || "";
-    const indicadorRes = resolveIndicatorFromDimension([produtoId, produtoNome, indicadorCodigoExtra], scenarioHint);
-    if (indicadorRes) {
-      if (indicadorRes.indicadorId) produtoId = indicadorRes.indicadorId;
-      if (indicadorRes.indicadorNome) produtoNome = indicadorRes.indicadorNome;
-      if (indicadorRes.familiaId) familiaId = indicadorRes.familiaId;
-      if (indicadorRes.familiaNome) familiaNome = indicadorRes.familiaNome;
-    }
-
-    let resolvedSubId = subSlug;
-    let resolvedSubNome = subproduto;
-    const subRes = resolveSubIndicatorFromDimension([subSlug, subCodigo, subproduto], indicadorRes, scenarioHint);
-    if (subRes) {
-      if (subRes.subId) resolvedSubId = subRes.subId;
-      if (subRes.subNome) resolvedSubNome = subRes.subNome;
-      if (subRes.familiaId && !familiaId) familiaId = subRes.familiaId;
-      if (subRes.familiaNome && !familiaNome) familiaNome = subRes.familiaNome;
-    }
-
-    const base = {
-      registroId,
-      segmento,
-      segmentoId,
-      diretoria: diretoriaId || diretoriaNome,
-      diretoriaId: diretoriaId || diretoriaNome,
-      diretoriaNome,
-      gerenciaRegional: gerenciaId || gerenciaNome,
-      gerenciaId: gerenciaId || gerenciaNome,
-      gerenciaNome,
-      regional: regionalNome,
-      agencia: agenciaId,
-      agenciaId,
-      agenciaNome: agenciaNome || agenciaCodigo || agenciaId,
-      agenciaCodigo,
-      gerenteGestao: gerenteGestaoId,
-      gerenteGestaoId,
-      gerenteGestaoNome,
-      gerenteGestaoLabel: gerenteGestaoParsed.label,
-      gerente: gerenteId,
-      gerenteId,
-      gerenteNome,
-      gerenteLabel: gerenteParsed.label,
-      familiaId,
-      familiaNome,
-      subproduto,
-      carteira,
-      canalVenda,
-      tipoVenda,
-      modalidadePagamento,
-      data,
-      competencia,
-      realizado: realizadoMens,
-      real_mens: realizadoMens,
-      real_acum: realizadoAcum || realizadoMens,
-      qtd: quantidade,
-      variavelReal,
-    };
-    if (scenarioHint) base.segmentoScenario = scenarioHint;
-    if (familiaCodigo) base.familiaCodigo = familiaCodigo;
-    if (indicadorCodigo) base.indicadorCodigo = indicadorCodigo;
-    if (subCodigo) base.subindicadorCodigo = subCodigo;
-    if (resolvedSubId) {
-      base.subprodutoId = resolvedSubId;
-      base.subId = resolvedSubId;
-      base.subindicadorId = resolvedSubId;
-    }
-    if (resolvedSubNome) {
-      base.subproduto = resolvedSubNome;
-      base.subProduto = resolvedSubNome;
-      base.subindicadorNome = resolvedSubNome;
-    }
-    aplicarIndicadorAliases(base, produtoId, produtoNome);
-    base.familiaId = familiaId;
-    base.familiaNome = familiaNome;
-    base.prodOrSub = resolvedSubNome || subproduto || base.produtoNome || base.produtoId;
-    if (!base.gerenteGestaoId && base.agenciaId) {
-      const derivedGg = deriveGerenteGestaoIdFromAgency(base.agenciaId || base.agencia);
-      if (derivedGg) {
-        base.gerenteGestao = derivedGg;
-        base.gerenteGestaoId = derivedGg;
-        if (!base.gerenteGestaoLabel) {
-          base.gerenteGestaoLabel = labelGerenteGestao(derivedGg);
-        }
-        if (!base.gerenteGestaoNome || base.gerenteGestaoNome === base.gerenteGestao) {
-          const ggEntry = getGerenteGestaoEntry(derivedGg);
-          if (ggEntry) {
-            base.gerenteGestaoNome = ggEntry.nome || extractNameFromLabel(ggEntry.label) || base.gerenteGestaoNome;
-          }
-        }
-      }
-    }
-    return base;
-  }).filter(Boolean);
-}
-
-// Aqui eu deixo o fato de metas com os mesmos padrões de datas e chaves dos realizados para facilitar os cruzamentos.
-function normalizarLinhasFatoMetas(rows){
-  return rows.map(raw => {
-    const registroId = raw.registro_id;
-    if (!registroId) return null;
-
-    const segmento = raw.segmento;
-    const segmentoId = raw.segmento_id;
-    const diretoriaId = raw.diretoria_id;
-    const diretoriaNome = raw.diretoria_nome || diretoriaId;
-    const gerenciaId = raw.gerencia_id;
-    const gerenciaNome = raw.gerencia_nome || raw.regional_nome || gerenciaId;
-    const regionalNome = raw.regional_nome || gerenciaNome;
-    const agenciaIdRaw = raw.agencia_id;
-    const agenciaCodigoRaw = raw.agencia_codigo;
-    const agenciaNome = raw.agencia_nome || agenciaCodigoRaw || agenciaIdRaw;
-    const agenciaCodigo = agenciaCodigoRaw || agenciaIdRaw || agenciaNome;
-    const agenciaId = agenciaIdRaw || agenciaCodigoRaw || agenciaNome;
-    const gerenteGestaoIdRaw = raw.gerente_gestao_id;
-    const gerenteGestaoNomeRaw = raw.gerente_gestao_nome;
-    const gerenteGestaoParsed = normalizeFuncionalPair(gerenteGestaoIdRaw, gerenteGestaoNomeRaw);
-    const gerenteGestaoId = gerenteGestaoParsed.id;
-    const gerenteGestaoNome = gerenteGestaoParsed.nome || gerenteGestaoParsed.label || gerenteGestaoId;
-    const gerenteIdRaw = raw.gerente_id;
-    const gerenteNomeRaw = raw.gerente_nome;
-    const gerenteParsed = normalizeFuncionalPair(gerenteIdRaw, gerenteNomeRaw);
-    const gerenteId = gerenteParsed.id;
-    const gerenteNome = gerenteParsed.nome || gerenteParsed.label || gerenteId;
-
-    let familiaId = raw.familia_id || "";
-    let familiaNome = raw.familia_nome || familiaId;
-    let produtoId = raw.id_indicador;
-    let produtoNome = raw.ds_indicador || produtoId;
-    let subproduto = raw.subproduto || "";
-
-    const familiaCodigoExtra = raw.familia_codigo;
-    const indicadorCodigoExtra = raw.indicador_codigo;
-    const subCodigoExtra = raw.subindicador_codigo;
-    const familiaCodigo = limparTexto(familiaCodigoExtra);
-    if (familiaCodigo) {
-      const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
-      if (familiaSlug && (!familiaId || familiaId === familiaCodigo)) {
-        familiaId = familiaSlug;
-        if (!familiaNome || familiaNome === familiaCodigo) {
-          const famMeta = FAMILIA_BY_ID.get(familiaSlug);
-          if (famMeta?.nome) familiaNome = famMeta.nome;
-        }
-      }
-    }
-
-    const indicadorCodigo = limparTexto(indicadorCodigoExtra);
-    if (indicadorCodigo) {
-      const indicadorSlug = INDICADOR_CODE_TO_SLUG.get(indicadorCodigo);
-      if (indicadorSlug) {
-        produtoId = indicadorSlug;
-      }
-    }
-
-    const subCodigo = limparTexto(subCodigoExtra);
-    const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const carteira = raw.carteira;
-    const canalVenda = raw.canal_venda;
-    const tipoVenda = raw.tipo_venda;
-    const modalidadePagamento = raw.modalidade_pagamento;
-    const metaMens = toNumber(raw.meta_mensal);
-    const metaAcum = toNumber(raw.meta_acumulada);
-    const variavelMeta = toNumber(raw.variavel_meta);
-    const peso = toNumber(raw.peso);
-    let data = converterDataISO(raw.data);
-    let competencia = converterDataISO(raw.competencia);
-    if (!data && competencia) {
-      data = competencia;
-    }
-    if (!competencia && data) {
-      competencia = `${data.slice(0, 7)}-01`;
-    }
-
-    const scenarioHint = getSegmentScenarioFromValue(segmento) || getSegmentScenarioFromValue(segmentoId) || "";
-    const indicadorRes = resolveIndicatorFromDimension([produtoId, produtoNome, indicadorCodigoExtra], scenarioHint);
-    if (indicadorRes) {
-      if (indicadorRes.indicadorId) produtoId = indicadorRes.indicadorId;
-      if (indicadorRes.indicadorNome) produtoNome = indicadorRes.indicadorNome;
-      if (indicadorRes.familiaId) familiaId = indicadorRes.familiaId;
-      if (indicadorRes.familiaNome) familiaNome = indicadorRes.familiaNome;
-    }
-
-    let resolvedSubId = subSlug;
-    let resolvedSubNome = subproduto;
-    const subRes = resolveSubIndicatorFromDimension([subSlug, subCodigo, subproduto], indicadorRes, scenarioHint);
-    if (subRes) {
-      if (subRes.subId) resolvedSubId = subRes.subId;
-      if (subRes.subNome) resolvedSubNome = subRes.subNome;
-      if (subRes.familiaId && !familiaId) familiaId = subRes.familiaId;
-      if (subRes.familiaNome && !familiaNome) familiaNome = subRes.familiaNome;
-    }
-
-    const base = {
-      registroId,
-      segmento,
-      segmentoId,
-      diretoria: diretoriaId || diretoriaNome,
-      diretoriaId: diretoriaId || diretoriaNome,
-      diretoriaNome,
-      gerenciaRegional: gerenciaId || gerenciaNome,
-      gerenciaId: gerenciaId || gerenciaNome,
-      gerenciaNome,
-      regional: regionalNome,
-      agencia: agenciaId,
-      agenciaId,
-      agenciaNome,
-      agenciaCodigo,
-      gerenteGestao: gerenteGestaoId,
-      gerenteGestaoId,
-      gerenteGestaoNome,
-      gerenteGestaoLabel: gerenteGestaoParsed.label,
-      gerente: gerenteId,
-      gerenteId,
-      gerenteNome,
-      gerenteLabel: gerenteParsed.label,
-      familiaId,
-      familiaNome,
-      subproduto,
-      carteira,
-      canalVenda,
-      tipoVenda,
-      modalidadePagamento,
-      data,
-      competencia,
-      meta: metaMens,
-      meta_mens: metaMens,
-      meta_acum: metaAcum || metaMens,
-      variavelMeta,
-      peso,
-    };
-    if (scenarioHint) base.segmentoScenario = scenarioHint;
-    if (familiaCodigo) base.familiaCodigo = familiaCodigo;
-    if (indicadorCodigo) base.indicadorCodigo = indicadorCodigo;
-    if (subCodigo) base.subindicadorCodigo = subCodigo;
-    if (resolvedSubId) {
-      base.subprodutoId = resolvedSubId;
-      base.subId = resolvedSubId;
-      base.subindicadorId = resolvedSubId;
-    }
-    if (resolvedSubNome) {
-      base.subproduto = resolvedSubNome;
-      base.subProduto = resolvedSubNome;
-      base.subindicadorNome = resolvedSubNome;
-    }
-    aplicarIndicadorAliases(base, produtoId, produtoNome);
-    base.familiaId = familiaId;
-    base.familiaNome = familiaNome;
-    base.prodOrSub = resolvedSubNome || subproduto || base.produtoNome || base.produtoId;
-    if (!base.gerenteGestaoId && base.agenciaId) {
-      const derivedGg = deriveGerenteGestaoIdFromAgency(base.agenciaId || base.agencia);
-      if (derivedGg) {
-        base.gerenteGestao = derivedGg;
-        base.gerenteGestaoId = derivedGg;
-        if (!base.gerenteGestaoLabel) {
-          base.gerenteGestaoLabel = labelGerenteGestao(derivedGg);
-        }
-        if (!base.gerenteGestaoNome || base.gerenteGestaoNome === base.gerenteGestao) {
-          const ggEntry = getGerenteGestaoEntry(derivedGg);
-          if (ggEntry) {
-            base.gerenteGestaoNome = ggEntry.nome || extractNameFromLabel(ggEntry.label) || base.gerenteGestaoNome;
-          }
-        }
-      }
-    }
-    return base;
-  }).filter(Boolean);
-}
-
-// Aqui eu trato o fato variável (pontos) porque ele vem com os nomes de colunas diferentes das outras bases.
-function normalizarLinhasFatoVariavel(rows){
-  return rows.map(raw => {
-    const registroId = raw.registro_id;
-    if (!registroId) return null;
-    let produtoId = raw.id_indicador;
-    let produtoNome = raw.ds_indicador || produtoId;
-    let familiaId = raw.familia_id || "";
-    let familiaNome = raw.familia_nome || familiaId;
-    const familiaCodigoExtra = raw.familia_codigo;
-    const indicadorCodigoExtra = raw.indicador_codigo;
-    const subCodigoExtra = raw.subindicador_codigo;
-    const familiaCodigo = limparTexto(familiaCodigoExtra);
-    if (familiaCodigo) {
-      const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
-      if (familiaSlug && (!familiaId || familiaId === familiaCodigo)) {
-        familiaId = familiaSlug;
-        if (!familiaNome || familiaNome === familiaCodigo) {
-          const famMeta = FAMILIA_BY_ID.get(familiaSlug);
-          if (famMeta?.nome) familiaNome = famMeta.nome;
-        }
-      }
-    }
-    const indicadorCodigo = limparTexto(indicadorCodigoExtra);
-    if (indicadorCodigo) {
-      const indicadorSlug = INDICADOR_CODE_TO_SLUG.get(indicadorCodigo);
-      if (indicadorSlug) {
-        produtoId = indicadorSlug;
-      }
-    }
-    const subCodigo = limparTexto(subCodigoExtra);
-    const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const variavelMeta = toNumber(raw.variavel_meta);
-    const variavelReal = toNumber(raw.variavel_real);
-    let data = converterDataISO(raw.data);
-    let competencia = converterDataISO(raw.competencia);
-    if (!data && competencia) {
-      data = competencia;
-    }
-    if (!competencia && data) {
-      competencia = `${data.slice(0, 7)}-01`;
-    }
-    const indicadorRes = resolveIndicatorFromDimension([produtoId, produtoNome, indicadorCodigoExtra], "");
-    if (indicadorRes) {
-      if (indicadorRes.indicadorId) produtoId = indicadorRes.indicadorId;
-      if (indicadorRes.indicadorNome) produtoNome = indicadorRes.indicadorNome;
-      if (indicadorRes.familiaId) familiaId = indicadorRes.familiaId;
-      if (indicadorRes.familiaNome) familiaNome = indicadorRes.familiaNome;
-    }
-
-    let resolvedSubId = subSlug;
-    let resolvedSubNome = "";
-    const subRes = resolveSubIndicatorFromDimension([subSlug, subCodigo], indicadorRes, "");
-    if (subRes) {
-      if (subRes.subId) resolvedSubId = subRes.subId;
-      if (subRes.subNome) resolvedSubNome = subRes.subNome;
-      if (subRes.familiaId && !familiaId) familiaId = subRes.familiaId;
-      if (subRes.familiaNome && !familiaNome) familiaNome = subRes.familiaNome;
-    }
-
-    const base = {
-      registroId,
-      familiaId,
-      familiaNome,
-      data,
-      competencia,
-      variavelMeta,
-      variavelReal,
-    };
-    if (familiaCodigo) base.familiaCodigo = familiaCodigo;
-    if (indicadorCodigo) base.indicadorCodigo = indicadorCodigo;
-    if (subCodigo) base.subindicadorCodigo = subCodigo;
-    if (resolvedSubId) {
-      base.subprodutoId = resolvedSubId;
-      base.subId = resolvedSubId;
-      base.subindicadorId = resolvedSubId;
-    }
-    if (resolvedSubNome) {
-      base.subproduto = resolvedSubNome;
-      base.subProduto = resolvedSubNome;
-      base.subindicadorNome = resolvedSubNome;
-    }
-    aplicarIndicadorAliases(base, produtoId, produtoNome);
-    base.familiaId = familiaId;
-    base.familiaNome = familiaNome;
-    base.prodOrSub = resolvedSubNome || base.produtoNome || base.produtoId;
-    return base;
-  }).filter(Boolean);
-}
+// Função normalizarLinhasFatoVariavel movida para variavel.js
 
 function extractFactKeyValues(entry = {}) {
   return {
@@ -3132,286 +2475,13 @@ function findFactMatch(row = {}, lookup){
   return null;
 }
 
-// Aqui eu padronizo os dados das campanhas porque preciso ligar sprint, unidade e indicadores rapidamente.
-function normalizarLinhasFatoCampanhas(rows){
-  return rows.map(raw => {
-    const id = lerCelula(raw, ["Campanha ID", "ID"]);
-    if (!id) return null;
-    const sprintId = lerCelula(raw, ["Sprint ID", "Sprint"]);
-    const diretoriaId = lerCelula(raw, ["Diretoria", "Diretoria ID", "Id Diretoria"]);
-    const diretoriaNome = lerCelula(raw, ["Diretoria Nome", "Diretoria Regional"]) || diretoriaId;
-    const gerenciaId = lerCelula(raw, ["Gerencia Regional", "Gerencia ID", "Id Gerencia"]);
-    const regionalNome = lerCelula(raw, ["Regional Nome", "Regional"]) || gerenciaId;
-    const agenciaCodigoRaw = lerCelula(raw, ["Agencia Codigo", "Agencia ID", "Código Agência", "Agência Codigo"]);
-    const agenciaNome = lerCelula(raw, ["Agencia Nome", "Agência Nome", "Agencia"]) || agenciaCodigoRaw;
-    const agenciaId = agenciaCodigoRaw || agenciaNome;
-    const gerenteGestaoIdRaw = lerCelula(raw, [
-      "Gerente Gestao",
-      "Gerente Gestao ID",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "gerenteGestaoId",
-      "gerente_gestao_id"
-    ]);
-    const gerenteGestaoNome = lerCelula(raw, [
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "Gerente Gestao",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "gerenteGestaoNome",
-      "gerente_gestao_nome"
-    ]) || gerenteGestaoIdRaw;
-    const gerenteGestaoId = gerenteGestaoIdRaw || gerenteGestaoNome;
-    const gerenteIdRaw = lerCelula(raw, ["Gerente", "Gerente ID"]);
-    const gerenteNome = lerCelula(raw, ["Gerente Nome"]) || gerenteIdRaw;
-    const gerenteId = gerenteIdRaw || gerenteNome;
-    const segmento = lerCelula(raw, ["Segmento"]);
-    let familiaId = lerCelula(raw, ["Familia ID", "Família ID", "Familia"]);
-    let familiaNome = lerCelula(raw, ["Familia Nome", "Família Nome"]) || familiaId;
-    let produtoId = lerCelula(raw, ["id_indicador", "Produto ID", "Produto"]);
-    if (!produtoId) return null;
-    const produtoNome = lerCelula(raw, ["ds_indicador", "Produto Nome", "Produto"]) || produtoId;
-    const subproduto = lerCelula(raw, ["Subproduto", "Sub produto"]);
-    const familiaCodigoExtra = lerCelula(raw, ["Familia Codigo", "Familia Código", "FamiliaCod"]);
-    const indicadorCodigoExtra = lerCelula(raw, ["Indicador Codigo", "Indicador Código", "IndicadorCod"]);
-    const subCodigoExtra = lerCelula(raw, ["Subindicador Codigo", "Subindicador Código", "SubindicadorCod"]);
-    const familiaCodigo = limparTexto(familiaCodigoExtra);
-    if (familiaCodigo) {
-      const familiaSlug = FAMILIA_CODE_TO_SLUG.get(familiaCodigo);
-      if (familiaSlug && (!familiaId || familiaId === familiaCodigo)) {
-        familiaId = familiaSlug;
-        if (!familiaNome || familiaNome === familiaCodigo) {
-          const famMeta = FAMILIA_BY_ID.get(familiaSlug);
-          if (famMeta?.nome) familiaNome = famMeta.nome;
-        }
-      }
-    }
-    const indicadorCodigo = limparTexto(indicadorCodigoExtra);
-    if (indicadorCodigo) {
-      const indicadorSlug = INDICADOR_CODE_TO_SLUG.get(indicadorCodigo);
-      if (indicadorSlug) {
-        produtoId = indicadorSlug;
-      }
-    }
-    const subCodigo = limparTexto(subCodigoExtra);
-    const subSlug = subCodigo ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const carteira = lerCelula(raw, ["Carteira"]);
-    const linhas = toNumber(lerCelula(raw, ["Linhas"]));
-    const cash = toNumber(lerCelula(raw, ["Cash"]));
-    const conquista = toNumber(lerCelula(raw, ["Conquista"]));
-    const atividade = converterBooleano(lerCelula(raw, ["Atividade", "Ativo", "Status"]), true);
-    let data = converterDataISO(lerCelula(raw, ["Data"]));
-    let competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"]));
-    if (!data && competencia) {
-      data = competencia;
-    }
-    if (!competencia && data) {
-      competencia = `${data.slice(0, 7)}-01`;
-    }
+// Função normalizarLinhasFatoCampanhas movida para campanhas.js
 
-    const base = {
-      id,
-      sprintId,
-      diretoria: diretoriaId || diretoriaNome,
-      diretoriaId: diretoriaId || diretoriaNome,
-      diretoriaNome,
-      gerenciaRegional: gerenciaId || regionalNome,
-      gerenciaId: gerenciaId || regionalNome,
-      regional: regionalNome,
-      agenciaCodigo: agenciaCodigoRaw || agenciaId,
-      agencia: agenciaId,
-      agenciaId,
-      agenciaNome,
-      gerenteGestao: gerenteGestaoId,
-      gerenteGestaoId,
-      gerenteGestaoNome,
-      gerente: gerenteId,
-      gerenteId,
-      gerenteNome,
-      segmento,
-      familiaId,
-      familiaNome,
-      subproduto,
-      carteira,
-      linhas,
-      cash,
-      conquista,
-      atividade,
-      data,
-      competencia,
-    };
-    if (familiaCodigo) base.familiaCodigo = familiaCodigo;
-    if (indicadorCodigo) base.indicadorCodigo = indicadorCodigo;
-    if (subCodigo) base.subindicadorCodigo = subCodigo;
-    if (subSlug) base.subprodutoId = subSlug;
-    aplicarIndicadorAliases(base, produtoId, produtoNome);
-    return base;
-  }).filter(Boolean);
-}
+// Função normalizarLinhasCalendario movida para calendario.js
 
-// Aqui eu organizo o calendário corporativo (competências) para usar nas telas de período.
-function normalizarLinhasCalendario(rows){
-  return rows.map(raw => {
-    const data = converterDataISO(lerCelula(raw, ["Data"]));
-    if (!data) return null;
-    const competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"])) || `${data.slice(0, 7)}-01`;
-    const ano = lerCelula(raw, ["Ano"]) || data.slice(0, 4);
-    const mes = lerCelula(raw, ["Mes", "Mês"]) || data.slice(5, 7);
-    const mesNome = lerCelula(raw, ["Mes Nome", "Mês Nome"]);
-    const dia = lerCelula(raw, ["Dia"]) || data.slice(8, 10);
-    const diaSemana = lerCelula(raw, ["Dia da Semana"]);
-    const semana = lerCelula(raw, ["Semana"]);
-    const trimestre = lerCelula(raw, ["Trimestre"]);
-    const semestre = lerCelula(raw, ["Semestre"]);
-    const ehDiaUtil = converterBooleano(lerCelula(raw, ["Eh Dia Util", "É Dia Útil", "Dia Util"]), false) ? 1 : 0;
-    const mesAnoCurto = construirEtiquetaMesAno(ano, mes, mesNome);
-    return { data, competencia, ano, mes, mesNome, mesAnoCurto, dia, diaSemana, semana, trimestre, semestre, ehDiaUtil };
-  }).filter(Boolean).sort((a, b) => (a.data || "").localeCompare(b.data || ""));
-}
+// Função normalizarLinhasStatus movida para status.js
 
-// Aqui eu trato a base de status dos indicadores para poder exibir os nomes amigáveis e a ordem certa.
-function normalizarLinhasStatus(rows){
-  const normalized = [];
-  const seen = new Set();
-  const missing = new Set();
-  const list = Array.isArray(rows) ? rows : [];
-
-  if (!list.length) {
-  }
-
-  const register = (candidate = {}) => {
-    const rawKey = pegarPrimeiroPreenchido(
-      candidate.key,
-      candidate.slug,
-      candidate.id,
-      candidate.codigo,
-      candidate.nome
-    );
-    const resolvedKey = normalizarChaveStatus(rawKey);
-    if (!resolvedKey) return false;
-    if (seen.has(resolvedKey)) return true;
-
-    const codigo = limparTexto(candidate.codigo)
-      || limparTexto(candidate.id)
-      || resolvedKey;
-    const nome = limparTexto(candidate.nome)
-      || STATUS_LABELS[resolvedKey]
-      || limparTexto(candidate.label)
-      || codigo
-      || resolvedKey;
-    const originalId = limparTexto(candidate.id) || codigo || resolvedKey;
-    const ordemRaw = limparTexto(candidate.ordem);
-    const ordemNum = Number(ordemRaw);
-    const ordem = ordemRaw !== "" && Number.isFinite(ordemNum) ? ordemNum : undefined;
-
-    const entry = { id: originalId, codigo, nome, key: resolvedKey };
-    if (ordem !== undefined) entry.ordem = ordem;
-
-    normalized.push(entry);
-    seen.add(resolvedKey);
-    return true;
-  };
-
-  list.forEach(raw => {
-    if (!raw || typeof raw !== "object") return;
-    const nome = lerCelula(raw, ["Status Nome", "Status", "Nome", "Descrição", "Descricao"]);
-    const codigo = lerCelula(raw, ["Status Id", "StatusID", "id", "ID", "Codigo", "Código"]);
-    const chave = lerCelula(raw, ["Status Chave", "Status Key", "Chave", "Slug"]);
-    const ordem = lerCelula(raw, ["Ordem", "Order", "Posicao", "Posição", "Sequencia", "Sequência"]);
-    const key = pegarPrimeiroPreenchido(chave, codigo, nome);
-    const ok = register({ id: codigo || key, codigo, nome, key, ordem });
-    if (!ok) {
-      const fallback = pegarPrimeiroPreenchido(nome, codigo, chave);
-      if (fallback) missing.add(fallback);
-    }
-  });
-
-  DEFAULT_STATUS_INDICADORES.forEach(item => register(item));
-
-  if (missing.size) {
-    console.warn(`Status sem identificador válido: ${Array.from(missing).join(", ")}`);
-  }
-
-  return normalized;
-}
-
-function normalizarDimProdutos(rows){
-  const list = Array.isArray(rows) ? rows : [];
-  return list.map(raw => {
-    const familiaCodigoRaw = raw.id_familia || raw.familia_codigo || "";
-    const familiaNomeRaw = raw.familia || raw.familia_nome || "";
-    const indicadorCodigoRaw = raw.id_indicador || raw.indicador_codigo || "";
-    const indicadorNomeRaw = raw.indicador || raw.ds_indicador || "";
-    const subCodigoRaw = raw.id_subindicador || raw.subindicador_codigo || "";
-    const subNomeRaw = raw.subindicador || "";
-    const pesoRaw = raw.peso || 0;
-
-    const familiaNome = limparTexto(familiaNomeRaw) || "Indicador";
-    const familiaCodigo = limparTexto(String(familiaCodigoRaw));
-    let familiaId = "";
-    if (familiaCodigo && /[^0-9]/.test(familiaCodigo)) {
-      familiaId = familiaCodigo;
-    } else {
-      const slug = simplificarTexto(familiaNome);
-      familiaId = slug ? slug.replace(/\s+/g, "_") : String(familiaCodigo || "");
-    }
-
-    const indicadorNome = limparTexto(indicadorNomeRaw) || "Indicador";
-    const indicadorCodigo = limparTexto(String(indicadorCodigoRaw));
-    let indicadorId = "";
-    if (indicadorCodigo && /[^0-9]/.test(indicadorCodigo)) {
-      indicadorId = indicadorCodigo;
-    } else {
-      const slug = simplificarTexto(indicadorNome);
-      indicadorId = slug ? slug.replace(/\s+/g, "_") : String(indicadorCodigo || "");
-    }
-
-    const subNomeLimpo = limparTexto(subNomeRaw);
-    const subCodigo = limparTexto(String(subCodigoRaw));
-    const subCodigoValido = subCodigo && subCodigo !== "-" && subCodigo !== "0" ? subCodigo : "";
-    const hasSub = Boolean(subCodigoValido) || Boolean(subNomeLimpo);
-    
-    if (!hasSub) {
-      return {
-        familiaCodigo,
-        familiaId,
-        familiaNome,
-        indicadorCodigo,
-        indicadorId,
-        indicadorNome,
-        peso: toNumber(pesoRaw) || 0,
-        subCodigo: "",
-        subId: "",
-        subNome: ""
-      };
-    }
-
-    let subId = "";
-    if (subCodigoValido && /[^0-9]/.test(subCodigoValido) && !subNomeLimpo) {
-      subId = subCodigoValido;
-    } else {
-      const slug = subNomeLimpo ? simplificarTexto(subNomeLimpo) : simplificarTexto(subCodigoValido);
-      subId = slug ? slug.replace(/\s+/g, "_") : subCodigoValido;
-    }
-
-    const subNome = subNomeLimpo || subId || subCodigoValido || "";
-
-    return {
-      familiaCodigo,
-      familiaId,
-      familiaNome,
-      indicadorCodigo,
-      indicadorId,
-      indicadorNome,
-      peso: toNumber(pesoRaw) || 0,
-      subCodigo: subCodigoValido,
-      subId,
-      subNome
-    };
-  }).filter(row => row.indicadorId);
-}
+// Função normalizarDimProdutos movida para produtos.js
 
 function resetGlobalDimensionAliasIndex(){
   GLOBAL_INDICATOR_ALIAS_INDEX.clear();
@@ -3604,392 +2674,15 @@ function resolveSubIndicatorFromDimension(candidates, indicatorMeta = null, scen
   return null;
 }
 
-function normalizarLinhasFatoDetalhes(rows){
-  if (!Array.isArray(rows)) return [];
+// Função normalizarLinhasFatoDetalhes movida para detalhes.js
 
-  return rows.map(raw => {
-    const contratoId = limparTexto(lerCelula(raw, ["Contrato ID", "contrato_id", "Contrato", "Id Contrato", "ID Contrato"]));
-    const registroId = limparTexto(lerCelula(raw, ["Registro ID", "registro_id", "Registro", "Id Registro", "ID Registro"]));
-    if (!contratoId || !registroId) return null;
+// Função normalizarLinhasHistoricoRankingPobj movida para historico.js
 
-    const segmentoId = limparTexto(lerCelula(raw, ["Segmento ID", "segmento_id", "segmentoId"]));
-    const segmento = limparTexto(lerCelula(raw, ["Segmento", "segmento"])) || segmentoId;
-    const diretoriaId = limparTexto(lerCelula(raw, ["Diretoria ID", "diretoria_id", "diretoriaId"]));
-    const diretoriaNome = limparTexto(lerCelula(raw, ["Diretoria Nome", "Diretoria Regional", "diretoria_nome"])) || diretoriaId;
-    const gerenciaId = limparTexto(lerCelula(raw, ["Gerencia Regional ID", "Gerencia ID", "gerencia_regional_id", "gerenciaId", "regional_id"]));
-    const gerenciaNome = limparTexto(lerCelula(raw, ["Gerencia Regional Nome", "Regional Nome", "gerencia_regional_nome", "gerenciaNome"])) || gerenciaId;
-    const agenciaId = limparTexto(lerCelula(raw, ["Agencia ID", "Agência ID", "agencia_id", "agenciaId"]));
-    const agenciaNome = limparTexto(lerCelula(raw, ["Agencia Nome", "Agência Nome", "agencia_nome"])) || agenciaId;
-    const agenciaCodigo = limparTexto(lerCelula(raw, ["Agencia Codigo", "Agência Codigo", "Codigo Agencia", "agencia_codigo"]))
-      || agenciaId
-      || agenciaNome;
-    let gerenteGestaoId = limparTexto(lerCelula(raw, ["Gerente Gestao ID", "gerente_gestao_id", "GerenteGestaoId"]));
-    let gerenteGestaoNome = limparTexto(lerCelula(raw, ["Gerente Gestao Nome", "Gerente de Gestao", "Gerente Gestao", "gerente_gestao_nome"]));
-    let gerenteId = limparTexto(lerCelula(raw, ["Gerente ID", "gerente_id", "GerenteId"]));
-    let gerenteNome = limparTexto(lerCelula(raw, ["Gerente Nome", "Gerente", "gerente_nome", "Gerente Geral", "Gerente geral"])) || gerenteId;
-
-    if (!gerenteGestaoId) {
-      const derivedGg = deriveGerenteGestaoIdFromAgency(agenciaId || agenciaCodigo || agenciaNome);
-      if (derivedGg) {
-        gerenteGestaoId = derivedGg;
-      }
-    }
-
-    if (!gerenteGestaoNome && gerenteGestaoId) {
-      const entry = getGerenteGestaoEntry(gerenteGestaoId);
-      if (entry) {
-        gerenteGestaoNome = limparTexto(entry.nome) || extractNameFromLabel(entry.label) || gerenteGestaoId;
-      }
-    }
-
-    if (gerenteGestaoNome && gerenteGestaoNome.includes(" - ")) {
-      gerenteGestaoNome = extractNameFromLabel(gerenteGestaoNome);
-    }
-
-    if (!gerenteNome && gerenteId) {
-      const entry = getGerenteEntry(gerenteId);
-      if (entry) {
-        gerenteNome = limparTexto(entry.nome) || extractNameFromLabel(entry.label) || gerenteId;
-      }
-    }
-
-    if (gerenteNome && gerenteNome.includes(" - ")) {
-      gerenteNome = extractNameFromLabel(gerenteNome);
-    }
-
-    let familiaId = limparTexto(lerCelula(raw, ["Familia ID", "familia_id", "Familia"]));
-    let familiaNome = limparTexto(lerCelula(raw, ["Familia Nome", "familia_nome", "Família Nome", "Familia"])) || familiaId;
-
-    let indicadorId = limparTexto(lerCelula(raw, ["ID Indicador", "Indicador ID", "id_indicador", "Indicador"]));
-    let indicadorNome = limparTexto(lerCelula(raw, ["Indicador Nome", "ds_indicador", "Indicador"])) || indicadorId;
-
-    let subId = limparTexto(lerCelula(raw, ["Subindicador ID", "id_subindicador", "Sub Produto ID", "Subproduto ID", "Subproduto"]));
-    let subNome = limparTexto(lerCelula(raw, ["Subindicador Nome", "subindicador", "Subproduto", "Sub Produto"])) || subId;
-
-    const carteira = limparTexto(lerCelula(raw, ["Carteira", "carteira"]));
-    const canalVenda = limparTexto(lerCelula(raw, ["Canal Venda", "Canal", "canal_venda"]));
-    const tipoVenda = limparTexto(lerCelula(raw, ["Tipo Venda", "tipo_venda", "Tipo"]));
-    const modalidade = limparTexto(lerCelula(raw, ["Modalidade Pagamento", "modalidade_pagamento", "Modalidade"]));
-
-    let data = converterDataISO(lerCelula(raw, ["Data", "Data Movimento", "data"]));
-    let competencia = converterDataISO(lerCelula(raw, ["Competencia", "competencia", "Competência"]));
-    if (!competencia && data) competencia = `${data.slice(0, 7)}-01`;
-    if (!data && competencia) data = competencia;
-
-    const dataVencimento = converterDataISO(lerCelula(raw, ["Data Vencimento", "data_vencimento"]));
-    const dataCancelamento = converterDataISO(lerCelula(raw, ["Data Cancelamento", "data_cancelamento"]));
-    const motivoCancelamento = limparTexto(lerCelula(raw, ["Motivo Cancelamento", "motivo_cancelamento", "Motivo"]));
-
-    const valorMeta = toNumber(lerCelula(raw, ["Valor Meta", "Meta", "meta", "meta_mensal", "meta_contrato", "metaValor"]));
-    const valorReal = toNumber(lerCelula(raw, ["Valor Realizado", "Realizado", "realizado", "real_mensal", "valor_realizado", "realizadoValor"]));
-    const quantidade = toNumber(lerCelula(raw, ["Quantidade", "Qtd", "quantidade", "Quantidade Contrato"]));
-    const peso = toNumber(lerCelula(raw, ["Peso", "peso", "pontos_meta", "Pontos Meta"]));
-    const pontos = toNumber(lerCelula(raw, ["Pontos", "pontos", "pontos_cumpridos", "Pontos Cumpridos"]));
-    const statusId = limparTexto(lerCelula(raw, ["Status ID", "status_id", "Status"]));
-
-    const scenarioHint = getSegmentScenarioFromValue(segmento) || getSegmentScenarioFromValue(segmentoId) || "";
-    const indicadorRes = resolveIndicatorFromDimension([indicadorId, indicadorNome], scenarioHint);
-    if (indicadorRes) {
-      if (indicadorRes.indicadorId) indicadorId = indicadorRes.indicadorId;
-      if (indicadorRes.indicadorNome) indicadorNome = indicadorRes.indicadorNome;
-      if (indicadorRes.familiaId) familiaId = indicadorRes.familiaId;
-      if (indicadorRes.familiaNome) familiaNome = indicadorRes.familiaNome;
-    }
-
-    const subRes = resolveSubIndicatorFromDimension([subId, subNome], indicadorRes, scenarioHint);
-    if (subRes) {
-      if (subRes.subId) subId = subRes.subId;
-      if (subRes.subNome) subNome = subRes.subNome;
-      if (subRes.familiaId && !familiaId) familiaId = subRes.familiaId;
-      if (subRes.familiaNome && !familiaNome) familiaNome = subRes.familiaNome;
-    }
-
-    const detail = {
-      id: contratoId,
-      registroId,
-      segmento,
-      segmentoId,
-      diretoria: diretoriaId,
-      diretoriaId,
-      diretoriaNome,
-      gerenciaRegional: gerenciaId,
-      gerenciaId,
-      gerenciaNome,
-      regional: gerenciaNome,
-      agencia: agenciaId || agenciaCodigo || agenciaNome,
-      agenciaId: agenciaId || agenciaCodigo || agenciaNome,
-      agenciaNome: agenciaNome || agenciaId || agenciaCodigo,
-      agenciaCodigo: agenciaCodigo || agenciaId || agenciaNome,
-      gerenteGestao: gerenteGestaoId,
-      gerenteGestaoId,
-      gerenteGestaoNome: gerenteGestaoNome || gerenteGestaoId,
-      gerente: gerenteId,
-      gerenteId,
-      gerenteNome,
-      familiaId,
-      familiaNome,
-      carteira,
-      canalVenda,
-      tipoVenda,
-      modalidadePagamento: modalidade,
-      data,
-      competencia,
-      realizado: Number.isFinite(valorReal) ? valorReal : 0,
-      meta: Number.isFinite(valorMeta) ? valorMeta : 0,
-      qtd: Number.isFinite(quantidade) && quantidade > 0 ? quantidade : 1,
-      peso: Number.isFinite(peso) ? peso : 0,
-      pontos: Number.isFinite(pontos) ? pontos : undefined,
-      dataVencimento,
-      dataCancelamento,
-      motivoCancelamento,
-      statusId,
-    };
-
-    detail.segmentoLabel = resolveMapLabel(segMap, segmentoId, segmento, segmentoId);
-    detail.diretoriaLabel = resolveMapLabel(dirMap, diretoriaId, diretoriaNome, diretoriaId);
-    detail.gerenciaLabel = resolveMapLabel(regMap, gerenciaId, gerenciaNome, gerenciaId);
-    detail.agenciaLabel = resolveMapLabel(agMap, agenciaId, agenciaNome, agenciaId);
-    detail.gerenteGestaoLabel = labelGerenteGestao(gerenteGestaoId, gerenteGestaoNome);
-    detail.gerenteLabel = labelGerente(gerenteId, gerenteNome);
-
-    if (detail.segmentoLabel) detail.segmento = detail.segmentoLabel;
-    if (detail.diretoriaLabel) detail.diretoriaNome = extractNameFromLabel(detail.diretoriaLabel) || detail.diretoriaNome;
-    if (detail.gerenciaLabel) detail.gerenciaNome = extractNameFromLabel(detail.gerenciaLabel) || detail.gerenciaNome;
-    if (detail.agenciaLabel) detail.agenciaNome = extractNameFromLabel(detail.agenciaLabel) || detail.agenciaNome;
-    if (detail.gerenteGestaoLabel) detail.gerenteGestaoNome = extractNameFromLabel(detail.gerenteGestaoLabel) || detail.gerenteGestaoNome;
-    if (detail.gerenteLabel) detail.gerenteNome = extractNameFromLabel(detail.gerenteLabel) || detail.gerenteNome;
-
-    aplicarIndicadorAliases(detail, indicadorId, indicadorNome);
-    if (subId) {
-      detail.subproduto = subNome || subId;
-      detail.subIndicadorId = subId;
-      detail.subIndicadorNome = subNome || subId;
-    }
-    if (!detail.familiaId) detail.familiaId = familiaId;
-    if (!detail.familiaNome) detail.familiaNome = familiaNome || familiaId;
-    detail.prodOrSub = detail.subproduto || detail.produtoNome || detail.produtoId;
-    detail.ating = detail.meta ? (detail.realizado / detail.meta) : 0;
-    if (detail.pontos === undefined) {
-      const pontosCalc = Math.max(0, detail.peso || 0) * (detail.ating || 0);
-      detail.pontos = Number.isFinite(pontosCalc) ? pontosCalc : 0;
-    }
-
-    return detail;
-  }).filter(Boolean);
-}
-
-function normalizarLinhasHistoricoRankingPobj(rows){
-  if (!Array.isArray(rows)) return [];
-
-  const mapNivel = (value) => {
-    const simple = simplificarTexto(value);
-    if (simple === "diretoria") return "diretoria";
-    if (simple === "gerencia" || simple === "gerenciaregional") return "gerencia";
-    if (simple === "agencia") return "agencia";
-    if (simple === "gerente") return "gerente";
-    return "";
-  };
-
-  return rows.map(raw => {
-    const nivel = mapNivel(lerCelula(raw, ["nivel", "Nivel", "Nível", "level"]));
-    if (!nivel) return null;
-
-    const anoText = lerCelula(raw, ["ano", "Ano", "year", "Year"]);
-    const anoNum = Number(anoText);
-    const ano = Number.isFinite(anoNum) ? anoNum : null;
-    const database = converterDataISO(lerCelula(raw, ["database", "competencia", "Competencia", "data", "Data"]));
-
-    const segmento = lerCelula(raw, ["segmento", "Segmento"]);
-    const segmentoId = lerCelula(raw, ["segmentoId", "SegmentoId", "segmento_id", "Id Segmento"]);
-    const diretoria = lerCelula(raw, ["diretoria", "Diretoria", "diretoriaId", "DiretoriaId", "ID Diretoria"]);
-    const diretoriaNome = lerCelula(raw, ["diretoriaNome", "DiretoriaNome", "Diretoria Nome", "diretoria_nome"]);
-    const gerenciaRegional = lerCelula(raw, ["gerenciaRegional", "GerenciaRegional", "gerencia", "Gerencia", "Gerencia ID"]);
-    const gerenciaNome = lerCelula(raw, ["gerenciaNome", "GerenciaNome", "Regional Nome", "regionalNome"]);
-    const agencia = lerCelula(raw, ["agencia", "Agencia", "agenciaId", "AgenciaId"]);
-    const agenciaNome = lerCelula(raw, ["agenciaNome", "AgenciaNome", "Agencia Nome"]);
-    const agenciaCodigo = lerCelula(raw, ["agenciaCodigo", "AgenciaCodigo", "Codigo Agencia", "Agencia Codigo"]);
-    const gerenteGestao = lerCelula(raw, ["gerenteGestao", "GerenteGestao", "gerenteGestaoId", "GerenteGestaoId", "gerente_gestao_id"]);
-    const gerenteGestaoNome = lerCelula(raw, [
-      "gerenteGestaoNome",
-      "GerenteGestaoNome",
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "gerente_gestao_nome"
-    ]);
-    const gerente = lerCelula(raw, ["gerente", "Gerente", "gerenteId", "GerenteId"]);
-    const gerenteNome = lerCelula(raw, ["gerenteNome", "GerenteNome", "Gerente Nome"]);
-
-    const participantesNum = Number(lerCelula(raw, ["participantes", "Participantes", "totalParticipantes"]));
-    const participantes = Number.isFinite(participantesNum) && participantesNum > 0 ? participantesNum : null;
-
-    const rankNum = Number(lerCelula(raw, ["rank", "Rank", "posicao", "posição", "classificacao"]));
-    const rank = Number.isFinite(rankNum) && rankNum > 0 ? rankNum : null;
-
-    const pontosNum = Number(lerCelula(raw, ["pontos", "Pontos", "pontuacao", "Pontuacao", "p_acum"]));
-    const pontos = Number.isFinite(pontosNum) ? pontosNum : null;
-
-    const realizadoNum = Number(lerCelula(raw, ["realizado", "Realizado", "real_acum", "Real_acum", "resultado"]));
-    const metaNum = Number(lerCelula(raw, ["meta", "Meta", "meta_acum", "Meta_acum"]));
-
-    return {
-      nivel,
-      ano,
-      database: database || (ano ? `${ano}-12-31` : ""),
-      segmento,
-      segmentoId,
-      diretoria,
-      diretoriaId: diretoria || diretoriaNome,
-      diretoriaNome: diretoriaNome || diretoria,
-      gerenciaRegional,
-      gerenciaId: gerenciaRegional || gerenciaNome,
-      gerenciaNome: gerenciaNome || gerenciaRegional,
-      agencia,
-      agenciaId: agencia || agenciaCodigo || agenciaNome,
-      agenciaNome: agenciaNome || agencia,
-      agenciaCodigo: agenciaCodigo || agencia,
-      gerenteGestao,
-      gerenteGestaoId: gerenteGestao || gerenteGestaoNome,
-      gerenteGestaoNome: gerenteGestaoNome || gerenteGestao,
-      gerente,
-      gerenteId: gerente || gerenteNome,
-      gerenteNome: gerenteNome || gerente,
-      participantes,
-      rank,
-      pontos,
-      realizado: Number.isFinite(realizadoNum) ? realizadoNum : null,
-      meta: Number.isFinite(metaNum) ? metaNum : null,
-    };
-  }).filter(Boolean);
-}
-
-function rebuildStatusIndex(rows) {
-  const cleaned = [];
-  const map = new Map();
-  const source = Array.isArray(rows) ? rows : [];
-
-  source.forEach(item => {
-    if (!item || typeof item !== "object") return;
-    const key = item.key || normalizarChaveStatus(item.id ?? item.codigo ?? item.nome);
-    if (!key || map.has(key)) return;
-    const ordemRaw = limparTexto(item.ordem);
-    const ordemNum = Number(ordemRaw);
-    const ordem = ordemRaw !== "" && Number.isFinite(ordemNum) ? ordemNum : undefined;
-    const entry = { ...item, key };
-    if (ordem !== undefined) entry.ordem = ordem;
-    cleaned.push(entry);
-    map.set(key, entry);
-  });
-
-  DEFAULT_STATUS_INDICADORES.forEach(defaultItem => {
-    if (map.has(defaultItem.key)) return;
-    const entry = { ...defaultItem };
-    cleaned.push(entry);
-    map.set(entry.key, entry);
-  });
-
-  cleaned.sort((a, b) => {
-    if (a.key === "todos") return -1;
-    if (b.key === "todos") return 1;
-    const ordA = Number.isFinite(a.ordem) ? a.ordem : Number.MAX_SAFE_INTEGER;
-    const ordB = Number.isFinite(b.ordem) ? b.ordem : Number.MAX_SAFE_INTEGER;
-    if (ordA !== ordB) return ordA - ordB;
-    return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", { sensitivity: "base" });
-  });
-
-  STATUS_INDICADORES_DATA = cleaned;
-  STATUS_BY_KEY = map;
-  updateStatusFilterOptions();
-}
-
-function getStatusEntry(key) {
-  const normalized = normalizarChaveStatus(key);
-  if (!normalized) return null;
-  return STATUS_BY_KEY.get(normalized) || null;
-}
-
-function buildStatusFilterEntries() {
-  const base = Array.isArray(STATUS_INDICADORES_DATA) ? STATUS_INDICADORES_DATA : [];
-  const entries = base.map(st => {
-    const key = st?.key || normalizarChaveStatus(st?.id ?? st?.codigo ?? st?.nome);
-    if (!key) return null;
-    const label = st?.nome || obterRotuloStatus(key, st?.codigo ?? st?.id ?? key);
-    const codigo = st?.codigo ?? st?.id ?? key;
-    let ordem = st?.ordem;
-    if (typeof ordem === "string" && ordem !== "") {
-      const parsed = Number(ordem);
-      ordem = Number.isFinite(parsed) ? parsed : undefined;
-    }
-    if (!Number.isFinite(ordem)) {
-      ordem = Number.isFinite(st?.ordem) ? st.ordem : Number.MAX_SAFE_INTEGER;
-    }
-    return {
-      key,
-      value: key,
-      label,
-      codigo,
-      id: st?.id ?? codigo,
-      ordem,
-    };
-  }).filter(Boolean);
-
-  if (!entries.some(entry => entry.key === "todos")) {
-    entries.unshift({
-      key: "todos",
-      value: "todos",
-      label: STATUS_LABELS.todos,
-      codigo: "todos",
-      id: "todos",
-      ordem: -Infinity,
-    });
-  }
-
-  entries.sort((a, b) => {
-    if (a.key === "todos") return -1;
-    if (b.key === "todos") return 1;
-    if (a.ordem !== b.ordem) return a.ordem - b.ordem;
-    return String(a.label || "").localeCompare(String(b.label || ""), "pt-BR", { sensitivity: "base" });
-  });
-
-  return entries;
-}
-
-function updateStatusFilterOptions(preserveSelection = true) {
-  const select = document.getElementById("f-status-kpi");
-  if (!select) return;
-
-  const previousOption = select.selectedOptions?.[0] || null;
-  const previousKey = preserveSelection
-    ? (previousOption?.dataset.statusKey || normalizarChaveStatus(select.value) || "")
-    : "";
-
-  const entries = buildStatusFilterEntries();
-  select.innerHTML = "";
-
-  entries.forEach(entry => {
-    const opt = document.createElement("option");
-    opt.value = entry.value;
-    opt.textContent = entry.label;
-    opt.dataset.statusKey = entry.key;
-    if (entry.codigo !== undefined) opt.dataset.statusCodigo = entry.codigo;
-    if (entry.id !== undefined) opt.dataset.statusId = entry.id;
-    select.appendChild(opt);
-  });
-
-  if (preserveSelection && previousKey) {
-    const match = entries.find(entry => entry.key === previousKey);
-    if (match) {
-      select.value = match.value;
-    }
-  }
-
-  if (!entries.some(entry => entry.value === select.value)) {
-    const fallback = entries.find(entry => entry.key === "todos") || entries[0];
-    if (fallback) {
-      select.value = fallback.value;
-    }
-  }
-}
+// Funções de status movidas para status.js:
+// - rebuildStatusIndex
+// - getStatusEntry
+// - buildStatusFilterEntries
+// - updateStatusFilterOptions
 
 function processBaseDataSources({
   mesuRaw = [],
@@ -4010,138 +2703,67 @@ function processBaseDataSources({
   dimGerentesGestaoRaw = [],
   dimGerentesRaw = [],
 } = {}) {
-  const segmentosDim = Array.isArray(dimSegmentosRaw) ? dimSegmentosRaw : [];
-  const diretoriasDim = Array.isArray(dimDiretoriasRaw) ? dimDiretoriasRaw : [];
-  const regionaisDim = Array.isArray(dimRegionaisRaw) ? dimRegionaisRaw : [];
-  const agenciasDim = Array.isArray(dimAgenciasRaw) ? dimAgenciasRaw : [];
-  const gerentesGestaoDim = Array.isArray(dimGerentesGestaoRaw) ? dimGerentesGestaoRaw : [];
-  const gerentesDim = Array.isArray(dimGerentesRaw) ? dimGerentesRaw : [];
-
-  registerDimensionLookups({
-    segmentos: segmentosDim,
-    diretorias: diretoriasDim,
-    regionais: regionaisDim,
-    agencias: agenciasDim,
-    gerentesGestao: gerentesGestaoDim,
-    gerentes: gerentesDim,
+  // Processa dados de estrutura usando função de estrutura.js
+  const estruturaProcessed = processEstruturaData({
+    dimSegmentosRaw,
+    dimDiretoriasRaw,
+    dimRegionaisRaw,
+    dimAgenciasRaw,
+    dimGerentesGestaoRaw,
+    dimGerentesRaw,
   });
+  const segmentosDim = estruturaProcessed.dimSegmentos;
+  const diretoriasDim = estruturaProcessed.dimDiretorias;
+  const regionaisDim = estruturaProcessed.dimRegionais;
+  const agenciasDim = estruturaProcessed.dimAgencias;
+  const gerentesGestaoDim = estruturaProcessed.dimGerentesGestao;
+  const gerentesDim = estruturaProcessed.dimGerentes;
 
-  const segmentosOptions = uniqById(segmentosDim.map(row => normOpt({
-    id: row?.id ?? row?.segmento_id ?? row?.segmentoId,
-    label: row?.label ?? row?.nome ?? '',
-  })));
-  const diretoriasOptions = uniqById(diretoriasDim.map(row => normOpt({
-    id: row?.id ?? row?.diretoria_id ?? row?.diretoriaId,
-    label: row?.label ?? row?.nome ?? '',
-  })));
-  const regionaisOptions = uniqById(regionaisDim.map(row => normOpt({
-    id: row?.id ?? row?.gerencia_regional_id ?? row?.regional_id ?? row?.regionalId,
-    label: row?.label ?? row?.nome ?? '',
-  })));
-  const agenciasOptions = uniqById(agenciasDim.map(row => normOpt({
-    id: row?.id ?? row?.agencia_id ?? row?.agenciaId,
-    label: row?.label ?? row?.nome ?? '',
-  })));
-  const gerentesGestaoOptions = uniqById(gerentesGestaoDim.map(row => normOpt({
-    id: row?.id ?? row?.funcional ?? row?.gerente_gestao_id,
-    label: row?.label ?? row?.nome ?? '',
-  })));
-  const gerentesOptions = uniqById(gerentesDim.map(row => normOpt({
-    id: row?.id ?? row?.funcional ?? row?.gerente_id,
-    label: row?.label ?? row?.nome ?? '',
-  })));
+  // Processa dados de status usando função de status.js
+  processStatusData(statusRaw);
 
-  DIMENSION_FILTER_OPTIONS.segmento = segmentosOptions;
-  DIMENSION_FILTER_OPTIONS.diretoria = diretoriasOptions;
-  DIMENSION_FILTER_OPTIONS.gerencia = regionaisOptions;
-  DIMENSION_FILTER_OPTIONS.agencia = agenciasOptions;
-  DIMENSION_FILTER_OPTIONS.gerenteGestao = gerentesGestaoOptions;
-  DIMENSION_FILTER_OPTIONS.gerente = gerentesOptions;
-
-  const mesuRows = normalizarLinhasMesu(Array.isArray(mesuRaw) ? mesuRaw : []);
-  const statusRows = normalizarLinhasStatus(Array.isArray(statusRaw) ? statusRaw : []);
-  if (statusRows.length) {
-    rebuildStatusIndex(statusRows);
-  } else {
-    rebuildStatusIndex(DEFAULT_STATUS_INDICADORES);
-  }
-
-  const produtosDimRows = Array.isArray(produtosDimRaw) ? produtosDimRaw : [];
-  const baseDimProdutos = normalizarDimProdutos(produtosDimRows);
-  const dimProdutosVarejo = baseDimProdutos.map(row => ({ ...row, scenario: SEGMENT_SCENARIO_DEFAULT }));
-
-  const dimProdutosEmpresas = dimProdutosVarejo.map(row => ({ ...row, scenario: "empresas" }));
-
-  SEGMENT_DIMENSION_MAP.clear();
-  SEGMENT_DIMENSION_MAP.set(SEGMENT_SCENARIO_DEFAULT, dimProdutosVarejo);
-  SEGMENT_DIMENSION_MAP.set("empresas", dimProdutosEmpresas);
-  const defaultDim = dimProdutosVarejo.slice();
-  const empresasDim = dimProdutosEmpresas.slice();
-
-  const dimensionAliases = [
-    { key: SEGMENT_SCENARIO_DEFAULT, value: defaultDim },
-    { key: "default", value: defaultDim },
-    { key: "todos", value: defaultDim },
-    { key: "empresas", value: empresasDim }
-  ];
-
-  const globalMaps = [];
-  if (typeof window !== "undefined") {
-    globalMaps.push(window.segMap, window.dirMap, window.regMap, window.ageMap, window.agMap);
-  } else {
-    globalMaps.push(segMap, dirMap, regMap, ageMap, agMap);
-  }
-
-  globalMaps.forEach(map => {
-    if (!(map instanceof Map)) return;
-    map.clear();
-    dimensionAliases.forEach(({ key, value }) => {
-      map.set(key, value);
-    });
-  });
-  rebuildGlobalDimensionAliasIndex();
-  applySegmentDimension(CURRENT_SEGMENT_SCENARIO);
+  // Processa dados de produtos usando função de produtos.js
+  const produtosProcessed = processProdutosData(produtosDimRaw);
+  // Processa dados de MESU usando função de mesu.js
+  const mesuRows = processMesuData(mesuRaw);
   montarHierarquiaMesu(mesuRows);
 
-  FACT_REALIZADOS = normalizarLinhasFatoRealizados(Array.isArray(realizadosRaw) ? realizadosRaw : []);
-  FACT_METAS = normalizarLinhasFatoMetas(Array.isArray(metasRaw) ? metasRaw : []);
-  FACT_VARIAVEL = normalizarLinhasFatoVariavel(Array.isArray(variavelRaw) ? variavelRaw : []);
-  FACT_CAMPANHAS = normalizarLinhasFatoCampanhas(Array.isArray(campanhasRaw) ? campanhasRaw : []);
-  if (FACT_CAMPANHAS.length) {
-    replaceCampaignUnitData(FACT_CAMPANHAS);
-  }
-  DIM_CALENDARIO = normalizarLinhasCalendario(Array.isArray(calendarioRaw) ? calendarioRaw : []);
+  // Processa dados de realizados usando função de realizados.js
+  processRealizadosData(realizadosRaw);
+  // Processa dados de metas usando função de metas.js
+  processMetasData(metasRaw);
+  // Processa dados de variável usando função de variavel.js
+  processVariavelData(variavelRaw);
+  // Processa dados de campanhas usando função de campanhas.js
+  processCampanhasData(campanhasRaw);
+  // Processa dados de calendário usando função de calendario.js
+  processCalendarioData(calendarioRaw);
   updateCampaignSprintsUnits();
 
-  OPPORTUNITY_LEADS_RAW = Array.isArray(leadsRaw) ? leadsRaw : [];
-  ingestOpportunityLeadRows(OPPORTUNITY_LEADS_RAW);
+  // Processa dados de leads usando função de api-leads.js
+  processLeadsData(leadsRaw);
 
-  FACT_HISTORICO_RANKING_POBJ = normalizarLinhasHistoricoRankingPobj(Array.isArray(historicoRaw) ? historicoRaw : []);
-  FACT_DETALHES = normalizarLinhasFatoDetalhes(Array.isArray(detalhesRaw) ? detalhesRaw : []);
+  // Processa dados de histórico usando função de historico.js
+  processHistoricoData(historicoRaw);
+  // Processa dados de detalhes usando função de detalhes.js
+  processDetalhesData(detalhesRaw);
+  if (typeof FACT_REALIZADOS !== "undefined" && FACT_REALIZADOS.length) {
   applyHierarchyFallback(FACT_REALIZADOS);
+  }
+  if (typeof FACT_METAS !== "undefined" && FACT_METAS.length) {
   applyHierarchyFallback(FACT_METAS);
+  }
+  if (typeof FACT_VARIAVEL !== "undefined" && FACT_VARIAVEL.length) {
   applyHierarchyFallback(FACT_VARIAVEL);
-  applyHierarchyFallback(FACT_DETALHES);
-  DETAIL_BY_REGISTRO = new Map();
-  DETAIL_CONTRACT_IDS = new Set();
-  FACT_DETALHES.forEach(row => {
-    if (!row) return;
-    const registroKey = limparTexto(row.registroId);
-    if (registroKey) {
-      const bucket = DETAIL_BY_REGISTRO.get(registroKey) || [];
-      bucket.push({ ...row });
-      DETAIL_BY_REGISTRO.set(registroKey, bucket);
-    }
-    const contratoKey = limparTexto(row.id);
-    if (contratoKey) DETAIL_CONTRACT_IDS.add(contratoKey);
-  });
+  }
 
-  const availableDatesSource = (DIM_CALENDARIO.length
-    ? DIM_CALENDARIO.map(row => row.data)
+  const calendarioArray = typeof DIM_CALENDARIO !== "undefined" ? DIM_CALENDARIO : [];
+  const availableDatesSource = (calendarioArray.length
+    ? calendarioArray.map(row => row.data)
     : [
-        ...FACT_REALIZADOS.flatMap(row => [row.data, row.competencia]),
-        ...FACT_METAS.flatMap(row => [row.data, row.competencia]),
-        ...FACT_VARIAVEL.flatMap(row => [row.data, row.competencia]),
+        ...(typeof FACT_REALIZADOS !== "undefined" ? FACT_REALIZADOS : []).flatMap(row => [row.data, row.competencia]),
+        ...(typeof FACT_METAS !== "undefined" ? FACT_METAS : []).flatMap(row => [row.data, row.competencia]),
+        ...(typeof FACT_VARIAVEL !== "undefined" ? FACT_VARIAVEL : []).flatMap(row => [row.data, row.competencia]),
       ]
   );
   const availableDates = availableDatesSource.filter(Boolean).sort();
@@ -4166,20 +2788,20 @@ function processBaseDataSources({
     dimAgencias: agenciasDim,
     dimGerentesGestao: gerentesGestaoDim,
     dimGerentes: gerentesDim,
-    dimProdutos: DIM_PRODUTOS,
-    dimProdutosPorSegmento: Object.fromEntries(Array.from(SEGMENT_DIMENSION_MAP.entries()).map(([key, rows]) => [key, rows])),
-    status: STATUS_INDICADORES_DATA,
-    dados: FACT_REALIZADOS,
-    realizados: FACT_REALIZADOS,
-    metas: FACT_METAS,
-    variavel: FACT_VARIAVEL,
-    campanhas: FACT_CAMPANHAS,
-    calendario: DIM_CALENDARIO,
-    detalhes: FACT_DETALHES,
-    historico: FACT_HISTORICO_RANKING_POBJ,
+    dimProdutos: typeof DIM_PRODUTOS !== "undefined" ? DIM_PRODUTOS : [],
+    dimProdutosPorSegmento: produtosProcessed.dimProdutosPorSegmento || {},
+    status: typeof STATUS_INDICADORES_DATA !== "undefined" ? STATUS_INDICADORES_DATA : [],
+    dados: typeof FACT_REALIZADOS !== "undefined" ? FACT_REALIZADOS : [],
+    realizados: typeof FACT_REALIZADOS !== "undefined" ? FACT_REALIZADOS : [],
+    metas: typeof FACT_METAS !== "undefined" ? FACT_METAS : [],
+    variavel: typeof FACT_VARIAVEL !== "undefined" ? FACT_VARIAVEL : [],
+    campanhas: typeof FACT_CAMPANHAS !== "undefined" ? FACT_CAMPANHAS : [],
+    calendario: typeof DIM_CALENDARIO !== "undefined" ? DIM_CALENDARIO : [],
+    detalhes: typeof FACT_DETALHES !== "undefined" ? FACT_DETALHES : [],
+    historico: typeof FACT_HISTORICO_RANKING_POBJ !== "undefined" ? FACT_HISTORICO_RANKING_POBJ : [],
   };
 
-  if (DETAIL_CONTRACT_IDS.size) {
+  if (typeof DETAIL_CONTRACT_IDS !== "undefined" && DETAIL_CONTRACT_IDS.size) {
     state.contractIndex = [...DETAIL_CONTRACT_IDS].sort();
   }
 
@@ -4194,7 +2816,7 @@ async function loadBaseData(){
     try {
       if (DATA_SOURCE === "sql") {
         const [
-          dimensions,
+          estruturaData,
           status,
           produtos,
           calendario,
@@ -4207,18 +2829,18 @@ async function loadBaseData(){
           historico,
           leads
         ] = await Promise.all([
-          apiGet('/dimensions').catch(() => ({})),
-          apiGet('/status_indicadores').catch(() => []),
-          apiGet('/produtos').catch(() => []),
-          apiGet('/calendario').catch(() => []),
-          apiGet('/realizados').catch(() => []),
-          apiGet('/metas').catch(() => []),
-          apiGet('/variavel').catch(() => []),
-          apiGet('/mesu').catch(() => []),
-          apiGet('/campanhas').catch(() => []),
-          apiGet('/detalhes').catch(() => []),
-          apiGet('/historico').catch(() => []),
-          apiGet('/leads').catch(() => [])
+          loadEstruturaData(),
+          loadStatusData(),
+          loadProdutosData(),
+          loadCalendarioData(),
+          loadRealizadosData(),
+          loadMetasData(),
+          loadVariavelData(),
+          loadMesuData(),
+          loadCampanhasData(),
+          loadDetalhesData(),
+          loadHistoricoData(),
+          loadLeadsData()
         ]);
 
         return processBaseDataSources({
@@ -4233,12 +2855,12 @@ async function loadBaseData(){
           leadsRaw: leads || [],
           detalhesRaw: detalhes || [],
           historicoRaw: historico || [],
-          dimSegmentosRaw: dimensions?.dimSegmentos || dimensions?.segmentosDim || dimensions?.segmentos || [],
-          dimDiretoriasRaw: dimensions?.dimDiretorias || dimensions?.diretoriasDim || dimensions?.diretorias || [],
-          dimRegionaisRaw: dimensions?.dimRegionais || dimensions?.regionaisDim || dimensions?.regionais || [],
-          dimAgenciasRaw: dimensions?.dimAgencias || dimensions?.agenciasDim || dimensions?.agencias || [],
-          dimGerentesGestaoRaw: dimensions?.dimGerentesGestao || dimensions?.gerentesGestaoDim || dimensions?.ggestoes || [],
-          dimGerentesRaw: dimensions?.dimGerentes || dimensions?.gerentesDim || dimensions?.gerentes || [],
+          dimSegmentosRaw: estruturaData.segmentos || [],
+          dimDiretoriasRaw: estruturaData.diretorias || [],
+          dimRegionaisRaw: estruturaData.regionais || [],
+          dimAgenciasRaw: estruturaData.agencias || [],
+          dimGerentesGestaoRaw: estruturaData.gerentesGestao || [],
+          dimGerentesRaw: estruturaData.gerentes || [],
         });
       }
 
@@ -5055,6 +3677,11 @@ function applyCardSections(sections = []) {
       });
     });
   });
+  
+  // Inicializa dados de campanha após PRODUCT_INDEX estar disponível
+  if (typeof initializeCampaignUnitData === "function") {
+    initializeCampaignUnitData();
+  }
 }
 
 function rebuildCardCatalogFromDimension(rows = DIM_PRODUTOS) {
@@ -5165,70 +3792,7 @@ function resolveFamilyMetaFromRow(row) {
   return { id: familiaId, label: familiaLabel };
 }
 
-const DEFAULT_CAMPAIGN_UNIT_DATA = [
-  { id: "nn-atlas", diretoria: "DR 01", diretoriaNome: "Norte & Nordeste", gerenciaRegional: "GR 01", regional: "Regional Fortaleza", gerenteGestao: "GG 01", agenciaCodigo: "Ag 1001", agencia: "Agência 1001 • Fortaleza Centro", segmento: "Negócios", produtoId: "captacao_bruta", subproduto: "Aplicação", gerente: "Gerente 1", gerenteNome: "Ana Lima", carteira: "Carteira Atlas", linhas: 132.4, cash: 118.2, conquista: 112.6, atividade: true, data: "2025-09-15" },
-  { id: "nn-delta", diretoria: "DR 01", diretoriaNome: "Norte & Nordeste", gerenciaRegional: "GR 01", regional: "Regional Fortaleza", gerenteGestao: "GG 01", agenciaCodigo: "Ag 1001", agencia: "Agência 1001 • Fortaleza Centro", segmento: "Negócios", produtoId: "captacao_liquida", subproduto: "Resgate", gerente: "Gerente 1", gerenteNome: "Ana Lima", carteira: "Carteira Delta", linhas: 118.3, cash: 109.5, conquista: 104.1, atividade: true, data: "2025-09-16" },
-  { id: "nn-iguatu", diretoria: "DR 01", diretoriaNome: "Norte & Nordeste", gerenciaRegional: "GR 02", regional: "Regional Recife", gerenteGestao: "GG 02", agenciaCodigo: "Ag 1002", agencia: "Agência 1002 • Recife Boa Vista", segmento: "Empresas", produtoId: "prod_credito_pj", subproduto: "À vista", gerente: "Gerente 2", gerenteNome: "Paulo Nunes", carteira: "Carteira Iguatu", linhas: 124.2, cash: 110.3, conquista: 102.1, atividade: true, data: "2025-09-12" },
-  { id: "nn-sertao", diretoria: "DR 01", diretoriaNome: "Norte & Nordeste", gerenciaRegional: "GR 02", regional: "Regional Recife", gerenteGestao: "GG 02", agenciaCodigo: "Ag 1002", agencia: "Agência 1002 • Recife Boa Vista", segmento: "Empresas", produtoId: "centralizacao", subproduto: "Parcelado", gerente: "Gerente 2", gerenteNome: "Paulo Nunes", carteira: "Carteira Sertão", linhas: 98.4, cash: 94.6, conquista: 96.8, atividade: false, data: "2025-09-09" },
-  { id: "sd-horizonte", diretoria: "DR 02", diretoriaNome: "Sudeste", gerenciaRegional: "GR 03", regional: "Regional São Paulo", gerenteGestao: "GG 03", agenciaCodigo: "Ag 1004", agencia: "Agência 1004 • Avenida Paulista", segmento: "Empresas", produtoId: "rotativo_pj_vol", subproduto: "Aplicação", gerente: "Gerente 3", gerenteNome: "Juliana Prado", carteira: "Carteira Horizonte", linhas: 115.2, cash: 120.5, conquista: 108.4, atividade: true, data: "2025-09-14" },
-  { id: "sd-paulista", diretoria: "DR 02", diretoriaNome: "Sudeste", gerenciaRegional: "GR 03", regional: "Regional São Paulo", gerenteGestao: "GG 03", agenciaCodigo: "Ag 1004", agencia: "Agência 1004 • Avenida Paulista", segmento: "Empresas", produtoId: "rotativo_pj_qtd", subproduto: "Resgate", gerente: "Gerente 3", gerenteNome: "Juliana Prado", carteira: "Carteira Paulista", linhas: 104.8, cash: 99.1, conquista: 101.3, atividade: true, data: "2025-09-06" },
-  { id: "sd-bandeirantes", diretoria: "DR 02", diretoriaNome: "Sudeste", gerenciaRegional: "GR 03", regional: "Regional São Paulo", gerenteGestao: "GG 03", agenciaCodigo: "Ag 1004", agencia: "Agência 1004 • Avenida Paulista", segmento: "Negócios", produtoId: "consorcios", subproduto: "Parcelado", gerente: "Gerente 4", gerenteNome: "Bruno Garcia", carteira: "Carteira Bandeirantes", linhas: 92.7, cash: 88.6, conquista: 94.2, atividade: true, data: "2025-09-10" },
-  { id: "sd-capital", diretoria: "DR 02", diretoriaNome: "Sudeste", gerenciaRegional: "GR 03", regional: "Regional São Paulo", gerenteGestao: "GG 03", agenciaCodigo: "Ag 1004", agencia: "Agência 1004 • Avenida Paulista", segmento: "Negócios", produtoId: "cartoes", subproduto: "À vista", gerente: "Gerente 4", gerenteNome: "Bruno Garcia", carteira: "Carteira Capital", linhas: 105.6, cash: 102.4, conquista: 100.2, atividade: true, data: "2025-09-18" },
-  { id: "sc-curitiba", diretoria: "DR 03", diretoriaNome: "Sul & Centro-Oeste", gerenciaRegional: "GR 04", regional: "Regional Curitiba", gerenteGestao: "GG 02", agenciaCodigo: "Ag 1003", agencia: "Agência 1003 • Curitiba Batel", segmento: "MEI", produtoId: "seguros", subproduto: "Aplicação", gerente: "Gerente 5", gerenteNome: "Carla Menezes", carteira: "Carteira Curitiba", linhas: 109.6, cash: 101.2, conquista: 98.5, atividade: true, data: "2025-09-11" },
-  { id: "sc-litoral", diretoria: "DR 03", diretoriaNome: "Sul & Centro-Oeste", gerenciaRegional: "GR 04", regional: "Regional Curitiba", gerenteGestao: "GG 02", agenciaCodigo: "Ag 1003", agencia: "Agência 1003 • Curitiba Batel", segmento: "MEI", produtoId: "bradesco_expresso", subproduto: "Resgate", gerente: "Gerente 5", gerenteNome: "Carla Menezes", carteira: "Carteira Litoral", linhas: 95.4, cash: 90.1, conquista: 92.8, atividade: true, data: "2025-09-07" },
-  { id: "sc-vale", diretoria: "DR 03", diretoriaNome: "Sul & Centro-Oeste", gerenciaRegional: "GR 04", regional: "Regional Curitiba", gerenteGestao: "GG 02", agenciaCodigo: "Ag 1003", agencia: "Agência 1003 • Curitiba Batel", segmento: "MEI", produtoId: "rec_credito", subproduto: "À vista", gerente: "Gerente 5", gerenteNome: "Carla Menezes", carteira: "Carteira Vale", linhas: 120.2, cash: 115.6, conquista: 110.4, atividade: true, data: "2025-09-17" },
-  { id: "nn-manaus", diretoria: "DR 01", diretoriaNome: "Norte & Nordeste", gerenciaRegional: "GR 05", regional: "Regional Manaus", gerenteGestao: "GG 05", agenciaCodigo: "Ag 2001", agencia: "Agência 2001 • Manaus Centro", segmento: "Negócios", produtoId: "captacao_bruta", subproduto: "Aplicação", gerente: "Lara Costa", gerenteNome: "Lara Costa", carteira: "Carteira Amazônia", linhas: 119.4, cash: 111.8, conquista: 103.2, atividade: true, data: "2025-09-12" },
-  { id: "sc-floripa", diretoria: "DR 03", diretoriaNome: "Sul & Centro-Oeste", gerenciaRegional: "GR 06", regional: "Regional Florianópolis", gerenteGestao: "GG 06", agenciaCodigo: "Ag 2002", agencia: "Agência 2002 • Florianópolis Beira-Mar", segmento: "Empresas", produtoId: "rotativo_pj_vol", subproduto: "Volume", gerente: "Sofia Martins", gerenteNome: "Sofia Martins", carteira: "Carteira Litoral", linhas: 108.6, cash: 116.3, conquista: 105.5, atividade: true, data: "2025-09-16" },
-  { id: "sc-goiania", diretoria: "DR 03", diretoriaNome: "Sul & Centro-Oeste", gerenciaRegional: "GR 07", regional: "Regional Goiânia", gerenteGestao: "GG 07", agenciaCodigo: "Ag 2003", agencia: "Agência 2003 • Goiânia Setor Bueno", segmento: "MEI", produtoId: "bradesco_expresso", subproduto: "Expresso", gerente: "Tiago Andrade", gerenteNome: "Tiago Andrade", carteira: "Carteira Centro-Oeste", linhas: 102.5, cash: 94.2, conquista: 97.1, atividade: true, data: "2025-09-15" },
-  { id: "sd-campinas", diretoria: "DR 02", diretoriaNome: "Sudeste", gerenciaRegional: "GR 05", regional: "Regional Campinas", gerenteGestao: "GG 05", agenciaCodigo: "Ag 2004", agencia: "Agência 2004 • Campinas Tech", segmento: "Negócios", produtoId: "centralizacao", subproduto: "Cash", gerente: "Eduardo Freitas", gerenteNome: "Eduardo Freitas", carteira: "Carteira Inovação", linhas: 123.1, cash: 129.4, conquista: 111.7, atividade: true, data: "2025-09-09" }
-];
-DEFAULT_CAMPAIGN_UNIT_DATA.forEach(unit => aplicarIndicadorAliases(unit, unit.produtoId, unit.produtoNome || unit.produtoId));
-
-const CAMPAIGN_UNIT_DATA = [];
-
-function replaceCampaignUnitData(rows = []) {
-  CAMPAIGN_UNIT_DATA.length = 0;
-  const source = Array.isArray(rows) && rows.length ? rows : DEFAULT_CAMPAIGN_UNIT_DATA;
-  source.forEach(item => {
-    const dataISO = converterDataISO(item.data);
-    let competencia = converterDataISO(item.competencia);
-    const resolvedData = dataISO || "";
-    if (!competencia && resolvedData) {
-      competencia = `${resolvedData.slice(0, 7)}-01`;
-    }
-    CAMPAIGN_UNIT_DATA.push({ ...item, data: resolvedData, competencia: competencia || "" });
-  });
-}
-
-replaceCampaignUnitData(DEFAULT_CAMPAIGN_UNIT_DATA);
-
-CAMPAIGN_UNIT_DATA.forEach(unit => {
-  const meta = PRODUCT_INDEX.get(unit.produtoId);
-  const familiaMeta = PRODUTO_TO_FAMILIA.get(unit.produtoId);
-  if (familiaMeta) {
-    if (!unit.familiaId) unit.familiaId = familiaMeta.id;
-    if (!unit.familia) unit.familia = familiaMeta.nome || familiaMeta.id;
-    if (!unit.familiaNome) unit.familiaNome = familiaMeta.nome || familiaMeta.id;
-    if (!unit.secaoId) unit.secaoId = familiaMeta.secaoId || meta?.sectionId;
-    if (!unit.secao) unit.secao = familiaMeta.secaoId || meta?.sectionId;
-    if (!unit.secaoNome) unit.secaoNome = familiaMeta.secaoNome || meta?.sectionLabel || getSectionLabel(familiaMeta.secaoId);
-  } else if (meta?.sectionId) {
-    if (!unit.familiaId) unit.familiaId = meta.sectionId;
-    if (!unit.familia) unit.familia = meta.sectionId;
-    if (!unit.secaoId) unit.secaoId = meta.sectionId;
-    if (!unit.secao) unit.secao = meta.sectionId;
-    if (!unit.secaoNome) unit.secaoNome = meta.sectionLabel || meta.sectionId;
-    if (!unit.familiaNome) unit.familiaNome = meta.sectionLabel || meta.sectionId;
-  }
-  if (!unit.produtoNome) unit.produtoNome = meta?.name || unit.produto || unit.produtoId || "Subindicador";
-  if (!unit.gerenteGestaoNome) {
-    const numeric = (unit.gerenteGestao || "").replace(/[^0-9]/g, "");
-    unit.gerenteGestaoNome = numeric ? `Gerente geral ${numeric}` : "Gerente geral";
-  }
-  if (!unit.familiaNome && unit.familia) unit.familiaNome = unit.familia;
-  if (!unit.subproduto) unit.subproduto = "";
-  if (unit.subproduto) registrarAliasIndicador(unit.produtoId, unit.subproduto);
-});
+// DEFAULT_CAMPAIGN_UNIT_DATA, CAMPAIGN_UNIT_DATA e replaceCampaignUnitData movidos para campanhas.js
 const CAMPAIGN_SPRINTS = [
   {
     id: "sprint-pj-2025",
@@ -5577,8 +4141,9 @@ function resolveCalendarToday(){
   const isoPattern = /^\d{4}-\d{2}-\d{2}$/;
   if (cap && isoPattern.test(cap)) return cap;
 
-  if (Array.isArray(DIM_CALENDARIO) && DIM_CALENDARIO.length) {
-    const ordered = DIM_CALENDARIO
+  const calendarioArray = typeof DIM_CALENDARIO !== "undefined" ? DIM_CALENDARIO : [];
+  if (Array.isArray(calendarioArray) && calendarioArray.length) {
+    const ordered = calendarioArray
       .map(entry => (typeof entry?.data === "string" ? entry.data.slice(0, 10) : ""))
       .filter(Boolean)
       .sort();
@@ -5620,8 +4185,9 @@ function getCurrentMonthBusinessSnapshot(){
   const monthKey = today.slice(0,7);
   let total = 0;
   let elapsed = 0;
-  if (Array.isArray(DIM_CALENDARIO) && DIM_CALENDARIO.length) {
-    const entries = DIM_CALENDARIO.filter(entry => {
+  const calendarioArray = typeof DIM_CALENDARIO !== "undefined" ? DIM_CALENDARIO : [];
+  if (Array.isArray(calendarioArray) && calendarioArray.length) {
+    const entries = calendarioArray.filter(entry => {
       const data = entry.data || entry.dt || "";
       return typeof data === "string" && data.startsWith(monthKey);
     });
@@ -6290,8 +4856,9 @@ function prepareApiUrl(baseUrl, path, params){
 async function getData(){
   const period = state.period || getDefaultPeriodRange();
 
-  const calendarioByDate = new Map(DIM_CALENDARIO.map(entry => [entry.data, entry]));
-  const calendarioByCompetencia = new Map(DIM_CALENDARIO.map(entry => [entry.competencia, entry]));
+  const calendarioArray = typeof DIM_CALENDARIO !== "undefined" ? DIM_CALENDARIO : [];
+  const calendarioByDate = new Map(calendarioArray.map(entry => [entry.data, entry]));
+  const calendarioByCompetencia = new Map(calendarioArray.map(entry => [entry.competencia, entry]));
 
   // Aqui eu gero linhas sintéticas das campanhas para reaproveitar no ranking e nos simuladores.
   const buildCampanhaFacts = () => {
@@ -6325,11 +4892,14 @@ async function getData(){
     return campanhaFacts;
   };
 
-  if (FACT_REALIZADOS.length) {
-    const metasLookup = buildFactLookupMap(FACT_METAS);
-    let variavelLookup = buildFactLookupMap(FACT_VARIAVEL);
+  const realizadosArray = typeof FACT_REALIZADOS !== "undefined" ? FACT_REALIZADOS : [];
+  if (realizadosArray.length) {
+    const metasArray = typeof FACT_METAS !== "undefined" ? FACT_METAS : [];
+    const metasLookup = buildFactLookupMap(metasArray);
+    const variavelArray = typeof FACT_VARIAVEL !== "undefined" ? FACT_VARIAVEL : [];
+    let variavelLookup = buildFactLookupMap(variavelArray);
 
-    let factRows = FACT_REALIZADOS.map(row => {
+    let factRows = realizadosArray.map(row => {
       const meta = findFactMatch(row, metasLookup) || {};
       const variavel = findFactMatch(row, variavelLookup) || {};
       const produtoMeta = PRODUCT_INDEX.get(row.produtoId) || {};
@@ -6466,8 +5036,8 @@ async function getData(){
       return base;
     });
 
-    if (FACT_VARIAVEL.length) {
-      const variavelIds = new Set(FACT_VARIAVEL.map(row => row?.registroId || row?.registroid));
+    if (variavelArray.length) {
+      const variavelIds = new Set(variavelArray.map(row => row?.registroId || row?.registroid));
       const novosVariavel = factRows.filter(row => row?.registroId && !variavelIds.has(row.registroId)).map(row => ({
         registroId: row.registroId,
         produtoId: row.produtoId,
@@ -6481,13 +5051,15 @@ async function getData(){
       }));
       if (novosVariavel.length) {
         novosVariavel.forEach(item => aplicarIndicadorAliases(item, item.produtoId, item.produtoNome));
+        if (typeof FACT_VARIAVEL !== "undefined") {
         FACT_VARIAVEL.push(...novosVariavel);
         variavelLookup = buildFactLookupMap(FACT_VARIAVEL);
+        }
       }
     }
 
     const baseByRegistro = new Map(factRows.map(row => [row.registroId, row]));
-    const variavelFacts = (FACT_VARIAVEL.length ? FACT_VARIAVEL : factRows).map(source => {
+    const variavelFacts = (variavelArray.length ? variavelArray : factRows).map(source => {
       const registroId = source.registroId || source.registroid;
       const base = baseByRegistro.get(registroId) || {};
       if (!registroId || !base.registroId) return null;
@@ -6586,7 +5158,7 @@ async function getData(){
       summary: baseDashboard.summary,
       ranking,
       period,
-      facts: { dados: factRows, variavel: fVariavel, campanhas: campanhaFacts, historico: FACT_HISTORICO_RANKING_POBJ }
+      facts: { dados: factRows, variavel: fVariavel, campanhas: campanhaFacts, historico: typeof FACT_HISTORICO_RANKING_POBJ !== "undefined" ? FACT_HISTORICO_RANKING_POBJ : [] }
     };
   }
 
@@ -6906,7 +5478,7 @@ async function getData(){
     summary: baseDashboard.summary,
     ranking,
     period,
-    facts: { dados: fDados, variavel: fVariavel, campanhas: fCampanhas, historico: FACT_HISTORICO_RANKING_POBJ }
+    facts: { dados: fDados, variavel: fVariavel, campanhas: fCampanhas, historico: typeof FACT_HISTORICO_RANKING_POBJ !== "undefined" ? FACT_HISTORICO_RANKING_POBJ : [] }
   };
 }
 
@@ -9524,7 +8096,7 @@ function ensureContracts(r) {
   if (!r) return [];
   if (r._contracts) return r._contracts;
   const registroKey = limparTexto(r.registroId || r.registro_id || r.registro);
-  if (registroKey && DETAIL_BY_REGISTRO.has(registroKey)) {
+  if (registroKey && typeof DETAIL_BY_REGISTRO !== "undefined" && DETAIL_BY_REGISTRO.has(registroKey)) {
     const hydrated = DETAIL_BY_REGISTRO.get(registroKey).map(item => hydrateDetailContract(item, r));
     r._contracts = hydrated;
     return hydrated;
@@ -15674,7 +14246,7 @@ function renderRanking(){
 
     const historySource = Array.isArray(state.facts?.historico) && state.facts.historico.length
       ? state.facts.historico
-      : FACT_HISTORICO_RANKING_POBJ;
+      : (typeof FACT_HISTORICO_RANKING_POBJ !== "undefined" ? FACT_HISTORICO_RANKING_POBJ : []);
 
     if (!historySource.length) {
       hostSum.innerHTML = `<div class="rk-badges"><span class="rk-badge rk-badge--warn">Sem dados históricos para o contexto selecionado.</span></div>`;

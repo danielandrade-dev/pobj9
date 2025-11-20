@@ -15,7 +15,7 @@ use Pobj\Api\Http\Controllers\OmegaTicketsController;
 use Pobj\Api\Http\Controllers\OmegaUsersController;
 use Pobj\Api\Http\Controllers\ResumoController;
 use Pobj\Api\Http\Controllers\StatusIndicadoresController;
-use Pobj\Api\Http\Controllers\DimensionsController;
+use Pobj\Api\Http\Controllers\EstruturaController;
 use Pobj\Api\Http\Controllers\ProdutosController;
 use Pobj\Api\Http\Controllers\CalendarioController;
 use Pobj\Api\Http\Controllers\RealizadosController;
@@ -36,7 +36,7 @@ return function (Router $router): void {
         $router->add('resumo', ResumoController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('status_indicadores', StatusIndicadoresController::class, 'handle', [HttpMethod::GET->value]);
         
-        $router->add('dimensions', DimensionsController::class, 'handle', [HttpMethod::GET->value]);
+        $router->add('estrutura', EstruturaController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('produtos', ProdutosController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('calendario', CalendarioController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('realizados', RealizadosController::class, 'handle', [HttpMethod::GET->value]);

@@ -1,0 +1,3 @@
+[2025-11-20 13:54:34] [WARNING] HTTP 404: endpoint não encontrado | Context: {"status":404,"request_uri":"\/api\/dimensions"}
+[2025-11-20 13:56:36] [WARNING] HTTP 404: endpoint não encontrado | Context: {"status":404,"request_uri":"\/api\/dimensions"}
+[2025-11-20 13:57:24] [WARNING] HTTP 404: endpoint não encontrado | Context: {"status":404,"request_uri":"\/api\/dimensions"}

@@ -27,5 +27,7 @@ if (file_exists($composerAutoload)) {
 use Pobj\Api\Helpers\ErrorHandler;
 use Pobj\Api\Http\Helpers\DefaultViewHelpers;
 
+require_once __DIR__ . '/Helpers/GlobalHelpers.php';
+
 ErrorHandler::register();
 DefaultViewHelpers::registerDefaults();

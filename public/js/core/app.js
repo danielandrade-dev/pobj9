@@ -565,7 +565,7 @@ const FILTER_LEVEL_CONFIG = [
   { key: "diretoria", selector: "#f-diretoria", levelKey: "diretoria" },
   { key: "gerencia", selector: "#f-gerencia", levelKey: "gerencia" },
   { key: "agencia", selector: "#f-agencia", levelKey: "agencia" },
-  { key: "ggestao", selector: "#f-ggestao", levelKey: "gGestao" },
+  { key: "ggestao", selector: "#f-gerente-gestao", levelKey: "gGestao" },
   { key: "gerente", selector: "#f-gerente", levelKey: "gerente" },
 ];
 
@@ -1762,7 +1762,7 @@ function montarHierarquiaMesu(rows){
 
   const ggestaoOptions = DIMENSION_FILTER_OPTIONS.gerenteGestao.length
     ? DIMENSION_FILTER_OPTIONS.gerenteGestao
-    : Array.from(ggMap.values()).map(entry => ({ id: entry.id, label: entry.label }));
+    : Array.from(DIM_GGESTAO_LOOKUP.values()).map(entry => ({ id: entry.id, label: entry.nome || entry.label || entry.id }));
   GERENTES_GESTAO = ggestaoOptions.map(opt => {
     const normalized = normOpt(opt);
     const id = limparTexto(normalized.id);
@@ -2870,21 +2870,6 @@ const TABLE_VIEWS = [
 // Aqui eu construo os grupos de indicadores dinamicamente a partir da dimensão dProdutos.
 const DEFAULT_CARD_ICON = "ti ti-chart-bar";
 
-// DEPRECATED: CARD_SECTION_ORDER e CARD_INDICATOR_META não são mais usados.
-// As seções e indicadores são construídos dinamicamente a partir dos dados do backend.
-// Mantido apenas para referência histórica.
-
-// const CARD_SECTION_ORDER = [
-//   { id: "captacao", label: "CAPTAÇÃO", order: 10 },
-//   { id: "financeiro", label: "FINANCEIRO", order: 20 },
-//   { id: "credito", label: "CRÉDITO", order: 30 },
-//   { id: "ligadas", label: "LIGADAS", order: 40 },
-//   { id: "produtividade", label: "PRODUTIVIDADE", order: 50 },
-//   { id: "clientes", label: "CLIENTES", order: 60 },
-//   { id: "relacionamento_emp", label: "RELACIONAMENTO", order: 15 },
-//   { id: "negocios_emp", label: "NEGÓCIOS", order: 35 },
-//   { id: "adicionais_emp", label: "ADICIONAIS", order: 45 },
-// ];
 
 const CARD_INDICATOR_META = {
   captacao_bruta: {
@@ -5937,7 +5922,7 @@ function wireClearFiltersButton() {
 async function clearFilters() {
   [
     "#f-segmento","#f-diretoria","#f-gerencia","#f-gerente",
-    "#f-agencia","#f-ggestao","#f-secao","#f-familia","#f-produto",
+    "#f-agencia","#f-gerente-gestao","#f-secao","#f-familia","#f-produto",
     "#f-status-kpi","#f-visao"
   ].forEach(sel => {
     const el = $(sel);
@@ -6990,8 +6975,8 @@ function renderAppliedFilters() {
     push("Agência", label, () => $("#f-agencia").selectedIndex = 0);
   }
   if (vals.ggestao && vals.ggestao !== "Todos") {
-    const label = $("#f-ggestao")?.selectedOptions?.[0]?.text || labelGerenteGestao(vals.ggestao);
-    push("Gerente de gestão", label, () => $("#f-ggestao").selectedIndex = 0);
+    const label = $("#f-gerente-gestao")?.selectedOptions?.[0]?.text || labelGerenteGestao(vals.ggestao);
+    push("Gerente de gestão", label, () => $("#f-gerente-gestao").selectedIndex = 0);
   }
   if (vals.gerente && vals.gerente !== "Todos") {
     const label = $("#f-gerente")?.selectedOptions?.[0]?.text || labelGerente(vals.gerente);
@@ -7043,7 +7028,7 @@ const HIERARCHY_FIELDS_DEF = [
   { key: "diretoria", select: "#f-diretoria", defaultValue: "Todas", defaultLabel: "Todas", idKey: "diretoriaId",   labelKey: "diretoriaNome",   fallback: () => RANKING_DIRECTORIAS },
   { key: "gerencia",  select: "#f-gerencia",  defaultValue: "Todas", defaultLabel: "Todas", idKey: "regionalId",    labelKey: "regionalNome",    fallback: () => RANKING_GERENCIAS },
   { key: "agencia",   select: "#f-agencia",   defaultValue: "Todas", defaultLabel: "Todas", idKey: "agenciaId",     labelKey: "agenciaNome",     fallback: () => RANKING_AGENCIAS },
-  { key: "ggestao",   select: "#f-ggestao",   defaultValue: "Todos", defaultLabel: "Todos", idKey: "gerenteGestaoId", labelKey: "gerenteGestaoNome", fallback: () => GERENTES_GESTAO },
+  { key: "ggestao",   select: "#f-gerente-gestao",   defaultValue: "Todos", defaultLabel: "Todos", idKey: "gerenteGestaoId", labelKey: "gerenteGestaoNome", fallback: () => GERENTES_GESTAO },
   { key: "gerente",   select: "#f-gerente",   defaultValue: "Todos", defaultLabel: "Todos", idKey: "gerenteId",      labelKey: "gerenteNome",      fallback: () => RANKING_GERENTES }
 ];
 const HIERARCHY_FIELD_MAP = new Map(HIERARCHY_FIELDS_DEF.map(field => [field.key, field]));
@@ -7324,15 +7309,26 @@ function buildHierarchyOptions(fieldKey, selection, rows){
   const def = HIERARCHY_FIELD_MAP.get(fieldKey);
   if (!def) return [];
   
+  // Mapeamento de fieldKey para a chave correta em DIMENSION_FILTER_OPTIONS
+  const dimensionKeyMap = {
+    'ggestao': 'gerenteGestao',
+    'gerente': 'gerente',
+    'segmento': 'segmento',
+    'diretoria': 'diretoria',
+    'gerencia': 'gerencia',
+    'agencia': 'agencia'
+  };
+  const dimensionKey = dimensionKeyMap[fieldKey] || fieldKey;
+  
   // Se há opções de dimensão pré-definidas, usa-as diretamente após filtrar
-  const hasDimensionPreset = Array.isArray(DIMENSION_FILTER_OPTIONS[fieldKey])
-    && DIMENSION_FILTER_OPTIONS[fieldKey].length > 0;
+  const hasDimensionPreset = Array.isArray(DIMENSION_FILTER_OPTIONS[dimensionKey])
+    && DIMENSION_FILTER_OPTIONS[dimensionKey].length > 0;
   
   // Se há preset e não há rows, usa diretamente as opções de dimensão
   if (hasDimensionPreset && (!Array.isArray(rows) || !rows.length)) {
     const baseOption = { value: def.defaultValue, label: def.defaultLabel };
     const options = [baseOption].concat(
-      DIMENSION_FILTER_OPTIONS[fieldKey].map(opt => {
+      DIMENSION_FILTER_OPTIONS[dimensionKey].map(opt => {
         const normalized = normOpt(opt);
         return {
           value: normalized.id || normalized.label,
@@ -7350,7 +7346,7 @@ function buildHierarchyOptions(fieldKey, selection, rows){
     : fallbackRows;
   const filtered = filterHierarchyRowsForField(fieldKey, selection, sourceRows);
   const dimensionOptionMap = new Map(
-    (DIMENSION_FILTER_OPTIONS[fieldKey] || [])
+    (DIMENSION_FILTER_OPTIONS[dimensionKey] || [])
       .map(opt => normOpt(opt))
       .filter(opt => opt.id)
       .map(opt => [limparTexto(opt.id), opt.label])
@@ -7531,7 +7527,7 @@ function buildHierarchyOptions(fieldKey, selection, rows){
   });
 
   if (!options.length && hasDimensionPreset) {
-    DIMENSION_FILTER_OPTIONS[fieldKey].forEach(opt => {
+    DIMENSION_FILTER_OPTIONS[dimensionKey].forEach(opt => {
       const normalized = normOpt(opt);
       if (!normalized.id) return;
       register(normalized.id, normalized.label);
@@ -7848,7 +7844,7 @@ function getFilterValues() {
     diretoria: val("#f-diretoria"),
     gerencia:  val("#f-gerencia"),
     agencia:   val("#f-agencia"),
-    ggestao:   val("#f-ggestao"),
+    ggestao:   val("#f-gerente-gestao"),
     gerente:   val("#f-gerente"),
     secaoId:   val("#f-secao"),
     familiaId: val("#f-familia"),
@@ -8732,7 +8728,7 @@ function initCombos() {
     { key: "diretoria", selector: "#f-diretoria" },
     { key: "gerencia",  selector: "#f-gerencia" },
     { key: "agencia",   selector: "#f-agencia" },
-    { key: "ggestao",   selector: "#f-ggestao" },
+    { key: "ggestao",   selector: "#f-gerente-gestao" },
     { key: "gerente",   selector: "#f-gerente" },
   ].forEach(({ key, selector }) => {
     const el = $(selector);
@@ -8879,7 +8875,7 @@ function bindEvents() {
     });
   });
 
-  ["#f-segmento","#f-diretoria","#f-gerencia","#f-agencia","#f-ggestao","#f-gerente","#f-secao","#f-familia","#f-produto","#f-status-kpi"].forEach(sel => {
+  ["#f-segmento","#f-diretoria","#f-gerencia","#f-agencia","#f-gerente-gestao","#f-gerente","#f-secao","#f-familia","#f-produto","#f-status-kpi"].forEach(sel => {
     $(sel)?.addEventListener("change", async () => {
       await withSpinner(async () => {
         autoSnapViewToFilters();
@@ -8980,7 +8976,7 @@ function reorderFiltersUI() {
   const gDR  = groupOf("#f-diretoria");
   const gGR  = groupOf("#f-gerencia");
   const gAg  = groupOf("#f-agencia");
-  const gGG  = groupOf("#f-ggestao");
+  const gGG  = groupOf("#f-gerente-gestao");
   const gGer = groupOf("#f-gerente");
   const gSec = groupOf("#f-secao");
   const gFam = groupOf("#f-familia");
@@ -12277,7 +12273,7 @@ function createExecutiveView(){
   syncSegmented('#exec-heatmap-toggle', 'hm', 'heatmapMode', 'secoes');
 
   if (!host.dataset.execFiltersBound) {
-    const execSel = ["#f-segmento","#f-diretoria","#f-gerencia","#f-agencia","#f-ggestao","#f-gerente","#f-familia","#f-produto","#f-status-kpi"];
+    const execSel = ["#f-segmento","#f-diretoria","#f-gerencia","#f-agencia","#f-gerente-gestao","#f-gerente","#f-familia","#f-produto","#f-status-kpi"];
     execSel.forEach(sel => $(sel)?.addEventListener("change", () => {
       if (state.activeView === 'exec') renderExecutiveView();
     }));
@@ -12348,7 +12344,7 @@ function execAggBy(rows, key){
 const EXEC_FILTER_SELECTORS = {
   gerencia: "#f-gerencia",
   agencia:  "#f-agencia",
-  gGestao:  "#f-ggestao",
+  gGestao:  "#f-gerente-gestao",
   gerente:  "#f-gerente",
   prodsub:  "#f-produto"
 };

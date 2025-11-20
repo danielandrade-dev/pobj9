@@ -21,25 +21,34 @@ function normalizarLinhasFatoDetalhes(rows){
   if (!Array.isArray(rows)) return [];
 
   return rows.map(raw => {
-    const contratoId = limparTexto(lerCelula(raw, ["Contrato ID", "contrato_id", "Contrato", "Id Contrato", "ID Contrato"]));
-    const registroId = limparTexto(lerCelula(raw, ["Registro ID", "registro_id", "Registro", "Id Registro", "ID Registro"]));
+    const contratoId = limparTexto(raw.contrato_id || raw.contratoId || raw.contrato || "");
+    const registroId = limparTexto(raw.registro_id || raw.registroId || raw.registro || "");
     if (!contratoId || !registroId) return null;
 
-    const segmentoId = limparTexto(lerCelula(raw, ["Segmento ID", "segmento_id", "segmentoId"]));
-    const segmento = limparTexto(lerCelula(raw, ["Segmento", "segmento"])) || segmentoId;
-    const diretoriaId = limparTexto(lerCelula(raw, ["Diretoria ID", "diretoria_id", "diretoriaId"]));
-    const diretoriaNome = limparTexto(lerCelula(raw, ["Diretoria Nome", "Diretoria Regional", "diretoria_nome"])) || diretoriaId;
-    const gerenciaId = limparTexto(lerCelula(raw, ["Gerencia Regional ID", "Gerencia ID", "gerencia_regional_id", "gerenciaId", "regional_id"]));
-    const gerenciaNome = limparTexto(lerCelula(raw, ["Gerencia Regional Nome", "Regional Nome", "gerencia_regional_nome", "gerenciaNome"])) || gerenciaId;
-    const agenciaId = limparTexto(lerCelula(raw, ["Agencia ID", "Agência ID", "agencia_id", "agenciaId"]));
-    const agenciaNome = limparTexto(lerCelula(raw, ["Agencia Nome", "Agência Nome", "agencia_nome"])) || agenciaId;
-    const agenciaCodigo = limparTexto(lerCelula(raw, ["Agencia Codigo", "Agência Codigo", "Codigo Agencia", "agencia_codigo"]))
+    const segmentoId = limparTexto(raw.segmento_id || raw.segmentoId || "");
+    const segmento = limparTexto(raw.segmento || "") || segmentoId;
+    const diretoriaId = limparTexto(raw.diretoria_id || raw.diretoriaId || "");
+    const diretoriaNome = limparTexto(raw.diretoria_nome || raw.diretoriaNome || raw.diretoria_regional || "") || diretoriaId;
+    const gerenciaId = limparTexto(raw.gerencia_regional_id || raw.gerenciaRegionalId || raw.gerencia_id || raw.gerenciaId || raw.regional_id || "");
+    const gerenciaNome = limparTexto(raw.gerencia_regional_nome || raw.gerenciaRegionalNome || raw.regional_nome || raw.regionalNome || "") || gerenciaId;
+    const agenciaId = limparTexto(raw.agencia_id || raw.agenciaId || "");
+    const agenciaNome = limparTexto(raw.agencia_nome || raw.agenciaNome || "") || agenciaId;
+    const agenciaCodigo = limparTexto(raw.agencia_codigo || raw.agenciaCodigo || "")
       || agenciaId
       || agenciaNome;
-    let gerenteGestaoId = limparTexto(lerCelula(raw, ["Gerente Gestao ID", "gerente_gestao_id", "GerenteGestaoId"]));
-    let gerenteGestaoNome = limparTexto(lerCelula(raw, ["Gerente Gestao Nome", "Gerente de Gestao", "Gerente Gestao", "gerente_gestao_nome"]));
-    let gerenteId = limparTexto(lerCelula(raw, ["Gerente ID", "gerente_id", "GerenteId"]));
-    let gerenteNome = limparTexto(lerCelula(raw, ["Gerente Nome", "Gerente", "gerente_nome", "Gerente Geral", "Gerente geral"])) || gerenteId;
+    // Suporta tanto estrutura plana quanto objeto aninhado {id, nome}
+    let gerenteGestaoId = "";
+    let gerenteGestaoNome = "";
+    const gerenteGestaoObj = raw.gerente_gestao || raw.gerenteGestao;
+    if (gerenteGestaoObj && typeof gerenteGestaoObj === "object" && !Array.isArray(gerenteGestaoObj)) {
+      gerenteGestaoId = limparTexto(gerenteGestaoObj.id || "");
+      gerenteGestaoNome = limparTexto(gerenteGestaoObj.nome || "");
+    } else {
+      gerenteGestaoId = limparTexto(raw.gerente_gestao_id || raw.gerenteGestaoId || "");
+      gerenteGestaoNome = limparTexto(raw.gerente_gestao_nome || raw.gerenteGestaoNome || "");
+    }
+    let gerenteId = limparTexto(raw.gerente_id || raw.gerenteId || "");
+    let gerenteNome = limparTexto(raw.gerente_nome || raw.gerenteNome || raw.gerente || "") || gerenteId;
 
     if (!gerenteGestaoId) {
       if (typeof deriveGerenteGestaoIdFromAgency === "function") {
@@ -76,35 +85,35 @@ function normalizarLinhasFatoDetalhes(rows){
       gerenteNome = typeof extractNameFromLabel === "function" ? extractNameFromLabel(gerenteNome) : gerenteNome;
     }
 
-    let familiaId = limparTexto(lerCelula(raw, ["Familia ID", "familia_id", "Familia"]));
-    let familiaNome = limparTexto(lerCelula(raw, ["Familia Nome", "familia_nome", "Família Nome", "Familia"])) || familiaId;
+    let familiaId = limparTexto(raw.familia_id || raw.familiaId || raw.familia || "");
+    let familiaNome = limparTexto(raw.familia_nome || raw.familiaNome || "") || familiaId;
 
-    let indicadorId = limparTexto(lerCelula(raw, ["ID Indicador", "Indicador ID", "id_indicador", "Indicador"]));
-    let indicadorNome = limparTexto(lerCelula(raw, ["Indicador Nome", "ds_indicador", "Indicador"])) || indicadorId;
+    let indicadorId = limparTexto(raw.id_indicador || raw.indicador_id || raw.indicadorId || raw.indicador || "");
+    let indicadorNome = limparTexto(raw.ds_indicador || raw.indicador_nome || raw.indicadorNome || "") || indicadorId;
 
-    let subId = limparTexto(lerCelula(raw, ["Subindicador ID", "id_subindicador", "Sub Produto ID", "Subproduto ID", "Subproduto"]));
-    let subNome = limparTexto(lerCelula(raw, ["Subindicador Nome", "subindicador", "Subproduto", "Sub Produto"])) || subId;
+    let subId = limparTexto(raw.id_subindicador || raw.subindicador_id || raw.subindicadorId || raw.sub_produto_id || raw.subproduto_id || raw.subprodutoId || raw.subproduto || "");
+    let subNome = limparTexto(raw.subindicador_nome || raw.subindicadorNome || raw.subindicador || raw.subproduto || "") || subId;
 
-    const carteira = limparTexto(lerCelula(raw, ["Carteira", "carteira"]));
-    const canalVenda = limparTexto(lerCelula(raw, ["Canal Venda", "Canal", "canal_venda"]));
-    const tipoVenda = limparTexto(lerCelula(raw, ["Tipo Venda", "tipo_venda", "Tipo"]));
-    const modalidade = limparTexto(lerCelula(raw, ["Modalidade Pagamento", "modalidade_pagamento", "Modalidade"]));
+    const carteira = limparTexto(raw.carteira || "");
+    const canalVenda = limparTexto(raw.canal_venda || raw.canalVenda || raw.canal || "");
+    const tipoVenda = limparTexto(raw.tipo_venda || raw.tipoVenda || raw.tipo || "");
+    const modalidade = limparTexto(raw.modalidade_pagamento || raw.modalidadePagamento || raw.modalidade || "");
 
-    let data = typeof converterDataISO === "function" ? converterDataISO(lerCelula(raw, ["Data", "Data Movimento", "data"])) : "";
-    let competencia = typeof converterDataISO === "function" ? converterDataISO(lerCelula(raw, ["Competencia", "competencia", "Competência"])) : "";
+    let data = typeof converterDataISO === "function" ? converterDataISO(raw.data || raw.data_movimento || "") : "";
+    let competencia = typeof converterDataISO === "function" ? converterDataISO(raw.competencia || "") : "";
     if (!competencia && data) competencia = `${data.slice(0, 7)}-01`;
     if (!data && competencia) data = competencia;
 
-    const dataVencimento = typeof converterDataISO === "function" ? converterDataISO(lerCelula(raw, ["Data Vencimento", "data_vencimento"])) : "";
-    const dataCancelamento = typeof converterDataISO === "function" ? converterDataISO(lerCelula(raw, ["Data Cancelamento", "data_cancelamento"])) : "";
-    const motivoCancelamento = limparTexto(lerCelula(raw, ["Motivo Cancelamento", "motivo_cancelamento", "Motivo"]));
+    const dataVencimento = typeof converterDataISO === "function" ? converterDataISO(raw.data_vencimento || raw.dataVencimento || "") : "";
+    const dataCancelamento = typeof converterDataISO === "function" ? converterDataISO(raw.data_cancelamento || raw.dataCancelamento || "") : "";
+    const motivoCancelamento = limparTexto(raw.motivo_cancelamento || raw.motivoCancelamento || raw.motivo || "");
 
-    const valorMeta = toNumber(lerCelula(raw, ["Valor Meta", "Meta", "meta", "meta_mensal", "meta_contrato", "metaValor"]));
-    const valorReal = toNumber(lerCelula(raw, ["Valor Realizado", "Realizado", "realizado", "real_mensal", "valor_realizado", "realizadoValor"]));
-    const quantidade = toNumber(lerCelula(raw, ["Quantidade", "Qtd", "quantidade", "Quantidade Contrato"]));
-    const peso = toNumber(lerCelula(raw, ["Peso", "peso", "pontos_meta", "Pontos Meta"]));
-    const pontos = toNumber(lerCelula(raw, ["Pontos", "pontos", "pontos_cumpridos", "Pontos Cumpridos"]));
-    const statusId = limparTexto(lerCelula(raw, ["Status ID", "status_id", "Status"]));
+    const valorMeta = toNumber(raw.meta || raw.meta_mensal || raw.metaMensal || raw.meta_contrato || raw.metaContrato || raw.meta_valor || raw.metaValor || 0);
+    const valorReal = toNumber(raw.realizado || raw.real_mensal || raw.realMensal || raw.valor_realizado || raw.valorRealizado || raw.realizado_valor || raw.realizadoValor || 0);
+    const quantidade = toNumber(raw.quantidade || raw.qtd || raw.quantidade_contrato || raw.quantidadeContrato || 0);
+    const peso = toNumber(raw.peso || raw.pontos_meta || raw.pontosMeta || 0);
+    const pontos = toNumber(raw.pontos || raw.pontos_cumpridos || raw.pontosCumpridos || 0);
+    const statusId = limparTexto(raw.status_id || raw.statusId || raw.status || "");
 
     const scenarioHint = typeof getSegmentScenarioFromValue === "function" 
       ? (getSegmentScenarioFromValue(segmento) || getSegmentScenarioFromValue(segmentoId) || "")

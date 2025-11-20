@@ -26,48 +26,41 @@ function normalizarLinhasHistoricoRankingPobj(rows){
   };
 
   return rows.map(raw => {
-    const nivel = mapNivel(lerCelula(raw, ["nivel", "Nivel", "Nível", "level"]));
+    const nivel = mapNivel(raw.nivel || raw.level || "");
     if (!nivel) return null;
 
-    const anoText = lerCelula(raw, ["ano", "Ano", "year", "Year"]);
+    const anoText = raw.ano || raw.year || "";
     const anoNum = Number(anoText);
     const ano = Number.isFinite(anoNum) ? anoNum : null;
     const database = typeof converterDataISO === "function" 
-      ? converterDataISO(lerCelula(raw, ["database", "competencia", "Competencia", "data", "Data"]))
+      ? converterDataISO(raw.database || raw.competencia || raw.data || "")
       : "";
 
-    const segmento = lerCelula(raw, ["segmento", "Segmento"]);
-    const segmentoId = lerCelula(raw, ["segmentoId", "SegmentoId", "segmento_id", "Id Segmento"]);
-    const diretoria = lerCelula(raw, ["diretoria", "Diretoria", "diretoriaId", "DiretoriaId", "ID Diretoria"]);
-    const diretoriaNome = lerCelula(raw, ["diretoriaNome", "DiretoriaNome", "Diretoria Nome", "diretoria_nome"]);
-    const gerenciaRegional = lerCelula(raw, ["gerenciaRegional", "GerenciaRegional", "gerencia", "Gerencia", "Gerencia ID"]);
-    const gerenciaNome = lerCelula(raw, ["gerenciaNome", "GerenciaNome", "Regional Nome", "regionalNome"]);
-    const agencia = lerCelula(raw, ["agencia", "Agencia", "agenciaId", "AgenciaId"]);
-    const agenciaNome = lerCelula(raw, ["agenciaNome", "AgenciaNome", "Agencia Nome"]);
-    const agenciaCodigo = lerCelula(raw, ["agenciaCodigo", "AgenciaCodigo", "Codigo Agencia", "Agencia Codigo"]);
-    const gerenteGestao = lerCelula(raw, ["gerenteGestao", "GerenteGestao", "gerenteGestaoId", "GerenteGestaoId", "gerente_gestao_id"]);
-    const gerenteGestaoNome = lerCelula(raw, [
-      "gerenteGestaoNome",
-      "GerenteGestaoNome",
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "gerente_gestao_nome"
-    ]);
-    const gerente = lerCelula(raw, ["gerente", "Gerente", "gerenteId", "GerenteId"]);
-    const gerenteNome = lerCelula(raw, ["gerenteNome", "GerenteNome", "Gerente Nome"]);
+    const segmento = raw.segmento || "";
+    const segmentoId = raw.segmento_id || raw.segmentoId || "";
+    const diretoria = raw.diretoria_id || raw.diretoriaId || raw.diretoria || "";
+    const diretoriaNome = raw.diretoria_nome || raw.diretoriaNome || "";
+    const gerenciaRegional = raw.gerencia_id || raw.gerenciaId || raw.gerencia_regional || raw.gerenciaRegional || raw.gerencia || "";
+    const gerenciaNome = raw.gerencia_nome || raw.gerenciaNome || raw.regional_nome || raw.regionalNome || "";
+    const agencia = raw.agencia_id || raw.agenciaId || raw.agencia || "";
+    const agenciaNome = raw.agencia_nome || raw.agenciaNome || "";
+    const agenciaCodigo = raw.agencia_codigo || raw.agenciaCodigo || "";
+    const gerenteGestao = raw.gerente_gestao_id || raw.gerenteGestaoId || raw.gerente_gestao || raw.gerenteGestao || "";
+    const gerenteGestaoNome = raw.gerente_gestao_nome || raw.gerenteGestaoNome || "";
+    const gerente = raw.gerente_id || raw.gerenteId || raw.gerente || "";
+    const gerenteNome = raw.gerente_nome || raw.gerenteNome || "";
 
-    const participantesNum = Number(lerCelula(raw, ["participantes", "Participantes", "totalParticipantes"]));
+    const participantesNum = Number(raw.participantes || raw.total_participantes || raw.totalParticipantes || 0);
     const participantes = Number.isFinite(participantesNum) && participantesNum > 0 ? participantesNum : null;
 
-    const rankNum = Number(lerCelula(raw, ["rank", "Rank", "posicao", "posição", "classificacao"]));
+    const rankNum = Number(raw.rank || raw.posicao || raw.posição || raw.classificacao || 0);
     const rank = Number.isFinite(rankNum) && rankNum > 0 ? rankNum : null;
 
-    const pontosNum = Number(lerCelula(raw, ["pontos", "Pontos", "pontuacao", "Pontuacao", "p_acum"]));
+    const pontosNum = Number(raw.pontos || raw.pontuacao || raw.p_acum || 0);
     const pontos = Number.isFinite(pontosNum) ? pontosNum : null;
 
-    const realizadoNum = Number(lerCelula(raw, ["realizado", "Realizado", "real_acum", "Real_acum", "resultado"]));
-    const metaNum = Number(lerCelula(raw, ["meta", "Meta", "meta_acum", "Meta_acum"]));
+    const realizadoNum = Number(raw.realizado || raw.real_acum || raw.resultado || 0);
+    const metaNum = Number(raw.meta || raw.meta_acum || 0);
 
     return {
       nivel,

@@ -11,6 +11,9 @@ class ResponseHelper
 {
     public static function json($data): void
     {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -45,6 +48,9 @@ class ResponseHelper
         }
 
         http_response_code($status);
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
         echo json_encode(['error' => $message], JSON_UNESCAPED_UNICODE);
         exit;
     }

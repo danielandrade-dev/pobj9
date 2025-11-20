@@ -42,48 +42,41 @@ if (typeof aplicarIndicadorAliases === "function") {
 // Aqui eu padronizo os dados das campanhas porque preciso ligar sprint, unidade e indicadores rapidamente.
 function normalizarLinhasFatoCampanhas(rows){
   return rows.map(raw => {
-    const id = lerCelula(raw, ["Campanha ID", "ID"]);
+    const id = raw.campanha_id || raw.id || raw.campanhaId;
     if (!id) return null;
-    const sprintId = lerCelula(raw, ["Sprint ID", "Sprint"]);
-    const diretoriaId = lerCelula(raw, ["Diretoria", "Diretoria ID", "Id Diretoria"]);
-    const diretoriaNome = lerCelula(raw, ["Diretoria Nome", "Diretoria Regional"]) || diretoriaId;
-    const gerenciaId = lerCelula(raw, ["Gerencia Regional", "Gerencia ID", "Id Gerencia"]);
-    const regionalNome = lerCelula(raw, ["Regional Nome", "Regional"]) || gerenciaId;
-    const agenciaCodigoRaw = lerCelula(raw, ["Agencia Codigo", "Agencia ID", "Código Agência", "Agência Codigo"]);
-    const agenciaNome = lerCelula(raw, ["Agencia Nome", "Agência Nome", "Agencia"]) || agenciaCodigoRaw;
+    const sprintId = raw.sprint_id || raw.sprintId || raw.sprint;
+    const diretoriaId = raw.diretoria_id || raw.diretoriaId || raw.diretoria;
+    const diretoriaNome = raw.diretoria_nome || raw.diretoriaNome || raw.diretoria_regional || diretoriaId;
+    const gerenciaId = raw.gerencia_id || raw.gerenciaId || raw.gerencia_regional || raw.gerenciaRegional;
+    const regionalNome = raw.regional_nome || raw.regionalNome || raw.regional || gerenciaId;
+    const agenciaCodigoRaw = raw.agencia_codigo || raw.agenciaCodigo || raw.agencia_id || raw.agenciaId;
+    const agenciaNome = raw.agencia_nome || raw.agenciaNome || raw.agencia || agenciaCodigoRaw;
     const agenciaId = agenciaCodigoRaw || agenciaNome;
-    const gerenteGestaoIdRaw = lerCelula(raw, [
-      "Gerente Gestao",
-      "Gerente Gestao ID",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "gerenteGestaoId",
-      "gerente_gestao_id"
-    ]);
-    const gerenteGestaoNome = lerCelula(raw, [
-      "Gerente Gestao Nome",
-      "Gerente de Gestao Nome",
-      "Gerente de Gestão Nome",
-      "Gerente Gestao",
-      "Gerente de Gestao",
-      "Gerente de Gestão",
-      "gerenteGestaoNome",
-      "gerente_gestao_nome"
-    ]) || gerenteGestaoIdRaw;
+    // Suporta tanto estrutura plana quanto objeto aninhado {id, nome}
+    let gerenteGestaoIdRaw = "";
+    let gerenteGestaoNome = "";
+    const gerenteGestaoObj = raw.gerente_gestao || raw.gerenteGestao;
+    if (gerenteGestaoObj && typeof gerenteGestaoObj === "object" && !Array.isArray(gerenteGestaoObj)) {
+      gerenteGestaoIdRaw = limparTexto(gerenteGestaoObj.id || "");
+      gerenteGestaoNome = limparTexto(gerenteGestaoObj.nome || "");
+    } else {
+      gerenteGestaoIdRaw = raw.gerente_gestao_id || raw.gerenteGestaoId || raw.gerente_gestao || raw.gerenteGestao;
+      gerenteGestaoNome = raw.gerente_gestao_nome || raw.gerenteGestaoNome || gerenteGestaoIdRaw;
+    }
     const gerenteGestaoId = gerenteGestaoIdRaw || gerenteGestaoNome;
-    const gerenteIdRaw = lerCelula(raw, ["Gerente", "Gerente ID"]);
-    const gerenteNome = lerCelula(raw, ["Gerente Nome"]) || gerenteIdRaw;
+    const gerenteIdRaw = raw.gerente_id || raw.gerenteId || raw.gerente;
+    const gerenteNome = raw.gerente_nome || raw.gerenteNome || gerenteIdRaw;
     const gerenteId = gerenteIdRaw || gerenteNome;
-    const segmento = lerCelula(raw, ["Segmento"]);
-    let familiaId = lerCelula(raw, ["Familia ID", "Família ID", "Familia"]);
-    let familiaNome = lerCelula(raw, ["Familia Nome", "Família Nome"]) || familiaId;
-    let produtoId = lerCelula(raw, ["id_indicador", "Produto ID", "Produto"]);
+    const segmento = raw.segmento;
+    let familiaId = raw.familia_id || raw.familiaId || raw.familia || "";
+    let familiaNome = raw.familia_nome || raw.familiaNome || familiaId;
+    let produtoId = raw.id_indicador || raw.produto_id || raw.produtoId || raw.produto;
     if (!produtoId) return null;
-    const produtoNome = lerCelula(raw, ["ds_indicador", "Produto Nome", "Produto"]) || produtoId;
-    const subproduto = lerCelula(raw, ["Subproduto", "Sub produto"]);
-    const familiaCodigoExtra = lerCelula(raw, ["Familia Codigo", "Familia Código", "FamiliaCod"]);
-    const indicadorCodigoExtra = lerCelula(raw, ["Indicador Codigo", "Indicador Código", "IndicadorCod"]);
-    const subCodigoExtra = lerCelula(raw, ["Subindicador Codigo", "Subindicador Código", "SubindicadorCod"]);
+    const produtoNome = raw.ds_indicador || raw.produto_nome || raw.produtoNome || produtoId;
+    const subproduto = raw.subproduto || raw.sub_produto || "";
+    const familiaCodigoExtra = raw.familia_codigo || raw.familiaCodigo || raw.familiaCod;
+    const indicadorCodigoExtra = raw.indicador_codigo || raw.indicadorCodigo || raw.indicadorCod;
+    const subCodigoExtra = raw.subindicador_codigo || raw.subindicadorCodigo || raw.subindicadorCod;
     const familiaCodigo = limparTexto(familiaCodigoExtra);
     if (familiaCodigo) {
       const familiaSlug = typeof FAMILIA_CODE_TO_SLUG !== "undefined" ? FAMILIA_CODE_TO_SLUG.get(familiaCodigo) : null;
@@ -104,13 +97,13 @@ function normalizarLinhasFatoCampanhas(rows){
     }
     const subCodigo = limparTexto(subCodigoExtra);
     const subSlug = subCodigo && typeof SUB_CODE_TO_SLUG !== "undefined" ? SUB_CODE_TO_SLUG.get(subCodigo) : "";
-    const carteira = lerCelula(raw, ["Carteira"]);
-    const linhas = toNumber(lerCelula(raw, ["Linhas"]));
-    const cash = toNumber(lerCelula(raw, ["Cash"]));
-    const conquista = toNumber(lerCelula(raw, ["Conquista"]));
-    const atividade = converterBooleano(lerCelula(raw, ["Atividade", "Ativo", "Status"]), true);
-    let data = converterDataISO(lerCelula(raw, ["Data"]));
-    let competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"]));
+    const carteira = raw.carteira || "";
+    const linhas = toNumber(raw.linhas || 0);
+    const cash = toNumber(raw.cash || 0);
+    const conquista = toNumber(raw.conquista || 0);
+    const atividade = converterBooleano(raw.atividade || raw.ativo || raw.status, true);
+    let data = converterDataISO(raw.data || "");
+    let competencia = converterDataISO(raw.competencia || "");
     if (!data && competencia) {
       data = competencia;
     }

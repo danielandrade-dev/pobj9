@@ -15,18 +15,18 @@ if (typeof window !== "undefined") {
 /* ===== Função para normalizar linhas de calendário ===== */
 function normalizarLinhasCalendario(rows){
   return rows.map(raw => {
-    const data = converterDataISO(lerCelula(raw, ["Data"]));
+    const data = converterDataISO(raw.data || "");
     if (!data) return null;
-    const competencia = converterDataISO(lerCelula(raw, ["Competencia", "Competência"])) || `${data.slice(0, 7)}-01`;
-    const ano = lerCelula(raw, ["Ano"]) || data.slice(0, 4);
-    const mes = lerCelula(raw, ["Mes", "Mês"]) || data.slice(5, 7);
-    const mesNome = lerCelula(raw, ["Mes Nome", "Mês Nome"]);
-    const dia = lerCelula(raw, ["Dia"]) || data.slice(8, 10);
-    const diaSemana = lerCelula(raw, ["Dia da Semana"]);
-    const semana = lerCelula(raw, ["Semana"]);
-    const trimestre = lerCelula(raw, ["Trimestre"]);
-    const semestre = lerCelula(raw, ["Semestre"]);
-    const ehDiaUtil = converterBooleano(lerCelula(raw, ["Eh Dia Util", "É Dia Útil", "Dia Util"]), false) ? 1 : 0;
+    const competencia = converterDataISO(raw.competencia || "") || `${data.slice(0, 7)}-01`;
+    const ano = raw.ano || data.slice(0, 4);
+    const mes = raw.mes || data.slice(5, 7);
+    const mesNome = raw.mes_nome || raw.mesNome || "";
+    const dia = raw.dia || data.slice(8, 10);
+    const diaSemana = raw.dia_semana || raw.diaSemana || "";
+    const semana = raw.semana || "";
+    const trimestre = raw.trimestre || "";
+    const semestre = raw.semestre || "";
+    const ehDiaUtil = converterBooleano(raw.eh_dia_util || raw.ehDiaUtil || raw.dia_util || raw.diaUtil, false) ? 1 : 0;
     const mesAnoCurto = construirEtiquetaMesAno(ano, mes, mesNome);
     return { data, competencia, ano, mes, mesNome, mesAnoCurto, dia, diaSemana, semana, trimestre, semestre, ehDiaUtil };
   }).filter(Boolean).sort((a, b) => (a.data || "").localeCompare(b.data || ""));

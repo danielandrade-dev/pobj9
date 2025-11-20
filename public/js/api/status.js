@@ -109,10 +109,10 @@ function normalizarLinhasStatus(rows){
 
   list.forEach(raw => {
     if (!raw || typeof raw !== "object") return;
-    const nome = lerCelula(raw, ["Status Nome", "Status", "Nome", "Descrição", "Descricao"]);
-    const codigo = lerCelula(raw, ["Status Id", "StatusID", "id", "ID", "Codigo", "Código"]);
-    const chave = lerCelula(raw, ["Status Chave", "Status Key", "Chave", "Slug"]);
-    const ordem = lerCelula(raw, ["Ordem", "Order", "Posicao", "Posição", "Sequencia", "Sequência"]);
+    const nome = raw.nome || raw.status_nome || raw.statusNome || raw.status || raw.descricao || raw.descrição || "";
+    const codigo = raw.codigo || raw.id || raw.status_id || raw.statusId || "";
+    const chave = raw.chave || raw.key || raw.status_chave || raw.statusChave || raw.slug || "";
+    const ordem = raw.ordem || raw.order || raw.posicao || raw.posição || raw.sequencia || raw.sequência || "";
     const key = pegarPrimeiroPreenchido(chave, codigo, nome);
     const ok = register({ id: codigo || key, codigo, nome, key, ordem });
     if (!ok) {

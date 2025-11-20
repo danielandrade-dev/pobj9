@@ -13,7 +13,8 @@ class ApiRequestHandler
 {
     public function handle(string $requestPath, string $requestUri): void
     {
-        header('Content-Type: application/json; charset=utf-8');
+        // Não define o header JSON aqui - deixa o ResponseHelper fazer isso quando necessário
+        // Isso permite que o dd() funcione corretamente
         
         $_SERVER['PATH_INFO'] = substr($requestPath, 4);
         parse_str(parse_url($requestUri, PHP_URL_QUERY) ?? '', $_GET);
@@ -57,6 +58,9 @@ class ApiRequestHandler
             ]);
 
             http_response_code(HttpStatusCode::INTERNAL_SERVER_ERROR->value);
+            if (!headers_sent()) {
+                header('Content-Type: application/json; charset=utf-8');
+            }
             echo json_encode([
                 'error' => 'server_error',
                 'message' => 'Ocorreu um erro interno. Verifique os logs para mais detalhes.',

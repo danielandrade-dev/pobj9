@@ -24,10 +24,10 @@ class FiltrosService
     public function getFiltroByNivel(FiltroNivel $nivel): array
     {
         return match ($nivel) {
-            FiltroNivel::SEGMENTOS => $this->estruturaRepository->findSegmentosForFilter(),
-            FiltroNivel::DIRETORIAS => $this->estruturaRepository->findDiretoriasForFilter(),
-            FiltroNivel::REGIONAIS => $this->estruturaRepository->findRegionaisForFilter(),
-            FiltroNivel::AGENCIAS => $this->estruturaRepository->findAgenciasForFilter(),
+            FiltroNivel::SEGMENTOS => $this->estruturaRepository->findAllSegmentos(),
+            FiltroNivel::DIRETORIAS => $this->estruturaRepository->findAllDiretorias(),
+            FiltroNivel::REGIONAIS => $this->estruturaRepository->findAllRegionais(),
+            FiltroNivel::AGENCIAS => $this->estruturaRepository->findAllAgencias(),
             FiltroNivel::GGESTOES => $this->estruturaRepository->findGGestoesForFilter(),
             FiltroNivel::GERENTES => $this->estruturaRepository->findGerentesForFilter(),
             FiltroNivel::STATUS_INDICADORES => $this->statusRepository->findAllForFilter(),

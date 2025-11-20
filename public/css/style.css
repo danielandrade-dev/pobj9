@@ -121,7 +121,7 @@ img{ max-width:100%; display:block; }
   color:#475569;
 }
 .logo{ display:flex; align-items:center; gap:10px; min-width:0; }
-.logo__mark{ width:28px; height:28px; border-radius:50%; background:#fff; flex:0 0 28px; }
+.logo__mark{ width:28px; height:28px; border-radius:50%; background:#fff; background-image:url(../img/BBD-6b19aac5.png); background-size:70%; background-position:center; background-repeat:no-repeat; flex:0 0 28px; }
 .logo__text{ font-weight:800; color:#fff; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 .userbox{ position:relative; display:flex; align-items:center; min-width:0; }

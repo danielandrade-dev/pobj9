@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Pobj\Api\Enums\HttpMethod;
 use Pobj\Api\Http\Router;
 use Pobj\Api\Http\Controllers\AgentController;
-use Pobj\Api\Http\Controllers\InitDataController;
 use Pobj\Api\Http\Controllers\FiltrosController;
 use Pobj\Api\Http\Controllers\HealthController;
 use Pobj\Api\Http\Controllers\OmegaMesuController;
@@ -31,7 +30,6 @@ return function (Router $router): void {
     $router->group('api', function ($router) {
         $router->add('health', HealthController::class, 'check', [HttpMethod::GET->value]);
         $router->add('agent', AgentController::class, 'handle', [HttpMethod::POST->value]);
-        $router->add('init-data', InitDataController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('filtros', FiltrosController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('resumo', ResumoController::class, 'handle', [HttpMethod::GET->value]);
         $router->add('status_indicadores', StatusIndicadoresController::class, 'handle', [HttpMethod::GET->value]);

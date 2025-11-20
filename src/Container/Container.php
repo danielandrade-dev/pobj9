@@ -31,7 +31,6 @@ use Pobj\Api\Services\DetalhesService;
 use Pobj\Api\Services\EstruturaService;
 use Pobj\Api\Services\FiltrosService;
 use Pobj\Api\Services\HistoricoService;
-use Pobj\Api\Services\InitDataService;
 use Pobj\Api\Services\LeadsService;
 use Pobj\Api\Services\MetaService;
 use Pobj\Api\Services\OmegaMesuService;
@@ -117,23 +116,6 @@ class Container
 
         $this->singleton(LeadsRepository::class, function (Container $container) {
             return new LeadsRepository($container->get(EntityManager::class));
-        });
-
-        $this->singleton(InitDataService::class, function (Container $container) {
-            return new InitDataService(
-                $container->get(EstruturaRepository::class),
-                $container->get(StatusIndicadoresRepository::class),
-                $container->get(RealizadoRepository::class),
-                $container->get(MetaRepository::class),
-                $container->get(VariavelRepository::class),
-                $container->get(OmegaMesuRepository::class),
-                $container->get(ProdutoRepository::class),
-                $container->get(CalendarioRepository::class),
-                $container->get(CampanhasRepository::class),
-                $container->get(DetalhesRepository::class),
-                $container->get(HistoricoRepository::class),
-                $container->get(LeadsRepository::class)
-            );
         });
 
         $this->singleton(FiltrosService::class, function (Container $container) {

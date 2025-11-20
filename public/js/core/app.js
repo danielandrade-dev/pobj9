@@ -424,8 +424,6 @@ function getCurrentUserDisplayName(){
   return name || 'Equipe Comercial';
 }
 
-let baseDataPromise = null;
-
 // Aqui eu limpo qualquer valor que vem das bases porque sei que sempre chega com espaços e formatos diferentes.
 function limparTexto(value){
   if (value == null) return "";
@@ -2756,69 +2754,64 @@ function processBaseDataSources({
   return state._raw;
 }
 
-// Carrega os dados da pasta "Bases" ou via API
+// Carrega os dados da pasta "Bases" ou via API (sem cache)
 async function loadBaseData(){
-  if (baseDataPromise) return baseDataPromise;
-  baseDataPromise = (async () => {
-    showLoader("Carregando dados…");
-    try {
-      if (DATA_SOURCE === "sql") {
-        const [
-          estruturaData,
-          status,
-          produtos,
-          calendario,
-          realizados,
-          metas,
-          variavel,
-          mesu,
-          campanhas,
-          detalhes,
-          historico,
-          leads
-        ] = await Promise.all([
-          loadEstruturaData(),
-          loadStatusData(),
-          loadProdutosData(),
-          loadCalendarioData(),
-          loadRealizadosData(),
-          loadMetasData(),
-          loadVariavelData(),
-          loadMesuData(),
-          loadCampanhasData(),
-          loadDetalhesData(),
-          loadHistoricoData(),
-          loadLeadsData()
-        ]);
+  showLoader("Carregando dados…");
+  try {
+    if (DATA_SOURCE === "sql") {
+      const [
+        estruturaData,
+        status,
+        produtos,
+        calendario,
+        realizados,
+        metas,
+        variavel,
+        mesu,
+        campanhas,
+        detalhes,
+        historico,
+        leads
+      ] = await Promise.all([
+        loadEstruturaData(),
+        loadStatusData(),
+        loadProdutosData(),
+        loadCalendarioData(),
+        loadRealizadosData(),
+        loadMetasData(),
+        loadVariavelData(),
+        loadMesuData(),
+        loadCampanhasData(),
+        loadDetalhesData(),
+        loadHistoricoData(),
+        loadLeadsData()
+      ]);
 
-        return processBaseDataSources({
-          mesuRaw: mesu || [],
-          statusRaw: status || [],
-          produtosDimRaw: produtos || [],
-          realizadosRaw: realizados || [],
-          metasRaw: metas || [],
-          variavelRaw: variavel || [],
-          campanhasRaw: campanhas || [],
-          calendarioRaw: calendario || [],
-          leadsRaw: leads || [],
-          detalhesRaw: detalhes || [],
-          historicoRaw: historico || [],
-          dimSegmentosRaw: estruturaData.segmentos || [],
-          dimDiretoriasRaw: estruturaData.diretorias || [],
-          dimRegionaisRaw: estruturaData.regionais || [],
-          dimAgenciasRaw: estruturaData.agencias || [],
-          dimGerentesGestaoRaw: estruturaData.gerentesGestao || [],
-          dimGerentesRaw: estruturaData.gerentes || [],
-        });
-      }
-
-      throw new Error('CSV não suportado. Use DATA_SOURCE="sql" para carregar dados via API.');
-    } finally {
-      hideLoader();
+      return processBaseDataSources({
+        mesuRaw: mesu || [],
+        statusRaw: status || [],
+        produtosDimRaw: produtos || [],
+        realizadosRaw: realizados || [],
+        metasRaw: metas || [],
+        variavelRaw: variavel || [],
+        campanhasRaw: campanhas || [],
+        calendarioRaw: calendario || [],
+        leadsRaw: leads || [],
+        detalhesRaw: detalhes || [],
+        historicoRaw: historico || [],
+        dimSegmentosRaw: estruturaData.segmentos || [],
+        dimDiretoriasRaw: estruturaData.diretorias || [],
+        dimRegionaisRaw: estruturaData.regionais || [],
+        dimAgenciasRaw: estruturaData.agencias || [],
+        dimGerentesGestaoRaw: estruturaData.gerentesGestao || [],
+        dimGerentesRaw: estruturaData.gerentes || [],
+      });
     }
-  })();
-  baseDataPromise.catch(() => { baseDataPromise = null; });
-  return baseDataPromise;
+
+    throw new Error('CSV não suportado. Use DATA_SOURCE="sql" para carregar dados via API.');
+  } finally {
+    hideLoader();
+  }
 }
 
 /* ===== Aqui eu ajusto a altura da topbar para o CSS responsivo funcionar ===== */
@@ -7174,7 +7167,7 @@ function hierarchyDefaultSelection(){
 }
 
 function getHierarchyRows(){
-  if (Array.isArray(MESU_DATA) && MESU_DATA.length) return MESU_DATA;
+  // Sempre retorna dados atualizados do banco (sem cache)
   if (MESU_FALLBACK_ROWS.length) return MESU_FALLBACK_ROWS;
 
   const rows = [];

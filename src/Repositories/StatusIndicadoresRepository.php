@@ -53,7 +53,7 @@ class StatusIndicadoresRepository implements RepositoryInterface
         foreach ($entities as $entity) {
             $result[] = [
                 'id' => $entity->getId(),
-                'status' => $entity->getStatus(),
+                'label' => $entity->getStatus(),
             ];
         }
 

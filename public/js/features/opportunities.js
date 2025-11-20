@@ -2,8 +2,6 @@
 /* =========================================================
    POBJ • Opportunities  —  Gerenciamento de leads propensos e oportunidades
    ========================================================= */
-let leadsTemplatePromise = null;
-
 function ensureLeadsTemplate(){
   const existing = document.getElementById("leads-modal");
   if (existing) {

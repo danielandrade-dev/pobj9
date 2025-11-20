@@ -56,13 +56,13 @@ function buildDimensionLookup(rows){
     ];
     const key = limparTexto(candidates.find(value => limparTexto(value)));
     if (!key) return;
-    const nome = limparTexto(raw.nome || raw.name || raw.descricao || raw.label) || key;
-    const labelRaw = limparTexto(raw.label) || nome || key;
+    // Padronizado: backend retorna 'label', com fallback apenas para compatibilidade temporária
+    const label = limparTexto(raw.label || raw.nome) || key;
     map.set(key, {
       ...raw,
       id: key,
-      nome,
-      label: labelRaw,
+      nome: label, // Mantém compatibilidade com código que usa 'nome'
+      label: label,
     });
   });
   return map;
@@ -216,27 +216,27 @@ function processEstruturaData({
 
   const segmentosOptions = uniqById(segmentosDim.map(row => normOpt({
     id: row?.id ?? '',
-    label: row?.nome ?? '',
+    label: row?.label || row?.nome || '',
   })));
   const diretoriasOptions = uniqById(diretoriasDim.map(row => normOpt({
     id: row?.id ?? '',
-    label: row?.nome ?? '',
+    label: row?.label || row?.nome || '',
   })));
   const regionaisOptions = uniqById(regionaisDim.map(row => normOpt({
     id: row?.id ?? '',
-    label: row?.nome ?? '',
+    label: row?.label || row?.nome || '',
   })));
   const agenciasOptions = uniqById(agenciasDim.map(row => normOpt({
     id: row?.id ?? '',
-    label: row?.nome ?? '',
+    label: row?.label || row?.nome || '',
   })));
   const gerentesGestaoOptions = uniqById(gerentesGestaoDim.map(row => normOpt({
     id: row?.id ?? '',
-    label: row?.nome ?? '',
+    label: row?.label || row?.nome || '',
   })));
   const gerentesOptions = uniqById(gerentesDim.map(row => normOpt({
     id: row?.id ?? '',
-    label: row?.nome ?? '',
+    label: row?.label || row?.nome || '',
   })));
 
   DIMENSION_FILTER_OPTIONS.segmento = segmentosOptions;

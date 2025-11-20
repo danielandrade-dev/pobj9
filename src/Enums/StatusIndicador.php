@@ -22,9 +22,9 @@ enum StatusIndicador: string
     public static function getDefaults(): array
     {
         return [
-            ['id' => self::ATINGIDO->value, 'status' => self::ATINGIDO->getLabel()],
-            ['id' => self::NAO_ATINGIDO->value, 'status' => self::NAO_ATINGIDO->getLabel()],
-            ['id' => self::TODOS->value, 'status' => self::TODOS->getLabel()],
+            ['id' => self::ATINGIDO->value, 'label' => self::ATINGIDO->getLabel()],
+            ['id' => self::NAO_ATINGIDO->value, 'label' => self::NAO_ATINGIDO->getLabel()],
+            ['id' => self::TODOS->value, 'label' => self::TODOS->getLabel()],
         ];
     }
 

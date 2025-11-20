@@ -110,12 +110,12 @@ function normalizarLinhasStatus(rows){
 
   list.forEach(raw => {
     if (!raw || typeof raw !== "object") return;
-    const nome = raw.nome || raw.status_nome || raw.statusNome || raw.status || raw.descricao || raw.descrição || "";
-    const codigo = raw.codigo || raw.id || raw.status_id || raw.statusId || "";
-    const chave = raw.chave || raw.key || raw.status_chave || raw.statusChave || raw.slug || "";
-    const ordem = raw.ordem || raw.order || raw.posicao || raw.posição || raw.sequencia || raw.sequência || "";
-    // Prioriza o nome (status) para normalizar a chave, pois é mais descritivo
-    // Se o nome contém "Todos", "Atingido", etc., isso será normalizado corretamente
+    // Padronizado: backend retorna 'label', com fallback apenas para compatibilidade temporária
+    const nome = raw.label || raw.nome || "";
+    const codigo = raw.codigo || raw.id || "";
+    const chave = raw.chave || raw.key || "";
+    const ordem = raw.ordem || raw.order || "";
+    // Prioriza o nome (label) para normalizar a chave, pois é mais descritivo
     const key = pegarPrimeiroPreenchido(chave, nome, codigo);
     const ok = register({ id: codigo || key, codigo, nome, key, ordem });
     if (!ok) {

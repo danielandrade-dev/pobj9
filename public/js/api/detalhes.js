@@ -1,6 +1,7 @@
-// BEGIN detalhes.js
+// BEGIN api/detalhes.js
 /* =========================================================
-   POBJ • detalhes.js  —  API e processamento de dados de detalhes
+   POBJ • API Detalhes  —  Carregamento e processamento de dados de detalhes de contratos
+   Endpoint: /api/detalhes
    ========================================================= */
 
 /* ===== Variáveis globais relacionadas a detalhes ===== */

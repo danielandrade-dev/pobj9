@@ -1,4 +1,7 @@
-/* ===== Leads propensos (oportunidades) ===== */
+// BEGIN features/opportunities.js
+/* =========================================================
+   POBJ • Opportunities  —  Gerenciamento de leads propensos e oportunidades
+   ========================================================= */
 let leadsTemplatePromise = null;
 
 function ensureLeadsTemplate(){

@@ -1,6 +1,7 @@
-// BEGIN produtos.js
+// BEGIN api/produtos.js
 /* =========================================================
-   POBJ • produtos.js  —  API e processamento de dados de produtos
+   POBJ • API Produtos  —  Carregamento e processamento de dados de produtos/indicadores
+   Endpoint: /api/produtos
    ========================================================= */
 
 /* ===== Constantes e variáveis de produtos ===== */

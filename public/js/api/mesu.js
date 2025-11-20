@@ -1,6 +1,7 @@
-// BEGIN mesu.js
+// BEGIN api/mesu.js
 /* =========================================================
-   POBJ • mesu.js  —  API e processamento de dados MESU
+   POBJ • API MESU  —  Carregamento e processamento de dados MESU (hierarquia organizacional)
+   Endpoint: /api/mesu
    ========================================================= */
 
 /* ===== Variáveis globais relacionadas a MESU ===== */
@@ -107,12 +108,12 @@ async function loadMesuData(){
 /* ===== Função para processar dados MESU ===== */
 function processMesuData(mesuRaw = []) {
   const mesuRows = normalizarLinhasMesu(Array.isArray(mesuRaw) ? mesuRaw : []);
-  // montarHierarquiaMesu será chamada em script.js após processMesuData
+  // montarHierarquiaMesu será chamada em app.js após processMesuData
   return mesuRows;
 }
 
 // A função montarHierarquiaMesu será movida para cá, mas como ela depende de muitas variáveis globais
-// e funções auxiliares que estão em script.js, ela será mantida em script.js por enquanto
+// e funções auxiliares que estão em app.js, ela será mantida em app.js por enquanto
 // ou movida para cá se todas as dependências estiverem disponíveis
 
 // END mesu.js

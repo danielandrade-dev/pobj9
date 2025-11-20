@@ -1,6 +1,7 @@
-// BEGIN status.js
+// BEGIN api/status.js
 /* =========================================================
-   POBJ • status.js  —  API e processamento de dados de status de indicadores
+   POBJ • API Status  —  Carregamento e processamento de dados de status de indicadores
+   Endpoint: /api/status_indicadores
    ========================================================= */
 
 /* ===== Constantes e variáveis de status ===== */

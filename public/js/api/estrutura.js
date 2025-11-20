@@ -1,6 +1,7 @@
-// BEGIN estrutura.js
+// BEGIN api/estrutura.js
 /* =========================================================
-   POBJ • estrutura.js  —  API e processamento de dados de estrutura
+   POBJ • API Estrutura  —  Carregamento e processamento de dados de estrutura organizacional
+   Endpoint: /api/estrutura
    ========================================================= */
 
 /* ===== Variáveis de lookup para dimensões de estrutura ===== */

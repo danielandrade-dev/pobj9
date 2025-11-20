@@ -1,6 +1,7 @@
-// BEGIN calendario.js
+// BEGIN api/calendario.js
 /* =========================================================
-   POBJ • calendario.js  —  API e processamento de dados de calendário
+   POBJ • API Calendário  —  Carregamento e processamento de dados de calendário
+   Endpoint: /api/calendario
    ========================================================= */
 
 /* ===== Variável de calendário ===== */

@@ -1,6 +1,7 @@
-// BEGIN realizados.js
+// BEGIN api/realizados.js
 /* =========================================================
-   POBJ • realizados.js  —  API e processamento de dados de realizados
+   POBJ • API Realizados  —  Carregamento e processamento de dados de realizados
+   Endpoint: /api/realizados
    ========================================================= */
 
 /* ===== Variável de realizados ===== */

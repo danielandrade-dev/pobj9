@@ -1,6 +1,7 @@
-// BEGIN campanhas.js
+// BEGIN api/campanhas.js
 /* =========================================================
-   POBJ • campanhas.js  —  API e processamento de dados de campanhas
+   POBJ • API Campanhas  —  Carregamento e processamento de dados de campanhas
+   Endpoint: /api/campanhas
    ========================================================= */
 
 /* ===== Variáveis globais relacionadas a campanhas ===== */
@@ -162,7 +163,7 @@ function normalizarLinhasFatoCampanhas(rows){
 /* ===== Função para substituir dados de unidade de campanha ===== */
 function replaceCampaignUnitData(rows = []) {
   if (typeof converterDataISO === "undefined") {
-    console.warn('converterDataISO não está disponível ainda. replaceCampaignUnitData será chamado novamente quando script.js carregar.');
+    console.warn('converterDataISO não está disponível ainda. replaceCampaignUnitData será chamado novamente quando app.js carregar.');
     return;
   }
   
@@ -184,8 +185,8 @@ function replaceCampaignUnitData(rows = []) {
   }
 }
 
-// Inicialização será feita após script.js carregar
-// A função initializeCampaignUnitData será chamada em script.js após converterDataISO e PRODUCT_INDEX estarem disponíveis
+// Inicialização será feita após app.js carregar
+// A função initializeCampaignUnitData será chamada em app.js após converterDataISO e PRODUCT_INDEX estarem disponíveis
 function initializeCampaignUnitData() {
   if (typeof converterDataISO === "undefined") {
     return;
@@ -197,7 +198,7 @@ function initializeCampaignUnitData() {
   }
   
   // Processa dados de unidade de campanha após produtos estarem disponíveis
-  // Esta parte será feita em script.js onde já existe código para isso (linha ~2317)
+  // Esta parte será feita em app.js onde já existe código para isso (linha ~2317)
   // Não precisa fazer aqui porque já é feito em montarCatalogoDeProdutos
 }
 

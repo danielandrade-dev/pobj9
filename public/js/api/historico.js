@@ -1,6 +1,7 @@
-// BEGIN historico.js
+// BEGIN api/historico.js
 /* =========================================================
-   POBJ • historico.js  —  API e processamento de dados de histórico
+   POBJ • API Histórico  —  Carregamento e processamento de dados de histórico de ranking
+   Endpoint: /api/historico
    ========================================================= */
 
 /* ===== Variável global relacionada a histórico ===== */

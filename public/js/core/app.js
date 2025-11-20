@@ -1,6 +1,6 @@
-// BEGIN script.js
+// BEGIN app.js
 /* =========================================================
-   POBJ • script.js  —  cards, tabela em árvore, ranking e visão executiva
+   POBJ • app.js  —  cards, tabela em árvore, ranking e visão executiva
    (com fixes: svh/topbar, z-index, listeners únicos, a11y)
    ========================================================= */
 
@@ -2740,7 +2740,7 @@ function processBaseDataSources({
   processCalendarioData(calendarioRaw);
   updateCampaignSprintsUnits();
 
-  // Processa dados de leads usando função de api-leads.js
+  // Processa dados de leads usando função de api/leads.js
   processLeadsData(leadsRaw);
 
   // Processa dados de histórico usando função de historico.js

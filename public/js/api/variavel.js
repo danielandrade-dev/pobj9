@@ -1,6 +1,7 @@
-// BEGIN variavel.js
+// BEGIN api/variavel.js
 /* =========================================================
-   POBJ • variavel.js  —  API e processamento de dados de variável
+   POBJ • API Variável  —  Carregamento e processamento de dados de variável
+   Endpoint: /api/variavel
    ========================================================= */
 
 /* ===== Variável de variável ===== */

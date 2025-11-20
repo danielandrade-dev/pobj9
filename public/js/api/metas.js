@@ -1,6 +1,7 @@
-// BEGIN metas.js
+// BEGIN api/metas.js
 /* =========================================================
-   POBJ • metas.js  —  API e processamento de dados de metas
+   POBJ • API Metas  —  Carregamento e processamento de dados de metas
+   Endpoint: /api/metas
    ========================================================= */
 
 /* ===== Variável de metas ===== */

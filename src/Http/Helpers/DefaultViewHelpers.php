@@ -10,7 +10,7 @@ namespace Pobj\Api\Http\Helpers;
  * Exemplo de uso nas views:
  * @helper('formatDate', '2024-01-01')
  * @helper('formatCurrency', 1234.56)
- * @helper('asset', 'script.js')
+ * @helper('asset', 'main.js')
  */
 class DefaultViewHelpers
 {

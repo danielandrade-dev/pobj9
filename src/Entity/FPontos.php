@@ -7,7 +7,14 @@ namespace Pobj\Api\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'f_pontos')]
+#[ORM\Table(
+    name: 'f_pontos',
+    indexes: [
+        new ORM\Index(name: 'idx_fp_data_realizado', columns: ['data_realizado']),
+        new ORM\Index(name: 'idx_fp_id_familia', columns: ['id_familia']),
+        new ORM\Index(name: 'idx_fp_familia_indicador', columns: ['id_familia', 'id_indicador']),
+    ]
+)]
 class FPontos
 {
     #[ORM\Id]
@@ -21,6 +28,9 @@ class FPontos
     #[ORM\Column(name: 'id_indicador', type: 'integer')]
     private int $idIndicador;
 
+    #[ORM\Column(name: 'id_familia', type: 'integer', nullable: true)]
+    private ?int $idFamilia = null;
+
     #[ORM\Column(type: 'string', length: 150)]
     private string $indicador;
 
@@ -29,6 +39,9 @@ class FPontos
 
     #[ORM\Column(type: 'decimal', precision: 18, scale: 2, options: ['default' => '0.00'])]
     private string $realizado;
+
+    #[ORM\Column(name: 'data_realizado', type: 'date', nullable: true)]
+    private ?\DateTimeInterface $dataRealizado = null;
 
     #[ORM\Column(name: 'dt_atualizacao', type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeInterface $dtAtualizacao;
@@ -57,6 +70,17 @@ class FPontos
     public function setIdIndicador(int $idIndicador): self
     {
         $this->idIndicador = $idIndicador;
+        return $this;
+    }
+
+    public function getIdFamilia(): ?int
+    {
+        return $this->idFamilia;
+    }
+
+    public function setIdFamilia(?int $idFamilia): self
+    {
+        $this->idFamilia = $idFamilia;
         return $this;
     }
 
@@ -90,6 +114,17 @@ class FPontos
     public function setRealizado(string $realizado): self
     {
         $this->realizado = $realizado;
+        return $this;
+    }
+
+    public function getDataRealizado(): ?\DateTimeInterface
+    {
+        return $this->dataRealizado;
+    }
+
+    public function setDataRealizado(?\DateTimeInterface $dataRealizado): self
+    {
+        $this->dataRealizado = $dataRealizado;
         return $this;
     }
 

@@ -21,9 +21,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllSegmentos(): array
     {
-        $sql = 'SELECT DISTINCT segmento_id AS id, segmento_label AS nome
-                FROM d_unidade
-                WHERE segmento_id IS NOT NULL AND segmento_label IS NOT NULL
+        $sql = 'SELECT DISTINCT id_segmento AS id, segmento AS nome
+                FROM d_estrutura
+                WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -31,9 +31,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllDiretorias(): array
     {
-        $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_label AS nome
-                FROM d_unidade 
-                WHERE diretoria_id IS NOT NULL AND diretoria_label IS NOT NULL
+        $sql = 'SELECT DISTINCT id_diretoria AS id, diretoria AS nome
+                FROM d_estrutura 
+                WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -41,9 +41,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllRegionais(): array
     {
-        $sql = 'SELECT DISTINCT regional_id AS id, regional_label AS nome
-                FROM d_unidade
-                WHERE regional_id IS NOT NULL AND regional_label IS NOT NULL
+        $sql = 'SELECT DISTINCT id_regional AS id, regional AS nome
+                FROM d_estrutura
+                WHERE id_regional IS NOT NULL AND regional IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -51,9 +51,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllAgencias(): array
     {
-        $sql = 'SELECT DISTINCT agencia_id AS id, agencia_label AS nome, porte
-                FROM d_unidade
-                WHERE agencia_id IS NOT NULL AND agencia_label IS NOT NULL
+        $sql = 'SELECT DISTINCT id_agencia AS id, agencia AS nome, porte
+                FROM d_estrutura
+                WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
                 ORDER BY nome';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -61,12 +61,13 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllGGestoes(): array
     {
-        $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS nome
-                FROM d_unidade
-                WHERE gerente_gestao_id IS NOT NULL 
-                    AND gerente_gestao_id != ''
-                    AND gerente_gestao IS NOT NULL
-                    AND gerente_gestao != ''
+        $sql = "SELECT DISTINCT funcional AS id, nome AS nome
+                FROM d_estrutura
+                WHERE cargo LIKE '%Gerente Gestão%'
+                    AND funcional IS NOT NULL 
+                    AND funcional != ''
+                    AND nome IS NOT NULL
+                    AND nome != ''
                 ORDER BY nome";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -74,12 +75,13 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAllGerentes(): array
     {
-        $sql = "SELECT DISTINCT gerente_id AS id, gerente AS nome
-                FROM d_unidade
-                WHERE gerente_id IS NOT NULL 
-                    AND gerente_id != ''
-                    AND gerente IS NOT NULL
-                    AND gerente != ''
+        $sql = "SELECT DISTINCT funcional AS id, nome AS nome
+                FROM d_estrutura
+                WHERE cargo LIKE '%Gerente%'
+                    AND funcional IS NOT NULL 
+                    AND funcional != ''
+                    AND nome IS NOT NULL
+                    AND nome != ''
                 ORDER BY nome";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -87,9 +89,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findSegmentosForFilter(): array
     {
-        $sql = 'SELECT DISTINCT segmento_id AS id, segmento AS label
-                FROM d_unidade
-                WHERE segmento_id IS NOT NULL AND segmento IS NOT NULL
+        $sql = 'SELECT DISTINCT id_segmento AS id, segmento AS label
+                FROM d_estrutura
+                WHERE id_segmento IS NOT NULL AND segmento IS NOT NULL
                 ORDER BY label';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -97,9 +99,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findDiretoriasForFilter(): array
     {
-        $sql = 'SELECT DISTINCT diretoria_id AS id, diretoria_regional AS label
-                FROM d_unidade
-                WHERE diretoria_id IS NOT NULL AND diretoria_regional IS NOT NULL
+        $sql = 'SELECT DISTINCT id_diretoria AS id, diretoria AS label
+                FROM d_estrutura
+                WHERE id_diretoria IS NOT NULL AND diretoria IS NOT NULL
                 ORDER BY label';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -107,9 +109,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findRegionaisForFilter(): array
     {
-        $sql = 'SELECT DISTINCT gerencia_regional_id AS id, gerencia_regional AS label
-                FROM d_unidade
-                WHERE gerencia_regional_id IS NOT NULL AND gerencia_regional IS NOT NULL
+        $sql = 'SELECT DISTINCT id_regional AS id, regional AS label
+                FROM d_estrutura
+                WHERE id_regional IS NOT NULL AND regional IS NOT NULL
                 ORDER BY label';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -117,9 +119,9 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findAgenciasForFilter(): array
     {
-        $sql = 'SELECT DISTINCT agencia_id AS id, agencia AS label, NULL AS porte
-                FROM d_unidade
-                WHERE agencia_id IS NOT NULL AND agencia IS NOT NULL
+        $sql = 'SELECT DISTINCT id_agencia AS id, agencia AS label, porte
+                FROM d_estrutura
+                WHERE id_agencia IS NOT NULL AND agencia IS NOT NULL
                 ORDER BY label';
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -127,9 +129,10 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findGGestoesForFilter(): array
     {
-        $sql = "SELECT DISTINCT gerente_gestao_id AS id, gerente_gestao AS label
-                FROM d_unidade
-                WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao IS NOT NULL
+        $sql = "SELECT DISTINCT funcional AS id, nome AS label
+                FROM d_estrutura
+                WHERE cargo LIKE '%Gerente Gestão%'
+                    AND funcional IS NOT NULL AND nome IS NOT NULL
                 ORDER BY label";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();
@@ -137,9 +140,10 @@ class EstruturaRepository implements RepositoryInterface
 
     public function findGerentesForFilter(): array
     {
-        $sql = "SELECT DISTINCT gerente_id AS id, gerente AS label
-                FROM d_unidade
-                WHERE gerente_id IS NOT NULL AND gerente IS NOT NULL
+        $sql = "SELECT DISTINCT funcional AS id, nome AS label
+                FROM d_estrutura
+                WHERE cargo LIKE '%Gerente%'
+                    AND funcional IS NOT NULL AND nome IS NOT NULL
                 ORDER BY label";
         
         return $this->connection->executeQuery($sql)->fetchAllAssociative();

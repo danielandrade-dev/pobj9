@@ -60,25 +60,25 @@ class MetaRepository implements RepositoryInterface
                     m.diretoria_id,
                     m.gerencia_regional_id,
                     m.agencia_id,
-                    COALESCE(u.segmento_label, '') AS segmento,
-                    COALESCE(u.diretoria_label, '') AS diretoria_nome,
-                    COALESCE(u.regional_label, '') AS gerencia_regional_nome,
-                    COALESCE(u.regional_label, '') AS regional_nome,
-                    COALESCE(u.agencia_label, '') AS agencia_nome,
-                    COALESCE(u.gerente_gestao_id, '') AS gerente_gestao_id,
-                    COALESCE(u.gerente_gestao, '') AS gerente_gestao_nome,
-                    COALESCE(u.gerente_id, '') AS gerente_id,
-                    COALESCE(u.gerente, '') AS gerente_nome,
+                    COALESCE(u.segmento, '') AS segmento,
+                    COALESCE(u.diretoria, '') AS diretoria_nome,
+                    COALESCE(u.regional, '') AS gerencia_regional_nome,
+                    COALESCE(u.regional, '') AS regional_nome,
+                    COALESCE(u.agencia, '') AS agencia_nome,
+                    COALESCE(u.funcional, '') AS gerente_gestao_id,
+                    COALESCE(u.nome, '') AS gerente_gestao_nome,
+                    COALESCE(u.funcional, '') AS gerente_id,
+                    COALESCE(u.nome, '') AS gerente_nome,
                     COALESCE(p.familia, '') AS familia_nome,
                     COALESCE(CAST(p.id_indicador AS CHAR), '') AS id_indicador,
                     COALESCE(p.indicador, '') AS ds_indicador,
                     COALESCE(p.subindicador, '') AS subproduto,
                     COALESCE(CAST(p.id_subindicador AS CHAR), '0') AS id_subindicador
                 FROM f_meta m
-                LEFT JOIN d_unidade u ON u.segmento_id = m.segmento_id
-                    AND u.diretoria_id = m.diretoria_id
-                    AND u.regional_id = m.gerencia_regional_id
-                    AND u.agencia_id = m.agencia_id
+                LEFT JOIN d_estrutura u ON u.id_segmento = m.segmento_id
+                    AND u.id_diretoria = m.diretoria_id
+                    AND u.id_regional = m.gerencia_regional_id
+                    AND u.id_agencia = m.agencia_id
                 LEFT JOIN d_produtos p ON p.id_indicador = m.id_indicador
                     AND (p.id_subindicador = m.id_subindicador OR (p.id_subindicador IS NULL AND m.id_subindicador IS NULL))
                 ORDER BY m.data_meta DESC, m.id";

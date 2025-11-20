@@ -25,84 +25,8 @@ try {
     // $pdo->exec("DELETE FROM d_calendario WHERE ano >= 2025");
     // echo "Dados limpos.\n\n";
 
-    // 2. Popular d_unidade (estrutura organizacional)
-    echo "Populando d_unidade...\n";
-    $unidades = [
-        // Segmento Empresas - Diretoria Empresas - Regional SP Sul/Oeste
-        ['segmento_id' => 1, 'segmento' => 'Empresas', 'segmento_label' => 'Empresas',
-         'diretoria_id' => 8607, 'diretoria' => 'Empresas', 'diretoria_label' => 'Empresas',
-         'regional_id' => 8486, 'regional' => 'SP Sul/Oeste', 'regional_label' => 'SP Sul/Oeste',
-         'agencia_id' => 1141, 'agencia' => 'Campo Limpo 1', 'agencia_label' => 'Campo Limpo 1',
-         'gerente_gestao' => 'Gerente Gestão SP Sul/Oeste', 'gerente_gestao_id' => 'GG8486',
-         'gerente' => 'Gerente Campo Limpo 1', 'gerente_id' => 'GE1141', 'porte' => 'Grande'],
-        
-        ['segmento_id' => 1, 'segmento' => 'Empresas', 'segmento_label' => 'Empresas',
-         'diretoria_id' => 8607, 'diretoria' => 'Empresas', 'diretoria_label' => 'Empresas',
-         'regional_id' => 8486, 'regional' => 'SP Sul/Oeste', 'regional_label' => 'SP Sul/Oeste',
-         'agencia_id' => 1267, 'agencia' => 'Faria Lima 2', 'agencia_label' => 'Faria Lima 2',
-         'gerente_gestao' => 'Gerente Gestão SP Sul/Oeste', 'gerente_gestao_id' => 'GG8486',
-         'gerente' => 'Gerente Faria Lima 2', 'gerente_id' => 'GE1267', 'porte' => 'Grande'],
-        
-        ['segmento_id' => 1, 'segmento' => 'Empresas', 'segmento_label' => 'Empresas',
-         'diretoria_id' => 8607, 'diretoria' => 'Empresas', 'diretoria_label' => 'Empresas',
-         'regional_id' => 8684, 'regional' => 'SP Sul e Oeste', 'regional_label' => 'SP Sul e Oeste',
-         'agencia_id' => 7378, 'agencia' => 'Faria Lima 1', 'agencia_label' => 'Faria Lima 1',
-         'gerente_gestao' => 'Marcos Peixoto', 'gerente_gestao_id' => 'GG8684',
-         'gerente' => 'Gerente 7378', 'gerente_id' => 'GE7378', 'porte' => 'Grande'],
-        
-        ['segmento_id' => 1, 'segmento' => 'Empresas', 'segmento_label' => 'Empresas',
-         'diretoria_id' => 8607, 'diretoria' => 'Empresas', 'diretoria_label' => 'Empresas',
-         'regional_id' => 8487, 'regional' => 'Nordeste', 'regional_label' => 'Nordeste',
-         'agencia_id' => 3336, 'agencia' => 'Salvador', 'agencia_label' => 'Salvador',
-         'gerente_gestao' => 'Rafael Carvalho', 'gerente_gestao_id' => 'GG8487',
-         'gerente' => 'Gerente 3336', 'gerente_id' => 'GE3336', 'porte' => 'Médio'],
-        
-        ['segmento_id' => 1, 'segmento' => 'Empresas', 'segmento_label' => 'Empresas',
-         'diretoria_id' => 8607, 'diretoria' => 'Empresas', 'diretoria_label' => 'Empresas',
-         'regional_id' => 8485, 'regional' => 'SUL', 'regional_label' => 'SUL',
-         'agencia_id' => 1697, 'agencia' => 'Itajaí - SC', 'agencia_label' => 'Itajaí - SC',
-         'gerente_gestao' => 'Aline Siqueira', 'gerente_gestao_id' => 'GG8485',
-         'gerente' => 'Gerente 1697', 'gerente_id' => 'GE1697', 'porte' => 'Médio'],
-    ];
-
-    $stmtUnidade = $pdo->prepare("
-        INSERT INTO d_unidade (
-            segmento_id, segmento, segmento_label,
-            diretoria_id, diretoria, diretoria_label,
-            regional_id, regional, regional_label,
-            agencia_id, agencia, agencia_label,
-            gerente_id, gerente,
-            gerente_gestao_id, gerente_gestao,
-            porte
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            segmento = VALUES(segmento),
-            segmento_label = VALUES(segmento_label),
-            diretoria = VALUES(diretoria),
-            diretoria_label = VALUES(diretoria_label),
-            regional = VALUES(regional),
-            regional_label = VALUES(regional_label),
-            agencia = VALUES(agencia),
-            agencia_label = VALUES(agencia_label),
-            gerente_id = VALUES(gerente_id),
-            gerente = VALUES(gerente),
-            gerente_gestao_id = VALUES(gerente_gestao_id),
-            gerente_gestao = VALUES(gerente_gestao),
-            porte = VALUES(porte)
-    ");
-
-    foreach ($unidades as $unidade) {
-        $stmtUnidade->execute([
-            $unidade['segmento_id'], $unidade['segmento'], $unidade['segmento_label'],
-            $unidade['diretoria_id'], $unidade['diretoria'], $unidade['diretoria_label'],
-            $unidade['regional_id'], $unidade['regional'], $unidade['regional_label'],
-            $unidade['agencia_id'], $unidade['agencia'], $unidade['agencia_label'],
-            $unidade['gerente_id'], $unidade['gerente'],
-            $unidade['gerente_gestao_id'], $unidade['gerente_gestao'],
-            $unidade['porte'] ?? null
-        ]);
-    }
-    echo "✓ d_unidade populada\n";
+    // 2. Popular d_unidade (estrutura organizacional) - REMOVIDO: agora usando d_estrutura
+    // A estrutura organizacional é populada na seção 5.5 abaixo (d_estrutura)
 
     // 3. Popular d_status_indicadores
     echo "Populando d_status_indicadores...\n";

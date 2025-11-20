@@ -9,15 +9,15 @@ $conn = $em->getConnection();
 
 echo "Populando dados vazios...\n";
 
-// 1. Atualizar d_unidade com gerentes e gerentes de gestão
-echo "Atualizando d_unidade com gerentes...\n";
+// 1. Atualizar d_estrutura com gerentes e gerentes de gestão
+echo "Atualizando d_estrutura com gerentes...\n";
 $conn->executeStatement("
-    UPDATE d_unidade 
-    SET gerente_gestao_id = CONCAT('GG', regional_id),
-        gerente_gestao = CONCAT('Gerente Gestão ', regional_label),
-        gerente_id = CONCAT('GE', agencia_id),
-        gerente = CONCAT('Gerente ', agencia_label)
-    WHERE gerente_gestao_id IS NULL OR gerente_gestao_id = ''
+    UPDATE d_estrutura 
+    SET cargo = CASE 
+        WHEN cargo IS NULL OR cargo = '' THEN CONCAT('Gerente Gestão ', regional)
+        ELSE cargo
+    END
+    WHERE id_regional IS NOT NULL
 ");
 
 // 2. Inserir dados em f_variavel baseado nos funcionais existentes
@@ -44,7 +44,7 @@ foreach ($funcionais as $index => $funcional) {
 }
 
 echo "Dados populados com sucesso!\n";
-echo "Total gerentes_gestao: " . $conn->executeQuery("SELECT COUNT(DISTINCT gerente_gestao_id) FROM d_unidade WHERE gerente_gestao_id IS NOT NULL AND gerente_gestao_id != ''")->fetchOne() . "\n";
-echo "Total gerentes: " . $conn->executeQuery("SELECT COUNT(DISTINCT gerente_id) FROM d_unidade WHERE gerente_id IS NOT NULL AND gerente_id != ''")->fetchOne() . "\n";
+echo "Total gerentes_gestao: " . $conn->executeQuery("SELECT COUNT(DISTINCT funcional) FROM d_estrutura WHERE cargo LIKE '%Gerente Gestão%' AND funcional IS NOT NULL AND funcional != ''")->fetchOne() . "\n";
+echo "Total gerentes: " . $conn->executeQuery("SELECT COUNT(DISTINCT funcional) FROM d_estrutura WHERE cargo LIKE '%Gerente%' AND funcional IS NOT NULL AND funcional != ''")->fetchOne() . "\n";
 echo "Total variavel: " . $conn->executeQuery("SELECT COUNT(*) FROM f_variavel")->fetchOne() . "\n";
 

@@ -24,21 +24,21 @@ class OmegaMesuRepository implements RepositoryInterface
     public function findAll(): array
     {
         $sql = "SELECT DISTINCT
-                    segmento_label AS segmento,
-                    segmento_id,
-                    diretoria_label AS diretoria,
-                    diretoria_id,
-                    regional_label AS gerencia_regional,
-                    regional_id AS gerencia_regional_id,
-                    agencia_label AS agencia,
-                    agencia_id,
-                    gerente_gestao,
-                    gerente_gestao_id,
-                    gerente,
-                    gerente_id
-                FROM d_unidade
+                    segmento AS segmento,
+                    id_segmento AS segmento_id,
+                    diretoria AS diretoria,
+                    id_diretoria AS diretoria_id,
+                    regional AS gerencia_regional,
+                    id_regional AS gerencia_regional_id,
+                    agencia AS agencia,
+                    id_agencia AS agencia_id,
+                    nome AS gerente_gestao,
+                    funcional AS gerente_gestao_id,
+                    nome AS gerente,
+                    funcional AS gerente_id
+                FROM d_estrutura
                 WHERE segmento IS NOT NULL
-                ORDER BY segmento_label, diretoria_label, regional_label, agencia_label";
+                ORDER BY segmento, diretoria, regional, agencia";
 
         $results = $this->connection->executeQuery($sql)->fetchAllAssociative();
         
